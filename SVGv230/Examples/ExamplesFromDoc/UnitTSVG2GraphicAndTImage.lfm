@@ -1,0 +1,18 @@
+object frmTSVG2GraphicAndTImage: TfrmTSVG2GraphicAndTImage
+  Left = 657
+  Height = 240
+  Top = 418
+  Width = 320
+  ClientHeight = 240
+  ClientWidth = 320
+  OnCreate = FormCreate
+  LCLVersion = '1.8.4.0'
+  object Image1: TImage
+    Left = 0
+    Height = 240
+    Top = 0
+    Width = 320
+    Align = alClient
+    Stretch = True
+  end
+end

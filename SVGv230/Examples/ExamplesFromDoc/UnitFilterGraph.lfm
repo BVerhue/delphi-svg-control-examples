@@ -1,0 +1,19 @@
+object frmFilterGraph: TfrmFilterGraph
+  Left = 787
+  Height = 273
+  Top = 429
+  Width = 632
+  ClientHeight = 273
+  ClientWidth = 632
+  OnCreate = FormCreate
+  LCLVersion = '1.8.4.0'
+  object SVG2Image1: TSVG2Image
+    Left = 0
+    Height = 273
+    Top = 0
+    Width = 632
+    Align = alClient
+    BufferQuality = bqHighQuality
+    AutoViewBox = True
+  end
+end

@@ -1,0 +1,31 @@
+object frmFindElementHard: TfrmFindElementHard
+  Left = 448
+  Height = 361
+  Top = 288
+  Width = 591
+  ClientHeight = 361
+  ClientWidth = 591
+  OnCreate = FormCreate
+  LCLVersion = '1.8.4.0'
+  object SVG2Image1: TSVG2Image
+    Left = 185
+    Height = 361
+    Top = 0
+    Width = 406
+    Align = alClient
+    BufferQuality = bqHighQuality
+    AutoViewBox = True
+    OnAfterParse = SVG2Image1AfterParse
+  end
+  object Memo1: TMemo
+    Left = 0
+    Height = 361
+    Top = 0
+    Width = 185
+    Align = alLeft
+    Lines.Strings = (
+      'Memo1'
+    )
+    TabOrder = 0
+  end
+end

@@ -1,0 +1,23 @@
+object frmDigitalClock: TfrmDigitalClock
+  Left = 715
+  Height = 240
+  Top = 287
+  Width = 320
+  ClientHeight = 240
+  ClientWidth = 320
+  LCLVersion = '1.8.4.0'
+  object SVG2Image1: TSVG2Image
+    Left = 0
+    Height = 240
+    Top = 0
+    Width = 320
+    Align = alClient
+    BufferQuality = bqHighQuality
+    AutoViewBox = True
+  end
+  object Timer1: TTimer
+    OnTimer = Timer1Timer
+    left = 16
+    top = 16
+  end
+end

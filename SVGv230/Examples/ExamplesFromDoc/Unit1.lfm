@@ -1,0 +1,139 @@
+object Form1: TForm1
+  Left = 152
+  Height = 387
+  Top = 259
+  Width = 320
+  ClientHeight = 387
+  ClientWidth = 320
+  LCLVersion = '1.8.4.0'
+  object Button1: TButton
+    Left = 0
+    Height = 25
+    Top = 0
+    Width = 320
+    Align = alTop
+    Caption = 'Simple filename assignment'
+    OnClick = Button1Click
+    TabOrder = 0
+  end
+  object Button2: TButton
+    Left = 0
+    Height = 25
+    Top = 25
+    Width = 320
+    Align = alTop
+    Caption = 'Digital clock'
+    OnClick = Button2Click
+    TabOrder = 1
+  end
+  object Button3: TButton
+    Left = 0
+    Height = 25
+    Top = 50
+    Width = 320
+    Align = alTop
+    Caption = 'Filters graph'
+    OnClick = Button3Click
+    TabOrder = 2
+  end
+  object Button4: TButton
+    Left = 0
+    Height = 25
+    Top = 75
+    Width = 320
+    Align = alTop
+    Caption = 'TSVG2Graphic and TImage'
+    OnClick = Button4Click
+    TabOrder = 3
+  end
+  object Button5: TButton
+    Left = 0
+    Height = 25
+    Top = 100
+    Width = 320
+    Align = alTop
+    Caption = 'Render SVG programmatically'
+    OnClick = Button5Click
+    TabOrder = 4
+  end
+  object Button6: TButton
+    Left = 0
+    Height = 25
+    Top = 125
+    Width = 320
+    Align = alTop
+    Caption = 'Find element (easy)'
+    OnClick = Button6Click
+    TabOrder = 5
+  end
+  object Button7: TButton
+    Left = 0
+    Height = 25
+    Top = 150
+    Width = 320
+    Align = alTop
+    Caption = 'Find element (hard)'
+    OnClick = Button7Click
+    TabOrder = 6
+  end
+  object Button8: TButton
+    Left = 0
+    Height = 25
+    Top = 175
+    Width = 320
+    Align = alTop
+    Caption = 'Change an attribute'
+    OnClick = Button8Click
+    TabOrder = 7
+  end
+  object Button9: TButton
+    Left = 0
+    Height = 25
+    Top = 200
+    Width = 320
+    Align = alTop
+    Caption = 'Setting style attributes'
+    OnClick = Button9Click
+    TabOrder = 8
+  end
+  object Button10: TButton
+    Left = 0
+    Height = 25
+    Top = 225
+    Width = 320
+    Align = alTop
+    Caption = 'Add and remove elements'
+    OnClick = Button10Click
+    TabOrder = 9
+  end
+  object Button11: TButton
+    Left = 0
+    Height = 25
+    Top = 250
+    Width = 320
+    Align = alTop
+    Caption = 'Find element under the mousepointer'
+    OnClick = Button11Click
+    TabOrder = 10
+  end
+  object Button12: TButton
+    Left = 0
+    Height = 25
+    Top = 275
+    Width = 320
+    Align = alTop
+    Caption = 'Using mouse events'
+    OnClick = Button12Click
+    TabOrder = 11
+  end
+  object Button13: TButton
+    Left = 0
+    Height = 25
+    Top = 300
+    Width = 320
+    Align = alTop
+    Caption = 'Loading files from internet'
+    OnClick = Button13Click
+    TabOrder = 12
+  end
+end

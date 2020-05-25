@@ -1,0 +1,20 @@
+object frmFindElementEasy: TfrmFindElementEasy
+  Left = 546
+  Height = 331
+  Top = 265
+  Width = 578
+  ClientHeight = 331
+  ClientWidth = 578
+  OnCreate = FormCreate
+  OnKeyDown = FormKeyDown
+  LCLVersion = '1.8.4.0'
+  object SVG2Image1: TSVG2Image
+    Left = 0
+    Height = 331
+    Top = 0
+    Width = 578
+    Align = alClient
+    BufferQuality = bqHighQuality
+    AutoViewBox = True
+  end
+end

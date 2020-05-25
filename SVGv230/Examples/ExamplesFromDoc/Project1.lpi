@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <ProjectOptions>
+    <Version Value="11"/>
+    <PathDelim Value="\"/>
+    <General>
+      <Flags>
+        <MainUnitHasUsesSectionForAllUnits Value="False"/>
+        <MainUnitHasCreateFormStatements Value="False"/>
+        <MainUnitHasTitleStatement Value="False"/>
+        <MainUnitHasScaledStatement Value="False"/>
+      </Flags>
+      <SessionStorage Value="InProjectDir"/>
+      <MainUnit Value="0"/>
+      <Title Value="Project1"/>
+      <UseAppBundle Value="False"/>
+      <ResourceType Value="res"/>
+      <Icon Value="0"/>
+    </General>
+    <BuildModes Count="1">
+      <Item1 Name="Default" Default="True"/>
+    </BuildModes>
+    <PublishOptions>
+      <Version Value="2"/>
+    </PublishOptions>
+    <RunParams>
+      <FormatVersion Value="2"/>
+      <Modes Count="1">
+        <Mode0 Name="default"/>
+      </Modes>
+    </RunParams>
+    <RequiredPackages Count="1">
+      <Item1>
+        <PackageName Value="LCL"/>
+      </Item1>
+    </RequiredPackages>
+    <Units Count="15">
+      <Unit0>
+        <Filename Value="Project1.dpr"/>
+        <IsPartOfProject Value="True"/>
+      </Unit0>
+      <Unit1>
+        <Filename Value="Unit1.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="Form1"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+      </Unit1>
+      <Unit2>
+        <Filename Value="UnitFilenameAssignment.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="frmFilenameAssignment"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+      </Unit2>
+      <Unit3>
+        <Filename Value="UnitDigitalClock.pas"/>
+        <IsPartOfProject Value="True"/>
+        <HasResources Value="True"/>
+      </Unit3>
+      <Unit4>
+        <Filename Value="UnitFilterGraph.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="frmFilterGraph"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+      </Unit4>
+      <Unit5>
+        <Filename Value="UnitTSVG2GraphicAndTImage.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="frmTSVG2GraphicAndTImage"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+      </Unit5>
+      <Unit6>
+        <Filename Value="UnitRenderProgrammatically.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="frmRenderProgrammatically"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+      </Unit6>
+      <Unit7>
+        <Filename Value="UnitFindElementEasy.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="frmFindElementEasy"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+      </Unit7>
+      <Unit8>
+        <Filename Value="UnitFindElementHard.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="frmFindElementHard"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+      </Unit8>
+      <Unit9>
+        <Filename Value="UnitChangeAttribute.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="frmChangeAttribute"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+      </Unit9>
+      <Unit10>
+        <Filename Value="UnitSettingStyleAttributes.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="frmSettingStyleAttributes"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+      </Unit10>
+      <Unit11>
+        <Filename Value="UnitAddRemoveElements.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="frmAddRemoveElements"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+      </Unit11>
+      <Unit12>
+        <Filename Value="UnitElementUnderMousepointer.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="frmElementUnderMousepointer"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+      </Unit12>
+      <Unit13>
+        <Filename Value="UnitMouseEvents.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="frmMouseEvents"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+      </Unit13>
+      <Unit14>
+        <Filename Value="UnitLoadingFilesFromInternet.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="frmLoadingFilesFromInternet"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+      </Unit14>
+    </Units>
+  </ProjectOptions>
+  <CompilerOptions>
+    <Version Value="11"/>
+    <PathDelim Value="\"/>
+    <SearchPaths>
+      <IncludeFiles Value="..\..\Common;..\..\Common\Fpc"/>
+      <OtherUnitFiles Value="..\..\Common;..\..\Common\Fpc;..\..\Common\Fpc\generics;..\..\Common\Platform"/>
+      <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
+    </SearchPaths>
+    <Parsing>
+      <SyntaxOptions>
+        <SyntaxMode Value="Delphi"/>
+      </SyntaxOptions>
+    </Parsing>
+    <Linking>
+      <Options>
+        <Win32>
+          <GraphicApplication Value="True"/>
+        </Win32>
+      </Options>
+    </Linking>
+  </CompilerOptions>
+  <Debugging>
+    <Exceptions Count="3">
+      <Item1>
+        <Name Value="EAbort"/>
+      </Item1>
+      <Item2>
+        <Name Value="ECodetoolError"/>
+      </Item2>
+      <Item3>
+        <Name Value="EFOpenError"/>
+      </Item3>
+    </Exceptions>
+  </Debugging>
+</CONFIG>
