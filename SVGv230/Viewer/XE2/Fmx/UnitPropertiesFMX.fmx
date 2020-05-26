@@ -1,0 +1,204 @@
+object frmProperties: TfrmProperties
+  Left = 0
+  Top = 0
+  Caption = 'Properties'
+  ClientHeight = 497
+  ClientWidth = 741
+  Visible = False
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
+  OnActivate = FormActivate
+  StyleLookup = 'backgroundstyle'
+  object Panel2: TPanel
+    Align = alTop
+    Width = 741.000000000000000000
+    Height = 30.000000000000000000
+    TabOrder = 0
+    object bParseSVG: TButton
+      Align = alLeft
+      Position.Point = '(4,4)'
+      Width = 80.000000000000000000
+      Height = 22.000000000000000000
+      Margins.Rect = '(0,0,10,0)'
+      Padding.Rect = '(4,4,4,4)'
+      OnClick = bParseSVGClick
+      TabOrder = 0
+      Text = 'Parse SVG'
+    end
+  end
+  object Label1: TLabel
+    Align = alTop
+    Position.Point = '(0,30)'
+    Width = 741.000000000000000000
+    Height = 21.000000000000000000
+    TabOrder = 1
+    Font.Style = [fsBold]
+    TextAlign = taCenter
+    Text = 'Label1'
+  end
+  object TabControl1: TTabControl
+    Align = alClient
+    Position.Point = '(0,51)'
+    Width = 741.000000000000000000
+    Height = 446.000000000000000000
+    TabOrder = 2
+    TabIndex = 0
+    TabHeight = 20.000000000000000000
+    object TabItem1: TTabItem
+      Width = 80.000000000000000000
+      Height = 20.000000000000000000
+      TabOrder = 0
+      Index = 0
+      Text = 'Structure'
+      WordWrap = False
+      object TreeView1: TTreeView
+        Align = alLeft
+        Width = 257.000000000000000000
+        Height = 426.000000000000000000
+        OnClick = TreeView1Click
+        TabOrder = 0
+      end
+      object Splitter1: TSplitter
+        Align = alLeft
+        Cursor = crHSplit
+        Position.Point = '(257,0)'
+        Width = 5.000000000000000000
+        Height = 426.000000000000000000
+        TabOrder = 1
+        MinSize = 20.000000000000000000
+      end
+      object Layout1: TLayout
+        Align = alClient
+        Position.Point = '(262,0)'
+        Width = 479.000000000000000000
+        Height = 426.000000000000000000
+        object Layout2: TLayout
+          Align = alBottom
+          Position.Point = '(0,305)'
+          Width = 479.000000000000000000
+          Height = 121.000000000000000000
+          object Panel1: TPanel
+            Align = alBottom
+            Position.Point = '(0,91)'
+            Width = 479.000000000000000000
+            Height = 30.000000000000000000
+            TabOrder = 0
+            object Change: TButton
+              Align = alLeft
+              Position.Point = '(4,4)'
+              Width = 80.000000000000000000
+              Height = 22.000000000000000000
+              Padding.Rect = '(4,4,4,4)'
+              OnClick = ChangeClick
+              TabOrder = 0
+              Text = 'Change'
+            end
+          end
+          object Memo2: TMemo
+            Align = alClient
+            Width = 479.000000000000000000
+            Height = 91.000000000000000000
+            TabOrder = 1
+            KeyboardType = vktDefault
+          end
+        end
+        object Splitter2: TSplitter
+          Align = alBottom
+          Cursor = crVSplit
+          Position.Point = '(0,300)'
+          Width = 479.000000000000000000
+          Height = 5.000000000000000000
+          TabOrder = 1
+          MinSize = 20.000000000000000000
+        end
+        object StringGrid1: TStringGrid
+          Align = alClient
+          Width = 479.000000000000000000
+          Height = 300.000000000000000000
+          OnClick = StringGrid1Click
+          StyleLookup = 'gridstyle'
+          TabOrder = 2
+          RowHeight = 21.000000000000000000
+          RowCount = 100
+          object StringColumn1: TStringColumn
+            Width = 100.000000000000000000
+            Height = 277.000000000000000000
+            TabOrder = 0
+          end
+          object StringColumn2: TStringColumn
+            Position.Point = '(100,0)'
+            Width = 100.000000000000000000
+            Height = 277.000000000000000000
+            TabOrder = 1
+          end
+        end
+      end
+    end
+    object TabItem2: TTabItem
+      Position.Point = '(80,0)'
+      Width = 80.000000000000000000
+      Height = 20.000000000000000000
+      TabOrder = 1
+      Index = 1
+      Text = 'Text'
+      WordWrap = False
+      object Memo1: TMemo
+        Align = alClient
+        Width = 741.000000000000000000
+        Height = 426.000000000000000000
+        TabOrder = 0
+        OnChange = Memo1Change
+        KeyboardType = vktDefault
+      end
+    end
+    object TabItem3: TTabItem
+      Position.Point = '(160,0)'
+      Width = 80.000000000000000000
+      Height = 20.000000000000000000
+      TabOrder = 2
+      Index = 2
+      Text = 'Parser'
+      WordWrap = False
+      object GroupBox1: TGroupBox
+        Align = alTop
+        Width = 741.000000000000000000
+        Height = 129.000000000000000000
+        TabOrder = 0
+        Text = 'Render options'
+        object cbFilters: TCheckBox
+          Position.Point = '(24,22)'
+          Width = 120.000000000000000000
+          Height = 19.000000000000000000
+          TabOrder = 0
+          Text = 'Filters'
+          OnChange = cbFiltersChange
+        end
+        object cbClipPaths: TCheckBox
+          Position.Point = '(24,54)'
+          Width = 120.000000000000000000
+          Height = 19.000000000000000000
+          TabOrder = 1
+          Text = 'Clippaths'
+          OnChange = cbClipPathsChange
+        end
+        object cbAutoViewbox: TCheckBox
+          Position.Point = '(24,86)'
+          Width = 120.000000000000000000
+          Height = 19.000000000000000000
+          TabOrder = 2
+          IsChecked = True
+          Text = 'Auto viewbox'
+          OnChange = cbAutoViewboxChange
+        end
+      end
+      object Memo3: TMemo
+        Align = alClient
+        Position.Point = '(0,129)'
+        Width = 741.000000000000000000
+        Height = 297.000000000000000000
+        TabOrder = 1
+        KeyboardType = vktDefault
+      end
+    end
+  end
+end
