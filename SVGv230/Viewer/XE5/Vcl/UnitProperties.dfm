@@ -239,8 +239,6 @@ object Form2: TForm2
           Align = alTop
           Caption = 'Events'
           TabOrder = 3
-          ExplicitLeft = 11
-          ExplicitTop = 99
         end
       end
       object Memo3: TMemo
@@ -251,8 +249,6 @@ object Form2: TForm2
         Align = alClient
         ScrollBars = ssBoth
         TabOrder = 1
-        ExplicitTop = 102
-        ExplicitHeight = 287
       end
     end
   end

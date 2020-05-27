@@ -1,4 +1,4 @@
-unit UnitProperties;
+unit Unit2;
 
 //------------------------------------------------------------------------------
 //
@@ -34,54 +34,50 @@ unit UnitProperties;
 //  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 //  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+
+{$mode objfpc}{$H+}
+
 interface
 
 uses
-  Winapi.Windows,
-  Winapi.Messages,
-  System.SysUtils,
-  System.Variants,
-  System.Classes,
-  System.Actions,
-  Xml.XMLIntf,
-  Vcl.Controls,
-  Vcl.Forms,
-  Vcl.StdCtrls,
-  Vcl.ExtCtrls,
-  Vcl.ComCtrls,
-  Vcl.PlatformDefaultStyleActnCtrls,
-  Vcl.ActnList,
-  Vcl.ActnMan,
-  Vcl.ToolWin,
-  Vcl.ActnCtrls,
+  Classes,
+  SysUtils,
+  Forms,
+  Controls,
+  Graphics,
+  Dialogs,
+  ComCtrls,
+  ActnList,
+  ExtCtrls,
+  StdCtrls,
+  BVE.SVG2Types,
+  BVE.SVG2SaxParser,
   BVE.ViewerCore.VCL;
 
 type
+
+  { TForm2 }
+
   TForm2 = class(TSVGViewerPropertiesForm)
-    Panel1: TPanel;
+    aParse: TAction;
+    ActionList1: TActionList;
+    cbAutoViewbox: TCheckBox;
+    cbClippaths: TCheckBox;
+    cbFilters: TCheckBox;
+    cbEvents: TCheckBox;
+    eWidth: TEdit;
+    eHeight: TEdit;
+    Label1: TLabel;
+    Label2: TLabel;
+    mInfo: TMemo;
+    mSVG: TMemo;
     PageControl1: TPageControl;
+    Panel1: TPanel;
+    Panel2: TPanel;
     TabSheet1: TTabSheet;
     TabSheet2: TTabSheet;
-    TreeView1: TTreeView;
-    Splitter1: TSplitter;
-    Memo1: TMemo;
-    ActionManager1: TActionManager;
-    Memo2: TMemo;
-    Panel3: TPanel;
-    Splitter2: TSplitter;
-    ListView1: TListView;
-    ActionToolBar1: TActionToolBar;
-    ActionToolBar2: TActionToolBar;
-    Panel4: TPanel;
-    aParseSVG: TAction;
-    aAttributeChange: TAction;
-    TabSheet3: TTabSheet;
-    GroupBox1: TGroupBox;
-    cbFilters: TCheckBox;
-    cbClippaths: TCheckBox;
-    Memo3: TMemo;
-    cbAutoViewbox: TCheckBox;
-    cbEvents: TCheckBox;
+    ToolBar1: TToolBar;
+    ToolButton1: TToolButton;
     procedure FormCreate(Sender: TObject);
   end;
 
@@ -90,9 +86,9 @@ var
 
 implementation
 uses
-  UnitViewer;
+  Unit1;
 
-{$R *.dfm}
+{$R *.lfm}
 
 { TForm2 }
 
@@ -101,18 +97,18 @@ begin
   Form1.FormProperties := Self;
 
   ConnectControls(
-    aAttributeChange,
-    Memo2,
-    Listview1,
-    Treeview1,
-    aParseSVG,
-    Memo3,
-    Memo1,
-    Panel1,
+    eWidth,
+    eHeight,
+    aParse,
+    mInfo,
+    mSVG,
+    Panel2,
     cbFilters,
     cbAutoViewbox,
     cbEvents,
     cbClippaths);
 end;
 
+
 end.
+

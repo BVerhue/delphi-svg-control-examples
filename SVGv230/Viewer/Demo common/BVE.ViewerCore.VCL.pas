@@ -81,6 +81,7 @@ uses
   Vcl.Themes,
   Vcl.Dialogs,
 {$ELSE}
+  Windows,
   Types,
   Classes,
   SysUtils,
@@ -92,6 +93,7 @@ uses
   Generics.Collections,
   ExtCtrls,
   ComCtrls,
+  ActnList,
   Dialogs,
   ExtDlgs,
   LclType,
@@ -223,11 +225,11 @@ type
     procedure MouseUp(Button: TMouseButton; Shift: TShiftState;
       X, Y: integer); override;
     procedure Resize; override;
-{$IFDEF Ver310Up}
+    {$IFDEF Ver310Up}
     procedure ChangeScale(M, D: Integer; isDpiChange: Boolean); override;
-{$ELSE}
+    {$ELSE}
     procedure ChangeScale(M, D: Integer); override;
-{$ENDIF}
+    {$ENDIF}
   public
     constructor Create(AOwner: TComponent; aSelectionList: TSVGSelectionList); reintroduce; virtual;
     destructor Destroy; override;
@@ -347,13 +349,13 @@ type
     procedure ImageListTheme(aImageList: TSVG2ImageList);
 
     procedure AfterParse(Sender: TObject);
-{$IFDEF Ver290Down}
+    {$IFDEF Ver290Down}
     // Although you can have application build with XE8 and lower to
     // respond to monitor dpi changes, see here:
     // https://www.helpandmanual.com/downloads_delphi.html
     // It doesn't seem to work on application startup.
     procedure WMDpiChanged(var Message: TMessage); message WM_DPICHANGED;
-{$ENDIF}
+    {$ENDIF}
     procedure BeforeMonitorDpiChanged(Sender: TObject; OldDPI,
       NewDPI: Integer);
     procedure SVGEvent(Sender: TObject; aSVGRoot: ISVGRoot; aEvent: ISVGEvent;
@@ -362,12 +364,12 @@ type
       Shift: TShiftState; X, Y: Integer);
     procedure SVGSelectMouseUp(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
-{$IFnDEF FPC}
+    {$IFnDEF FPC}
     procedure WMDROPFILES(var Msg: TWMDropFiles); message WM_DROPFILES;
-{$ELSE}
-    procedure OnDropFiles(Sender: TObject; const FileNames: array of String);
-{$ENDIF}
     procedure WMClipboardUpdate(var Msg: TMessage); message WM_CLIPBOARDUPDATE;
+    {$ELSE}
+    procedure OnDropFiles(Sender: TObject; const FileNames: array of String);
+    {$ENDIF}
     procedure SetFormAbout(const Value: TSVGViewerAboutForm);
   public
     procedure SeActionEnableFilters(const Value: TAction);
@@ -475,10 +477,7 @@ type
   private
     FTextChanged: Boolean;
     FSelectControl: TSVGSelectControl;
-    FDoc: ISVGDoc;
     FActionParse: TAction;
-    FActionAttrChange: TAction;
-    FMemoAttrValue: TMemo;
     FMemoInfo: TMemo;
     FMemoSVG: TMemo;
     FPanelInfo: TPanel;
@@ -486,14 +485,18 @@ type
     FCheckboxAutoViewbox: TCheckBox;
     FCheckboxEvents: TCheckbox;
     FCheckboxClippaths: TCheckbox;
+    {$IFnDEF FPC}
+    FActionAttrChange: TAction;
+    FDoc: ISVGDoc;
     FListView: TListView;
     FTreeView: TTreeView;
+    FMemoAttrValue: TMemo;
+    {$ELSE}
+    FEditWidth: TEdit;
+    FEditHeight: TEdit;
+    {$ENDIF}
   protected
-    procedure SetActionAttrChange(const Value: TAction);
     procedure SetActionParse(const Value: TAction);
-    procedure SetMemoAttrValue(const Value: TMemo);
-    procedure SetListView(const Value: TListView);
-    procedure SetTreeView(const Value: TTreeView);
     procedure SetMemoInfo(const Value: TMemo);
     procedure SetMemoSVG(const Value: TMemo);
     procedure SetPanelInfo(const Value: TPanel);
@@ -502,25 +505,41 @@ type
     procedure SetCheckboxEvents(const Value: TCheckbox);
     procedure SetCheckboxFilters(const Value: TCheckbox);
     procedure SetSelectControl(const Value: TSVGSelectControl);
+    {$IFnDEF FPC}
+    procedure SetActionAttrChange(const Value: TAction);
+    procedure SetMemoAttrValue(const Value: TMemo);
+    procedure SetListView(const Value: TListView);
+    procedure SetTreeView(const Value: TTreeView);
+    {$ELSE}
+    procedure SetEditWidth(const Value: TEdit);
+    procedure SetEditHeight(const Value: TEdit);
+    {$ENDIF}
 
     procedure DoShow; override;
 
     procedure ActionParseExecute(Sender: TObject);
-    procedure ActionAttrChangeExecute(Sender: TObject);
     procedure CheckboxAutoViewboxClick(Sender: TObject);
     procedure CheckboxClippathsClick(Sender: TObject);
     procedure CheckboxFiltersClick(Sender: TObject);
     procedure CheckboxEventsClick(Sender: TObject);
+    {$IFnDEF FPC}
+    procedure ActionAttrChangeExecute(Sender: TObject);
     procedure ListViewClick(Sender: TObject);
-    procedure MemoSVGChange(Sender: TObject);
-    procedure MemoSVGExit(Sender: TObject);
     procedure TreeViewClick(Sender: TObject);
     procedure TreeViewExpanding(Sender: TObject; Node: TTreeNode; var AllowExpansion: Boolean);
+    {$ELSE}
+    procedure EditWidthExit(Sender: TObject);
+    procedure EditHeightExit(Sender: TObject);
+    {$ENDIF}
+    procedure MemoSVGChange(Sender: TObject);
+    procedure MemoSVGExit(Sender: TObject);
 
     procedure UpdateAll;
     procedure UpdateCaption;
     procedure UpdateText;
+    {$IFnDEF FPC}
     procedure UpdateTreeView;
+    {$ENDIF}
     procedure UpdateOptions;
     procedure ApplyText;
   public
@@ -528,35 +547,47 @@ type
     destructor Destroy; override;
 
     procedure ConnectControls(
+      {$IFnDEF FPC}
       aActionAttrChange: TAction;
-      aActionParse: TAction;
       aMemoAttrValue: TMemo;
+      aListView: TListView;
+      aTreeView: TTreeView;
+      {$ELSE}
+      aEditWidth: TEdit;
+      aEditHeight: TEdit;
+      {$ENDIF}
+      aActionParse: TAction;
       aMemoInfo: TMemo;
       aMemoSVG: TMemo;
       aPanelInfo: TPanel;
       aCheckboxFilters: TCheckbox;
       aCheckboxAutoViewbox: TCheckBox;
       aCheckboxEvents: TCheckbox;
-      aCheckboxClippaths: TCheckbox;
-      aListView: TListView;
-      aTreeView: TTreeView);
+      aCheckboxClippaths: TCheckbox);
 
     procedure Parse;
+    {$IFnDEF FPC}
     procedure AttrChange;
+    {$ENDIF}
 
     property ActionParse: TAction read FActionParse write SetActionParse;
-    property ActionAttrChange: TAction read FActionAttrChange write SetActionAttrChange;
     property CheckboxAutoViewbox: TCheckBox read FCheckboxAutoViewbox write SetCheckboxAutoViewbox;
     property CheckboxFilters: TCheckbox read FCheckboxFilters write SetCheckboxFilters;
     property CheckboxClippaths: TCheckbox read FCheckboxClippaths write SetCheckboxClippaths;
     property CheckboxEvents: TCheckbox read FCheckboxEvents write SetCheckboxEvents;
-    property MemoAttrValue: TMemo read FMemoAttrValue write SetMemoAttrValue;
     property MemoInfo: TMemo read FMemoInfo write SetMemoInfo;
     property MemoSVG: TMemo read FMemoSVG write SetMemoSVG;
     property PanelInfo: TPanel read FPanelInfo write SetPanelInfo;
     property SelectControl: TSVGSelectControl read FSelectControl write SetSelectControl;
+    {$IFnDEF FPC}
+    property ActionAttrChange: TAction read FActionAttrChange write SetActionAttrChange;
+    property MemoAttrValue: TMemo read FMemoAttrValue write SetMemoAttrValue;
     property TreeView: TTreeView read FTreeView write SetTreeView;
     property ListView: TListView read FListView write SetListView;
+    {$ELSE}
+    property EditWidth: TEdit read FEditWidth write SetEditWidth;
+    property EditHeight: TEdit read FEditHeight write SetEditHeight;
+    {$ENDIF}
   end;
 
   TSVGViewerAboutForm = class(TForm)
@@ -574,11 +605,13 @@ type
 
 implementation
 uses
+  {$IFnDEF FPC}
+  BVE.SVG2Doc,
+  BVE.XMLTreeView.VCL,
+  {$ENDIF}
   BVE.SVG2FilterUtility,
   BVE.SVG2SaxParser,
-  BVE.SVG2Elements,
-  BVE.SVG2Doc,
-  BVE.XMLTreeView.VCL;
+  BVE.SVG2Elements;
 
 //------------------------------------------------------------------------------
 //
@@ -1723,30 +1756,34 @@ end;
 procedure TSVGViewerForm.DoCreate;
 begin
   Application.OnHint := Hint;
+  {$IFnDef FPC}
   AddClipboardFormatListener(Handle);
+  {$ENDIF}
 
   inherited;
 
-{$IFDEF Ver300Up}
+  {$IFDEF Ver300Up}
   OnBeforeMonitorDPIChanged := BeforeMonitorDpiChanged;
-{$ENDIF}
+  {$ENDIF}
 
-{$IFnDEF FPC}
+  {$IFnDEF FPC}
   DragAcceptFiles(Handle, True);
-{$ELSE}
+  {$ELSE}
   Application.AddOnDropFilesHandler(OnDropFiles);
-{$ENDIF}
+  {$ENDIF}
 end;
 
 procedure TSVGViewerForm.DoDestroy;
 begin
-{$IFDEF FPC}
+  {$IFDEF FPC}
   Application.RemoveOnDropFilesHandler(OnDropFiles);
-{$ENDIF}
+  {$ENDIF}
 
   inherited;
 
+  {$IFnDEF FPC}
   RemoveClipboardFormatListener(Handle);
+  {$ENDIF}
 end;
 
 procedure TSVGViewerForm.DoShow;
@@ -1827,14 +1864,14 @@ end;
 procedure TSVGViewerForm.ImageListScale(aImageList: TSVG2ImageList; M,
   D: Integer);
 begin
-{$IFnDEF FPC}
+  {$IFnDEF FPC}
   aImageList.ChangeScale(M,D);
-{$ENDIF}
+  {$ENDIF}
 end;
 
 procedure TSVGViewerForm.ImageListTheme(aImageList: TSVG2ImageList);
 begin
-{$IFnDEF FPC}
+  {$IFnDEF FPC}
   if not StyleServices.Enabled then
   begin
     aImageList.BeginUpdate;
@@ -1853,14 +1890,14 @@ begin
       aImageList.EndUpdate
     end;
   end;
-{$ELSE}
+  {$ELSE}
   aImageList.BeginUpdate;
   try
     aImageList.ClearColor := clNone;
   finally
     aImageList.EndUpdate
   end;
-{$ENDIF}
+  {$ENDIF}
 end;
 
 procedure TSVGViewerForm.KeyDown(var Key: Word; Shift: TShiftState);
@@ -1938,9 +1975,9 @@ var
   RenderContext: ISVGRenderContext;
   R: TRect;
   SaveMatrix: TSVGMatrix;
-{$IFDEF FPC}
+  {$IFDEF FPC}
   IntfBitmap: ISVGIntfBitmap;
-{$ENDIF}
+  {$ENDIF}
 begin
   Result := nil;
 
@@ -1960,13 +1997,13 @@ begin
   if (R.Width = 0) or (R.Height = 0) then
     Exit;
 
-{$IFDEF FPC}
+  {$IFDEF FPC}
   IntfBitmap := SVGCreateIntfBitmap(R.Width, R.Height);
   RenderContext := TSVGRenderContextManager.CreateRenderContextBitmap(IntfBitmap);
-{$ELSE}
+  {$ELSE}
   Result := TSVGRenderContextManager.CreateCompatibleBitmap(R.Width, R.Height, False);
   RenderContext := TSVGRenderContextManager.CreateRenderContextBitmap(Result);
-{$ENDIF}
+  {$ENDIF}
 
   RenderContext.BeginScene;
   try
@@ -2000,9 +2037,9 @@ begin
      RenderContext.EndScene;
    end;
 
-{$IFDEF FPC}
+  {$IFDEF FPC}
   Result := IntfBitmap.CreateBitmap;
-{$ENDIF}
+  {$ENDIF}
 end;
 
 procedure TSVGViewerForm.ScrollBoxMouseUp(Sender: TObject; Button: TMouseButton;
@@ -2133,15 +2170,15 @@ begin
 
   if assigned(FImageList) then
   begin
-{$IFDEF Ver310Up}
+    {$IFDEF Ver310Up}
     // Berlin
     ImageListScale(FImageList, Monitor.PixelsPerInch, GetDesignDPI);
-{$ELSE}
-{$IFDEF Ver300Down}
+    {$ELSE}
+    {$IFDEF Ver300Down}
     // Seattle
     ImageListScale(FImageList, PixelsPerInch, 96);
-{$ENDIF}
-{$ENDIF}
+    {$ENDIF}
+    {$ENDIF}
     ImageListTheme(FImageList);
   end;
 end;
@@ -2243,10 +2280,12 @@ end;
 //
 // -----------------------------------------------------------------------------
 
+{$IFnDEF FPC}
 procedure TSVGViewerPropertiesForm.ActionAttrChangeExecute(Sender: TObject);
 begin
   AttrChange;
 end;
+{$ENDIF}
 
 procedure TSVGViewerPropertiesForm.ActionParseExecute(Sender: TObject);
 begin
@@ -2257,18 +2296,22 @@ procedure TSVGViewerPropertiesForm.ApplyText;
 begin
   if assigned(FSelectControl) then
   begin
+    {$IFnDEF FPC}
     FDoc.XML := MemoSVG.Lines;
+    {$ENDIF}
     FSelectControl.SVG := MemoSVG.Lines;
     UpdateAll;
   end;
 end;
 
+{$IFnDEF FPC}
 procedure TSVGViewerPropertiesForm.AttrChange;
 begin
   AttributeValueApply(TreeView, ListView, MemoAttrValue.Lines);
   MemoSVG.Lines.Assign(FDoc.XML);
   FSelectControl.SVG := FDoc.XML;
 end;
+{$ENDIF}
 
 procedure TSVGViewerPropertiesForm.CheckboxAutoViewboxClick(Sender: TObject);
 begin
@@ -2315,15 +2358,67 @@ begin
   end;
 end;
 
-procedure TSVGViewerPropertiesForm.ConnectControls(aActionAttrChange,
-  aActionParse: TAction; aMemoAttrValue, aMemoInfo, aMemoSVG: TMemo;
-  aPanelInfo: TPanel; aCheckboxFilters, aCheckboxAutoViewbox,
-  aCheckboxEvents, aCheckboxClippaths: TCheckbox; aListView: TListView;
-  aTreeView: TTreeView);
+{$IFDEF FPC}
+procedure TSVGViewerPropertiesForm.EditWidthExit(Sender: TObject);
+var
+  W: integer;
 begin
+  if not assigned(FSelectControl) then
+    Exit;
+
+  if TryStrToInt(FEditWidth.Text, W) then
+  begin
+    W := W + FSelectControl.Padding.Top + FSelectControl.Padding.Bottom;
+    FSelectControl.Width := W;
+  end;
+end;
+{$ENDIF}
+
+{$IFDEF FPC}
+procedure TSVGViewerPropertiesForm.EditHeightExit(Sender: TObject);
+var
+  H: integer;
+begin
+  if not assigned(FSelectControl) then
+    Exit;
+
+  if TryStrToInt(FEditHeight.Text, H) then
+  begin
+    H := H + FSelectControl.Padding.Left + FSelectControl.Padding.Right;
+    FSelectControl.Height := H;
+  end;
+end;
+{$ENDIF}
+
+procedure TSVGViewerPropertiesForm.ConnectControls(
+  {$IFnDEF FPC}
+  aActionAttrChange: TAction;
+  aMemoAttrValue: TMemo;
+  aListView: TListView;
+  aTreeView: TTreeView;
+  {$ELSE}
+  aEditWidth: TEdit;
+  aEditHeight: TEdit;
+  {$ENDIF}
+  aActionParse: TAction;
+  aMemoInfo,
+  aMemoSVG: TMemo;
+  aPanelInfo: TPanel;
+  aCheckboxFilters,
+  aCheckboxAutoViewbox,
+  aCheckboxEvents,
+  aCheckboxClippaths: TCheckbox);
+begin
+  {$IFnDEF FPC}
   ActionAttrChange := aActionAttrChange;
-  ActionParse := aActionParse;
   MemoAttrValue := aMemoAttrValue;
+  ListView := aListView;
+  TreeView := aTreeView;
+  {$ELSE}
+  EditWidth := aEditWidth;
+  EditHeight := aEditHeight;
+  {$ENDIF}
+  ActionParse := aActionParse;
   MemoInfo := aMemoInfo;
   MemoSVG := aMemoSVG;
   PanelInfo := aPanelInfo;
@@ -2331,15 +2426,15 @@ begin
   CheckboxAutoViewbox := aCheckboxAutoViewbox;
   CheckboxEvents := aCheckboxEvents;
   CheckboxClippaths := aCheckboxClippaths;
-  ListView := aListView;
-  TreeView := aTreeView;
 end;
 
 constructor TSVGViewerPropertiesForm.Create(AOwnder: TComponent);
 begin
   inherited;
 
+  {$IFnDEF FPC}
   FDoc := TSVG2Doc.Create(self);
+  {$ENDIF}
 end;
 
 destructor TSVGViewerPropertiesForm.Destroy;
@@ -2355,10 +2450,12 @@ begin
     UpdateAll;
 end;
 
+{$IFnDEF FPC}
 procedure TSVGViewerPropertiesForm.ListViewClick(Sender: TObject);
 begin
   AttributeValueUpdate(ListView, MemoAttrValue.Lines);
 end;
+{$ENDIF}
 
 procedure TSVGViewerPropertiesForm.MemoSVGChange(Sender: TObject);
 begin
@@ -2397,12 +2494,14 @@ begin
   end;
 end;
 
+{$IFnDEF FPC}
 procedure TSVGViewerPropertiesForm.SetActionAttrChange(const Value: TAction);
 begin
   FActionAttrChange := Value;
   if assigned(FActionAttrChange) then
     FActionAttrChange.OnExecute := ActionAttrChangeExecute;
 end;
+{$ENDIF}
 
 procedure TSVGViewerPropertiesForm.SetActionParse(const Value: TAction);
 begin
@@ -2440,17 +2539,39 @@ begin
     FCheckboxFilters.OnClick := CheckboxFiltersClick;
 end;
 
+{$IFDEF FPC}
+procedure TSVGViewerPropertiesForm.SetEditWidth(const Value: TEdit);
+begin
+  FEditWidth := Value;
+  if assigned(FEditWidth) then
+    FEditWidth.OnExit := EditWidthExit;
+end;
+{$ENDIF}
+
+{$IFDEF FPC}
+procedure TSVGViewerPropertiesForm.SetEditHeight(const Value: TEdit);
+begin
+  FEditHeight := Value;
+  if assigned(FEditHeight) then
+    FEditHeight.OnExit := EditHeightExit;
+end;
+{$ENDIF}
+
+{$IFnDEF FPC}
 procedure TSVGViewerPropertiesForm.SetListView(const Value: TListView);
 begin
   FListView := Value;
   if assigned(FListView) then
     FListView.OnClick := ListViewClick;
 end;
+{$ENDIF}
 
+{$IFnDEF FPC}
 procedure TSVGViewerPropertiesForm.SetMemoAttrValue(const Value: TMemo);
 begin
   FMemoAttrValue := Value;
 end;
+{$ENDIF}
 
 procedure TSVGViewerPropertiesForm.SetMemoInfo(const Value: TMemo);
 begin
@@ -2484,6 +2605,7 @@ begin
   end;
 end;
 
+{$IFnDEF FPC}
 procedure TSVGViewerPropertiesForm.SetTreeView(const Value: TTreeView);
 begin
   FTreeView := Value;
@@ -2493,24 +2615,31 @@ begin
     FTreeView.OnExpanding := TreeViewExpanding;
   end;
 end;
+{$ENDIF}
 
+{$IFnDEF FPC}
 procedure TSVGViewerPropertiesForm.TreeViewClick(Sender: TObject);
 begin
   AttributeListUpdate(TreeView, ListView, MemoAttrValue.Lines);
 end;
+{$ENDIF}
 
+{$IFnDEF FPC}
 procedure TSVGViewerPropertiesForm.TreeViewExpanding(Sender: TObject;
   Node: TTreeNode; var AllowExpansion: Boolean);
 begin
   TreeViewExpand(TreeView, Node);
 end;
+{$ENDIF}
 
 procedure TSVGViewerPropertiesForm.UpdateAll;
 begin
   UpdateCaption;
   UpdateText;
   UpdateOptions;
+  {$IFnDEF FPC}
   UpdateTreeView;
+  {$ENDIF}
 end;
 
 procedure TSVGViewerPropertiesForm.UpdateCaption;
@@ -2546,6 +2675,7 @@ begin
   FTextChanged := False;
 end;
 
+{$IFnDEF FPC}
 procedure TSVGViewerPropertiesForm.UpdateTreeView;
 begin
   if assigned(FSelectControl) then
@@ -2564,6 +2694,7 @@ begin
   end else
     TreeViewUpdate(TreeView, nil);
 end;
+{$ENDIF}
 
 // -----------------------------------------------------------------------------
 //

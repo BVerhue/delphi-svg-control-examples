@@ -1,4 +1,4 @@
-unit UnitProperties;
+unit Unit3;
 
 //------------------------------------------------------------------------------
 //
@@ -34,85 +34,63 @@ unit UnitProperties;
 //  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 //  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+{$mode objfpc}{$H+}
+
 interface
 
 uses
-  Winapi.Windows,
-  Winapi.Messages,
-  System.SysUtils,
-  System.Variants,
-  System.Classes,
-  System.Actions,
-  Xml.XMLIntf,
-  Vcl.Controls,
-  Vcl.Forms,
-  Vcl.StdCtrls,
-  Vcl.ExtCtrls,
-  Vcl.ComCtrls,
-  Vcl.PlatformDefaultStyleActnCtrls,
-  Vcl.ActnList,
-  Vcl.ActnMan,
-  Vcl.ToolWin,
-  Vcl.ActnCtrls,
+  Classes,
+  SysUtils,
+  Forms,
+  Controls,
+  Graphics,
+  Dialogs,
+  ExtCtrls,
+  StdCtrls,
+  LCLIntf,
+  BVE.SVG2Types,
+  BVE.SVG2Intf,
+  BVE.SVG2Image.FPC,
   BVE.ViewerCore.VCL;
 
 type
-  TForm2 = class(TSVGViewerPropertiesForm)
+
+  { TForm3 }
+
+  TForm3 = class(TSVGViewerAboutForm)
+    Button1: TButton;
     Panel1: TPanel;
-    PageControl1: TPageControl;
-    TabSheet1: TTabSheet;
-    TabSheet2: TTabSheet;
-    TreeView1: TTreeView;
-    Splitter1: TSplitter;
-    Memo1: TMemo;
-    ActionManager1: TActionManager;
-    Memo2: TMemo;
-    Panel3: TPanel;
-    Splitter2: TSplitter;
-    ListView1: TListView;
-    ActionToolBar1: TActionToolBar;
-    ActionToolBar2: TActionToolBar;
-    Panel4: TPanel;
-    aParseSVG: TAction;
-    aAttributeChange: TAction;
-    TabSheet3: TTabSheet;
-    GroupBox1: TGroupBox;
-    cbFilters: TCheckBox;
-    cbClippaths: TCheckBox;
-    Memo3: TMemo;
-    cbAutoViewbox: TCheckBox;
-    cbEvents: TCheckBox;
+    SVG2Image1: TSVG2Image;
+    procedure Button1Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
+  private
+
+  public
+
   end;
 
 var
-  Form2: TForm2;
+  Form3: TForm3;
 
 implementation
 uses
-  UnitViewer;
+  Unit1;
 
-{$R *.dfm}
+{$R *.lfm}
 
-{ TForm2 }
+{ TForm3 }
 
-procedure TForm2.FormCreate(Sender: TObject);
+procedure TForm3.Button1Click(Sender: TObject);
 begin
-  Form1.FormProperties := Self;
+  Close;
+end;
 
-  ConnectControls(
-    aAttributeChange,
-    Memo2,
-    Listview1,
-    Treeview1,
-    aParseSVG,
-    Memo3,
-    Memo1,
-    Panel1,
-    cbFilters,
-    cbAutoViewbox,
-    cbEvents,
-    cbClippaths);
+procedure TForm3.FormCreate(Sender: TObject);
+begin
+  Form1.FormAbout := Self;
+
+  ConnectControls(SVG2Image1);
 end;
 
 end.
+
