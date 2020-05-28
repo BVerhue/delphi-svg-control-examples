@@ -1,0 +1,276 @@
+object frmProperties: TfrmProperties
+  Left = 0
+  Top = 0
+  Caption = 'Properties'
+  ClientHeight = 481
+  ClientWidth = 721
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop, iPhone, iPad]
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
+  OnShow = FormShow
+  DesignerMasterStyle = 0
+  object Panel2: TPanel
+    Align = Top
+    Size.Width = 721.000000000000000000
+    Size.Height = 30.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 0
+    object Button1: TButton
+      Action = aParseSVG
+      Align = Left
+      Enabled = True
+      Margins.Left = 4.000000000000000000
+      Margins.Top = 4.000000000000000000
+      Margins.Right = 4.000000000000000000
+      Margins.Bottom = 4.000000000000000000
+      Position.X = 4.000000000000000000
+      Position.Y = 4.000000000000000000
+      Size.Width = 80.000000000000000000
+      Size.Height = 22.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 0
+      Visible = True
+    end
+  end
+  object Label1: TLabel
+    Align = Top
+    StyledSettings = [Family, Size, FontColor]
+    Position.Y = 30.000000000000000000
+    Size.Width = 721.000000000000000000
+    Size.Height = 17.000000000000000000
+    Size.PlatformDefault = False
+    TextSettings.Font.Style = [fsBold]
+    TextSettings.HorzAlign = Center
+    Text = 'Label1'
+  end
+  object TabControl1: TTabControl
+    Align = Client
+    Size.Width = 721.000000000000000000
+    Size.Height = 434.000000000000000000
+    Size.PlatformDefault = False
+    TabIndex = 0
+    TabOrder = 2
+    TabPosition = Top
+    object TabItem1: TTabItem
+      CustomIcon = <
+        item
+        end>
+      IsSelected = True
+      Size.Width = 68.000000000000000000
+      Size.Height = 24.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 0
+      Text = 'Structure'
+      object TreeView1: TTreeView
+        Align = Left
+        Size.Width = 337.000000000000000000
+        Size.Height = 410.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 0
+        OnClick = TreeView1Click
+      end
+      object Splitter1: TSplitter
+        Align = Left
+        Cursor = crHSplit
+        MinSize = 20.000000000000000000
+        Position.X = 337.000000000000000000
+        Size.Width = 4.000000000000000000
+        Size.Height = 410.000000000000000000
+        Size.PlatformDefault = False
+      end
+      object Layout1: TLayout
+        Align = Client
+        Size.Width = 380.000000000000000000
+        Size.Height = 410.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 2
+        object Memo2: TMemo
+          Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
+          Align = Bottom
+          Position.Y = 282.000000000000000000
+          Size.Width = 380.000000000000000000
+          Size.Height = 98.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 0
+        end
+        object Panel1: TPanel
+          Align = Bottom
+          Position.Y = 380.000000000000000000
+          Size.Width = 380.000000000000000000
+          Size.Height = 30.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 1
+          object Button2: TButton
+            Action = aAttributeChange
+            Align = Left
+            Enabled = True
+            Margins.Left = 4.000000000000000000
+            Margins.Top = 4.000000000000000000
+            Margins.Right = 4.000000000000000000
+            Margins.Bottom = 4.000000000000000000
+            Position.X = 4.000000000000000000
+            Position.Y = 4.000000000000000000
+            Size.Width = 80.000000000000000000
+            Size.Height = 22.000000000000000000
+            Size.PlatformDefault = False
+            TabOrder = 0
+            Visible = True
+          end
+        end
+        object Splitter2: TSplitter
+          Align = Bottom
+          Cursor = crVSplit
+          MinSize = 20.000000000000000000
+          Position.Y = 278.000000000000000000
+          Size.Width = 380.000000000000000000
+          Size.Height = 4.000000000000000000
+          Size.PlatformDefault = False
+        end
+        object StringGrid1: TStringGrid
+          Align = Client
+          Size.Width = 380.000000000000000000
+          Size.Height = 278.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 3
+          OnClick = StringGrid1Click
+          RowCount = 3
+          RowHeight = 21.000000000000000000
+          object StringColumn1: TStringColumn
+            Header = 'Attribute'
+            Size.Width = 150.000000000000000000
+            Size.Height = 63.000000000000000000
+            Size.PlatformDefault = False
+            TabOrder = 0
+          end
+          object StringColumn2: TStringColumn
+            Header = 'Value'
+            Position.X = 150.000000000000000000
+            Size.Width = 200.000000000000000000
+            Size.Height = 63.000000000000000000
+            Size.PlatformDefault = False
+            TabOrder = 1
+          end
+        end
+      end
+    end
+    object TabItem2: TTabItem
+      CustomIcon = <
+        item
+        end>
+      IsSelected = False
+      Size.Width = 41.000000000000000000
+      Size.Height = 24.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 0
+      Text = 'Text'
+      object Memo1: TMemo
+        Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
+        Align = Client
+        Size.Width = 721.000000000000000000
+        Size.Height = 410.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 0
+        OnChange = Memo1Change
+        OnExit = Memo1Exit
+      end
+    end
+    object TabItem3: TTabItem
+      CustomIcon = <
+        item
+        end>
+      IsSelected = False
+      Size.Width = 111.000000000000000000
+      Size.Height = 24.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 0
+      Text = 'Renderer options'
+      object GroupBox1: TGroupBox
+        Align = Top
+        Padding.Left = 10.000000000000000000
+        Padding.Top = 16.000000000000000000
+        Padding.Right = 10.000000000000000000
+        Padding.Bottom = 10.000000000000000000
+        Size.Width = 721.000000000000000000
+        Size.Height = 105.000000000000000000
+        Size.PlatformDefault = False
+        Text = 'Render options'
+        TabOrder = 0
+        object cbClippaths: TCheckBox
+          Align = Top
+          IsChecked = True
+          Margins.Left = 8.000000000000000000
+          Margins.Top = 4.000000000000000000
+          Margins.Right = 8.000000000000000000
+          Margins.Bottom = 4.000000000000000000
+          Position.X = 18.000000000000000000
+          Position.Y = 47.000000000000000000
+          Size.Width = 685.000000000000000000
+          Size.Height = 19.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 0
+          Text = 'Clippaths'
+          OnChange = cbClippathsChange
+        end
+        object cbFilters: TCheckBox
+          Align = Top
+          Margins.Left = 8.000000000000000000
+          Margins.Top = 4.000000000000000000
+          Margins.Right = 8.000000000000000000
+          Margins.Bottom = 4.000000000000000000
+          Position.X = 18.000000000000000000
+          Position.Y = 20.000000000000000000
+          Size.Width = 685.000000000000000000
+          Size.Height = 19.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 1
+          Text = 'Filters'
+          OnChange = cbFiltersChange
+        end
+        object cbAutoViewbox: TCheckBox
+          Align = Top
+          IsChecked = True
+          Margins.Left = 8.000000000000000000
+          Margins.Top = 4.000000000000000000
+          Margins.Right = 8.000000000000000000
+          Margins.Bottom = 4.000000000000000000
+          Position.X = 18.000000000000000000
+          Position.Y = 74.000000000000000000
+          Size.Width = 685.000000000000000000
+          Size.Height = 19.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 2
+          Text = 'Auto viewbox'
+          OnChange = cbAutoViewboxChange
+        end
+      end
+      object Memo3: TMemo
+        Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
+        Align = Client
+        Margins.Left = 10.000000000000000000
+        Margins.Top = 10.000000000000000000
+        Margins.Right = 10.000000000000000000
+        Margins.Bottom = 10.000000000000000000
+        Size.Width = 701.000000000000000000
+        Size.Height = 285.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 1
+        TextSettings.Font.Family = 'Courier New'
+        StyledSettings = [Size, Style, FontColor]
+      end
+    end
+  end
+  object ActionList1: TActionList
+    Left = 480
+    Top = 21
+    object aParseSVG: TAction
+      Text = 'Parse SVG'
+      OnExecute = aParseSVGExecute
+    end
+    object aAttributeChange: TAction
+      Text = 'Change'
+      OnExecute = aAttributeChangeExecute
+    end
+  end
+end

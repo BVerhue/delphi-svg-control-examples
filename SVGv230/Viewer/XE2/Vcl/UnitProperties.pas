@@ -103,8 +103,19 @@ procedure TForm2.FormCreate(Sender: TObject);
 begin
   Form1.FormProperties := Self;
 
-  ConnectControls(aAttributeChange, aParseSVG, Memo2, Memo3, Memo1, Panel1,
-    cbFilters, cbAutoViewbox, cbEvents, cbClippaths, Listview1, Treeview1);
+  ConnectControls(
+    aAttributeChange,
+    Memo2,
+    Listview1,
+    Treeview1,
+    aParseSVG,
+    Memo3,
+    Memo1,
+    Panel1,
+    cbFilters,
+    cbAutoViewbox,
+    cbEvents,
+    cbClippaths);
 end;
 
 end.

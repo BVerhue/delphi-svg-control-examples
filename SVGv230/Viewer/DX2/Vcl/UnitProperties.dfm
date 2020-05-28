@@ -52,10 +52,6 @@ object Form2: TForm2
       Font.Name = 'Tahoma'
       Font.Style = []
       ParentFont = False
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object Splitter1: TSplitter
         Left = 265
         Top = 0
@@ -159,10 +155,6 @@ object Form2: TForm2
       Font.Style = []
       ImageIndex = 1
       ParentFont = False
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object Memo1: TMemo
         Left = 0
         Top = 0
@@ -184,10 +176,6 @@ object Form2: TForm2
     object TabSheet3: TTabSheet
       Caption = 'Options'
       ImageIndex = 2
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object GroupBox1: TGroupBox
         Left = 0
         Top = 0
@@ -251,8 +239,6 @@ object Form2: TForm2
           Align = alTop
           Caption = 'Events'
           TabOrder = 3
-          ExplicitLeft = 11
-          ExplicitTop = 99
         end
       end
       object Memo3: TMemo
@@ -263,8 +249,6 @@ object Form2: TForm2
         Align = alClient
         ScrollBars = ssBoth
         TabOrder = 1
-        ExplicitTop = 102
-        ExplicitHeight = 287
       end
     end
   end

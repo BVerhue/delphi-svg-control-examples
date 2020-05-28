@@ -1,0 +1,225 @@
+object frmViewer: TfrmViewer
+  Left = 0
+  Top = 0
+  Caption = 'SVG Viewer FMX'
+  ClientHeight = 640
+  ClientWidth = 923
+  FormFactor.Width = 1680
+  FormFactor.Height = 1050
+  FormFactor.Devices = [Desktop, iPhone, iPad]
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
+  OnKeyDown = FormKeyDown
+  OnResize = FormResize
+  DesignerMasterStyle = 0
+  object OpenDialog1: TOpenDialog
+    Left = 184
+    Top = 40
+  end
+  object sb: TScrollBox
+    Align = Client
+    Size.Width = 923.000000000000000000
+    Size.Height = 610.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 0
+    OnDragOver = sbDragOver
+    OnDragDrop = sbDragDrop
+    object lSize: TLayout
+      Size.Width = 769.000000000000000000
+      Size.Height = 505.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 0
+      object lZoom: TLayout
+        Size.Width = 753.000000000000000000
+        Size.Height = 481.000000000000000000
+        Size.PlatformDefault = False
+      end
+    end
+  end
+  object Panel1: TPanel
+    Align = Top
+    Size.Width = 923.000000000000000000
+    Size.Height = 30.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 1
+    object Button2: TButton
+      Action = aLoad
+      Align = Left
+      Enabled = True
+      Margins.Left = 4.000000000000000000
+      Margins.Top = 4.000000000000000000
+      Margins.Right = 4.000000000000000000
+      Margins.Bottom = 4.000000000000000000
+      Position.X = 4.000000000000000000
+      Position.Y = 4.000000000000000000
+      Size.Width = 80.000000000000000000
+      Size.Height = 22.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 0
+      Visible = True
+    end
+    object Button3: TButton
+      Action = aProperties
+      Align = Left
+      Enabled = True
+      Margins.Left = 4.000000000000000000
+      Margins.Top = 4.000000000000000000
+      Margins.Right = 4.000000000000000000
+      Margins.Bottom = 4.000000000000000000
+      Position.X = 92.000000000000000000
+      Position.Y = 4.000000000000000000
+      Size.Width = 80.000000000000000000
+      Size.Height = 22.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 1
+      Visible = True
+    end
+    object Button4: TButton
+      Action = aCopyDirect
+      Align = Left
+      Enabled = True
+      Margins.Left = 4.000000000000000000
+      Margins.Top = 4.000000000000000000
+      Margins.Right = 4.000000000000000000
+      Margins.Bottom = 4.000000000000000000
+      Position.X = 180.000000000000000000
+      Position.Y = 4.000000000000000000
+      Size.Width = 80.000000000000000000
+      Size.Height = 22.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 2
+      Visible = True
+    end
+    object Button5: TButton
+      Action = aExit
+      Align = Right
+      Enabled = True
+      Margins.Left = 4.000000000000000000
+      Margins.Top = 4.000000000000000000
+      Margins.Right = 4.000000000000000000
+      Margins.Bottom = 4.000000000000000000
+      Position.X = 839.000000000000000000
+      Position.Y = 4.000000000000000000
+      Size.Width = 80.000000000000000000
+      Size.Height = 22.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 3
+      Visible = True
+    end
+    object Label2: TLabel
+      Align = Left
+      Margins.Left = 4.000000000000000000
+      Margins.Top = 4.000000000000000000
+      Margins.Right = 4.000000000000000000
+      Margins.Bottom = 4.000000000000000000
+      Position.X = 444.000000000000000000
+      Position.Y = 4.000000000000000000
+      Size.Width = 49.000000000000000000
+      Size.Height = 22.000000000000000000
+      Size.PlatformDefault = False
+      TextSettings.HorzAlign = Center
+      Text = 'Zoom'
+    end
+    object tbZoom: TTrackBar
+      Align = Left
+      Max = 10.000000000000000000
+      Min = 0.009999999776482582
+      Orientation = Horizontal
+      Margins.Left = 4.000000000000000000
+      Margins.Top = 4.000000000000000000
+      Margins.Right = 4.000000000000000000
+      Margins.Bottom = 4.000000000000000000
+      Position.X = 501.000000000000000000
+      Position.Y = 6.000000000000000000
+      Size.Width = 168.000000000000000000
+      Size.Height = 19.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 5
+      Value = 1.000000000000000000
+      OnChange = tbZoomChange
+    end
+    object Button6: TButton
+      Action = aZoomReset
+      Align = Left
+      Enabled = True
+      Margins.Left = 4.000000000000000000
+      Margins.Top = 4.000000000000000000
+      Margins.Right = 4.000000000000000000
+      Margins.Bottom = 4.000000000000000000
+      Position.X = 677.000000000000000000
+      Position.Y = 4.000000000000000000
+      Size.Width = 80.000000000000000000
+      Size.Height = 22.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 6
+      Visible = True
+    end
+    object Button1: TButton
+      Action = aCopySVG
+      Align = Left
+      Enabled = True
+      Margins.Left = 4.000000000000000000
+      Margins.Top = 4.000000000000000000
+      Margins.Right = 4.000000000000000000
+      Margins.Bottom = 4.000000000000000000
+      Position.X = 268.000000000000000000
+      Position.Y = 4.000000000000000000
+      Size.Width = 80.000000000000000000
+      Size.Height = 22.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 7
+      Visible = True
+    end
+    object Button7: TButton
+      Action = aPasteSVG
+      Align = Left
+      Enabled = True
+      Margins.Left = 4.000000000000000000
+      Margins.Top = 4.000000000000000000
+      Margins.Right = 4.000000000000000000
+      Margins.Bottom = 4.000000000000000000
+      Position.X = 356.000000000000000000
+      Position.Y = 4.000000000000000000
+      Size.Width = 80.000000000000000000
+      Size.Height = 22.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 8
+      Visible = True
+    end
+  end
+  object ActionList1: TActionList
+    Left = 256
+    Top = 40
+    object aLoad: TAction
+      Text = 'Load'
+      OnExecute = aLoadExecute
+    end
+    object aProperties: TAction
+      Text = 'Properties'
+      OnExecute = aPropertiesExecute
+    end
+    object aCopyDirect: TAction
+      Text = 'Copy direct'
+      OnExecute = aCopyDirectExecute
+    end
+    object aExit: TAction
+      Text = 'Exit'
+      OnExecute = aExitExecute
+    end
+    object aZoomReset: TAction
+      Text = 'Reset'
+      OnExecute = aZoomResetExecute
+    end
+    object Action1: TAction
+      Text = 'Action1'
+    end
+    object aCopySVG: TAction
+      Text = 'Copy SVG'
+      OnExecute = aCopySVGExecute
+    end
+    object aPasteSVG: TAction
+      Text = 'Paste SVG'
+      OnExecute = aPasteSVGExecute
+    end
+  end
+end

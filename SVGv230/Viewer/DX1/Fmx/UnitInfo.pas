@@ -1,4 +1,4 @@
-unit UnitProperties;
+unit UnitInfo;
 
 //------------------------------------------------------------------------------
 //
@@ -35,84 +35,48 @@ unit UnitProperties;
 //  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 interface
-
 uses
-  Winapi.Windows,
-  Winapi.Messages,
   System.SysUtils,
-  System.Variants,
+  System.Types,
+  System.UITypes,
   System.Classes,
-  System.Actions,
-  Xml.XMLIntf,
-  Vcl.Controls,
-  Vcl.Forms,
-  Vcl.StdCtrls,
-  Vcl.ExtCtrls,
-  Vcl.ComCtrls,
-  Vcl.PlatformDefaultStyleActnCtrls,
-  Vcl.ActnList,
-  Vcl.ActnMan,
-  Vcl.ToolWin,
-  Vcl.ActnCtrls,
-  BVE.ViewerCore.VCL;
+  System.Variants,
+  FMX.Types,
+  FMX.Controls,
+  FMX.Forms,
+  FMX.Graphics,
+  FMX.Dialogs,
+  FMX.Controls.Presentation,
+  FMX.StdCtrls,
+  FMX.Layouts,
+  BVE.SVG2Intf,
+  BVE.SVG2Types,
+  BVE.SVG2Control.FMX,
+  BVE.SVG2Image.FMX,
+  UnitViewerCommon.FMX;
 
 type
-  TForm2 = class(TSVGViewerPropertiesForm)
-    Panel1: TPanel;
-    PageControl1: TPageControl;
-    TabSheet1: TTabSheet;
-    TabSheet2: TTabSheet;
-    TreeView1: TTreeView;
-    Splitter1: TSplitter;
-    Memo1: TMemo;
-    ActionManager1: TActionManager;
-    Memo2: TMemo;
-    Panel3: TPanel;
-    Splitter2: TSplitter;
-    ListView1: TListView;
-    ActionToolBar1: TActionToolBar;
-    ActionToolBar2: TActionToolBar;
-    Panel4: TPanel;
-    aParseSVG: TAction;
-    aAttributeChange: TAction;
-    TabSheet3: TTabSheet;
-    GroupBox1: TGroupBox;
-    cbFilters: TCheckBox;
-    cbClippaths: TCheckBox;
-    Memo3: TMemo;
-    cbAutoViewbox: TCheckBox;
-    cbEvents: TCheckBox;
+  TfrmInfo = class(TSVGViewerInfoForm)
+    Layout1: TLayout;
+    Button1: TButton;
+    SVG2Image1: TSVG2Image;
     procedure FormCreate(Sender: TObject);
   end;
 
 var
-  Form2: TForm2;
+  frmInfo: TfrmInfo;
 
 implementation
 uses
-  UnitViewer;
+  UnitViewerFMX;
 
-{$R *.dfm}
+{$R *.fmx}
 
-{ TForm2 }
-
-procedure TForm2.FormCreate(Sender: TObject);
+procedure TfrmInfo.FormCreate(Sender: TObject);
 begin
-  Form1.FormProperties := Self;
+  ConnectControls(Button1, SVG2Image1);
 
-  ConnectControls(
-    aAttributeChange,
-    Memo2,
-    Listview1,
-    Treeview1,
-    aParseSVG,
-    Memo3,
-    Memo1,
-    Panel1,
-    cbFilters,
-    cbAutoViewbox,
-    cbEvents,
-    cbClippaths);
+  frmSVGViewerFMX.FormInfo := Self;
 end;
 
 end.
