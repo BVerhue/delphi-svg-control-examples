@@ -21,8 +21,6 @@ object frmAddRemoveElements: TfrmAddRemoveElements
     Height = 299
     Align = alClient
     OnClick = SVG2Image1Click
-    BufferQuality = bqHighQuality
-    AutoViewBox = True
     ExplicitLeft = 160
     ExplicitTop = 112
     ExplicitWidth = 105

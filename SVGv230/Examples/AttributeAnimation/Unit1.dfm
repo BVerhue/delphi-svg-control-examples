@@ -19,8 +19,6 @@ object Form1: TForm1
     Top = 24
     Width = 561
     Height = 401
-    BufferQuality = bqHighQuality
-    AutoViewBox = True
     SVG.Strings = (
       '<?xml version="1.0" encoding="UTF-8" standalone="no"?>'
       '<svg'

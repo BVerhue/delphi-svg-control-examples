@@ -22,8 +22,6 @@ object Form1: TForm1
     Align = alClient
     OnMouseDown = SVG2Image1MouseDown
     OnMouseUp = SVG2Image1MouseUp
-    BufferQuality = bqHighQuality
-    AutoViewBox = True
     ExplicitLeft = 32
     ExplicitTop = 56
     ExplicitWidth = 625
@@ -47,8 +45,6 @@ object Form1: TForm1
       Caption = 
         '1. Download the cards SVG from this location: http://svg-cards.s' +
         'ourceforge.net/'
-      ExplicitLeft = 0
-      ExplicitTop = 0
       ExplicitWidth = 387
     end
     object Label2: TLabel
@@ -61,8 +57,6 @@ object Form1: TForm1
       Caption = 
         '2. Set the SVG2Image1 FileName property to the downloaded svg fi' +
         'le'
-      ExplicitLeft = 0
-      ExplicitTop = 13
       ExplicitWidth = 333
     end
     object Label3: TLabel
@@ -73,8 +67,6 @@ object Form1: TForm1
       Height = 13
       Align = alTop
       Caption = '3. Click on Imag1 to draw a card.'
-      ExplicitLeft = 0
-      ExplicitTop = 26
       ExplicitWidth = 159
     end
   end

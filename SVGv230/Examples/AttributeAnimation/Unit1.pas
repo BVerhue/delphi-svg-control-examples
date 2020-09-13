@@ -2,11 +2,23 @@ unit Unit1;
 
 interface
 
+{$Include CompilerSettings.inc}
+
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ExtCtrls,
+  Winapi.Windows,
+  Winapi.Messages,
+  System.SysUtils,
+  System.Variants,
+  System.Classes,
+  Vcl.Graphics,
+  Vcl.Controls,
+  Vcl.Forms,
+  Vcl.Dialogs,
+  Vcl.ExtCtrls,
+  BVE.SVG2Types,
+  BVE.SVG2Intf,
   BVE.SVG2Image.VCL,
-  BVE.SVG2Intf;
+  BVE.SVG2Control.VCL;
 
 type
   TForm1 = class(TForm)
@@ -29,6 +41,10 @@ implementation
 // Check that the DoubleBuffered property on the form is set to TRUE
 
 procedure TForm1.Timer1Timer(Sender: TObject);
+{$IFDEF SVGLibVersion2308Up}
+var
+  Attr: ISVGAttribute;
+{$ENDIF}
 begin
   if not assigned(FPath) then
     FPath := SVG2Image1.SVGRoot.Path['path2989']
@@ -44,7 +60,13 @@ begin
     // the element.
 
 
+    {$IFDEF SVGLibVersion2308Up}
+    Attr := FPath.InlineStyle[at_stroke_dashoffset];
+    if assigned(Attr) then
+      Attr.AsDimension := Attr.AsDimension.Add(1);
+    {$ELSE}
     FPath.InlineStyle.DashOffset := FPath.InlineStyle.DashOffset.Add(1);
+    {$ENDIF}
     SVG2Image1.Repaint;
   end;
 end;

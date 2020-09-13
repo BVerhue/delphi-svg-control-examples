@@ -17,7 +17,7 @@ uses
   Vcl.Controls,
   Vcl.Forms,
   Vcl.Dialogs,
-  BVE.SVG2Image.VCL;
+  BVE.SVG2Image.VCL, BVE.SVG2Control.VCL;
 {$ELSE}
   SysUtils,
   Variants,
@@ -34,6 +34,7 @@ type
     SVG2Image1: TSVG2Image;
     procedure SVG2Image1MouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
+    procedure FormCreate(Sender: TObject);
   private
     { Private declarations }
   public
@@ -54,6 +55,11 @@ implementation
 uses
   BVE.SVG2Types,
   BVE.SVG2Intf;
+
+procedure TfrmElementUnderMousepointer.FormCreate(Sender: TObject);
+begin
+  SVG2Image1.Filename := '..\..\..\..\Img\animated-clock.svg';
+end;
 
 procedure TfrmElementUnderMousepointer.SVG2Image1MouseDown(Sender: TObject;
   Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
