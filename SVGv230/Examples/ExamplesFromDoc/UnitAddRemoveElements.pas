@@ -18,8 +18,6 @@ uses
   Vcl.Controls,
   Vcl.Forms,
   Vcl.Dialogs,
-  BVE.SVG2Image.VCL,
-  BVE.SVG2Control.VCL;
 {$ELSE}
   SysUtils,
   Variants,
@@ -28,8 +26,12 @@ uses
   Controls,
   Forms,
   Dialogs,
-  BVE.SVG2Image.FPC;
 {$ENDIF}
+{$IFDEF SVGLibVersion2400Up}
+  BVE.SVG2Doc,
+{$ENDIF}
+  BVE.SVG2Image.VCL,
+  BVE.SVG2Control.VCL;
 
 type
   { TfrmAddRemoveElements }
