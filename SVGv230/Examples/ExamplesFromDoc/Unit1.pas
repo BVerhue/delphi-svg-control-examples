@@ -48,6 +48,7 @@ type
     Button11: TButton;
     Button12: TButton;
     Button13: TButton;
+    Button14: TButton;
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
     procedure Button3Click(Sender: TObject);
@@ -61,6 +62,7 @@ type
     procedure Button11Click(Sender: TObject);
     procedure Button12Click(Sender: TObject);
     procedure Button13Click(Sender: TObject);
+    procedure Button14Click(Sender: TObject);
   private
     { Private declarations }
   public
@@ -84,7 +86,8 @@ uses
   UnitAddRemoveElements,
   UnitElementUnderMousepointer,
   UnitMouseEvents,
-  UnitLoadingFilesFromInternet;
+  UnitLoadingFilesFromInternet,
+  UnitAddSVGFragment;
 
 {$IFnDEF FPC}
   {$R *.dfm}
@@ -110,6 +113,11 @@ end;
 procedure TForm1.Button13Click(Sender: TObject);
 begin
   ShowForm(TfrmLoadingFilesFromInternet);
+end;
+
+procedure TForm1.Button14Click(Sender: TObject);
+begin
+  ShowForm(TfrmAddSVGFragment);
 end;
 
 procedure TForm1.Button1Click(Sender: TObject);

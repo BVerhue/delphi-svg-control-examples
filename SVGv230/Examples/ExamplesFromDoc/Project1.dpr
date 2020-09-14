@@ -5,11 +5,11 @@ program Project1;
 {$ENDIF}
 
 uses
-{$IFnDEF FPC}
+  {$IFnDEF FPC}
   Vcl.Forms,
-{$ELSE}
-  Forms, Interfaces,
-{$ENDIF}
+  {$ELSE}
+  Forms,
+  {$ENDIF }
   Unit1 in 'Unit1.pas' {Form1},
   UnitFilenameAssignment in 'UnitFilenameAssignment.pas' {frmFilenameAssignment},
   UnitDigitalClock in 'UnitDigitalClock.pas' {frmDigitalClock},
@@ -23,7 +23,8 @@ uses
   UnitAddRemoveElements in 'UnitAddRemoveElements.pas' {frmAddRemoveElements},
   UnitElementUnderMousepointer in 'UnitElementUnderMousepointer.pas' {frmElementUnderMousepointer},
   UnitMouseEvents in 'UnitMouseEvents.pas' {frmMouseEvents},
-  UnitLoadingFilesFromInternet in 'UnitLoadingFilesFromInternet.pas' {frmLoadingFilesFromInternet};
+  UnitLoadingFilesFromInternet in 'UnitLoadingFilesFromInternet.pas' {frmLoadingFilesFromInternet},
+  UnitAddSVGFragment in 'UnitAddSVGFragment.pas' {frmAddSVGFragment};
 
 {$R *.res}
 

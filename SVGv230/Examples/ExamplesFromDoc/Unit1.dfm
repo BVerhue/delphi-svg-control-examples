@@ -62,9 +62,6 @@ object Form1: TForm1
     Caption = 'Render SVG programmatically'
     TabOrder = 4
     OnClick = Button5Click
-    ExplicitLeft = 48
-    ExplicitTop = 168
-    ExplicitWidth = 75
   end
   object Button6: TButton
     Left = 0
@@ -75,9 +72,6 @@ object Form1: TForm1
     Caption = 'Find element (easy)'
     TabOrder = 5
     OnClick = Button6Click
-    ExplicitLeft = 40
-    ExplicitTop = 192
-    ExplicitWidth = 75
   end
   object Button7: TButton
     Left = 0
@@ -88,9 +82,6 @@ object Form1: TForm1
     Caption = 'Find element (hard)'
     TabOrder = 6
     OnClick = Button7Click
-    ExplicitLeft = 64
-    ExplicitTop = 240
-    ExplicitWidth = 75
   end
   object Button8: TButton
     Left = 0
@@ -101,9 +92,6 @@ object Form1: TForm1
     Caption = 'Change an attribute'
     TabOrder = 7
     OnClick = Button8Click
-    ExplicitLeft = 80
-    ExplicitTop = 208
-    ExplicitWidth = 75
   end
   object Button9: TButton
     Left = 0
@@ -114,9 +102,6 @@ object Form1: TForm1
     Caption = 'Setting style attributes'
     TabOrder = 8
     OnClick = Button9Click
-    ExplicitLeft = 88
-    ExplicitTop = 239
-    ExplicitWidth = 75
   end
   object Button10: TButton
     Left = 0
@@ -127,47 +112,49 @@ object Form1: TForm1
     Caption = 'Add and remove elements'
     TabOrder = 9
     OnClick = Button10Click
-    ExplicitLeft = 88
-    ExplicitTop = 280
-    ExplicitWidth = 75
   end
   object Button11: TButton
     Left = 0
-    Top = 250
+    Top = 275
     Width = 221
     Height = 25
     Align = alTop
     Caption = 'Find element under the mousepointer'
     TabOrder = 10
     OnClick = Button11Click
-    ExplicitLeft = 80
-    ExplicitTop = 256
-    ExplicitWidth = 75
+    ExplicitTop = 250
   end
   object Button12: TButton
     Left = 0
-    Top = 275
+    Top = 300
     Width = 221
     Height = 25
     Align = alTop
     Caption = 'Using mouse events'
     TabOrder = 11
     OnClick = Button12Click
-    ExplicitLeft = 72
-    ExplicitTop = 312
-    ExplicitWidth = 75
+    ExplicitTop = 275
   end
   object Button13: TButton
     Left = 0
-    Top = 300
+    Top = 325
     Width = 221
     Height = 25
     Align = alTop
     Caption = 'Loading files from internet'
     TabOrder = 12
     OnClick = Button13Click
-    ExplicitLeft = 72
-    ExplicitTop = 304
-    ExplicitWidth = 75
+    ExplicitTop = 300
+  end
+  object Button14: TButton
+    Left = 0
+    Top = 250
+    Width = 221
+    Height = 25
+    Align = alTop
+    Caption = 'Add an SVG fragment'
+    TabOrder = 13
+    OnClick = Button14Click
+    ExplicitTop = 244
   end
 end

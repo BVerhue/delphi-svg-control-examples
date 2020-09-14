@@ -1,7 +1,7 @@
-object frmSettingStyleAttributes: TfrmSettingStyleAttributes
+object frmAddSVGFragment: TfrmAddSVGFragment
   Left = 0
   Top = 0
-  Caption = 'frmSettingStyleAttributes'
+  Caption = 'Add an SVG fragment'
   ClientHeight = 299
   ClientWidth = 635
   Color = clBtnFace
@@ -22,7 +22,7 @@ object frmSettingStyleAttributes: TfrmSettingStyleAttributes
     Align = alClient
     OnClick = SVG2Image1Click
     ExplicitLeft = 192
-    ExplicitTop = 96
+    ExplicitTop = 24
     ExplicitWidth = 105
     ExplicitHeight = 105
   end
