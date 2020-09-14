@@ -5,7 +5,7 @@ object Form1: TForm1
   Width = 320
   ClientHeight = 387
   ClientWidth = 320
-  LCLVersion = '1.8.4.0'
+  LCLVersion = '2.0.10.0'
   object Button1: TButton
     Left = 0
     Height = 25
@@ -109,7 +109,7 @@ object Form1: TForm1
   object Button11: TButton
     Left = 0
     Height = 25
-    Top = 250
+    Top = 275
     Width = 320
     Align = alTop
     Caption = 'Find element under the mousepointer'
@@ -119,7 +119,7 @@ object Form1: TForm1
   object Button12: TButton
     Left = 0
     Height = 25
-    Top = 275
+    Top = 300
     Width = 320
     Align = alTop
     Caption = 'Using mouse events'
@@ -129,11 +129,21 @@ object Form1: TForm1
   object Button13: TButton
     Left = 0
     Height = 25
-    Top = 300
+    Top = 325
     Width = 320
     Align = alTop
     Caption = 'Loading files from internet'
     OnClick = Button13Click
     TabOrder = 12
+  end
+  object Button14: TButton
+    Left = 0
+    Height = 25
+    Top = 250
+    Width = 320
+    Align = alTop
+    Caption = 'Add an SVG fragment'
+    OnClick = Button14Click
+    TabOrder = 13
   end
 end

@@ -8,7 +8,7 @@ uses
   {$IFnDEF FPC}
   Vcl.Forms,
   {$ELSE}
-  Forms,
+  Forms, Interfaces,
   {$ENDIF }
   Unit1 in 'Unit1.pas' {Form1},
   UnitFilenameAssignment in 'UnitFilenameAssignment.pas' {frmFilenameAssignment},

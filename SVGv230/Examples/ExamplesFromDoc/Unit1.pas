@@ -34,6 +34,8 @@ uses
 type
   TFormClass = class of TForm;
 
+  { TForm1 }
+
   TForm1 = class(TForm)
     Button1: TButton;
     Button2: TButton;

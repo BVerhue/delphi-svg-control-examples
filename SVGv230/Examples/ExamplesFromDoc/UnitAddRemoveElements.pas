@@ -4,7 +4,11 @@ unit UnitAddRemoveElements;
   {$MODE Delphi}
 {$ENDIF}
 
-{$I 'CompilerSettings.inc'}
+{$IFnDEF FPC}
+  {$I 'CompilerSettings.inc'}
+{$ELSE}
+  {$Define SVGLibVersion2400Up}
+{$ENDIF}
 
 interface
 uses
@@ -18,6 +22,11 @@ uses
   Vcl.Controls,
   Vcl.Forms,
   Vcl.Dialogs,
+  {$IFDEF SVGLibVersion2400Up}
+  BVE.SVG2Doc,
+  {$ENDIF}
+  BVE.SVG2Image.VCL,
+  BVE.SVG2Control.VCL;
 {$ELSE}
   SysUtils,
   Variants,
@@ -26,12 +35,12 @@ uses
   Controls,
   Forms,
   Dialogs,
-{$ENDIF}
-{$IFDEF SVGLibVersion2400Up}
+  {$IFDEF SVGLibVersion2400Up}
   BVE.SVG2Doc,
+  {$ENDIF}
+  BVE.SVG2Image.FPC,
+  BVE.SVG2Control.FPC;
 {$ENDIF}
-  BVE.SVG2Image.VCL,
-  BVE.SVG2Control.VCL;
 
 type
   { TfrmAddRemoveElements }

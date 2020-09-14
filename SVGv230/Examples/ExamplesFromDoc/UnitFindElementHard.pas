@@ -19,6 +19,7 @@ uses
   Vcl.Dialogs,
   Vcl.StdCtrls,
   XML.XMLIntf,
+  BVE.SVG2Intf,
   BVE.SVG2Image.VCL;
 {$ELSE}
   SysUtils,
@@ -29,6 +30,7 @@ uses
   Forms,
   Dialogs,
   StdCtrls,
+  BVE.SVG2Intf,
   BVE.SVG2Types,
   BVE.SVG2Image.FPC;
 {$ENDIF}
@@ -58,9 +60,6 @@ implementation
 {$ELSE}
   {$R *.lfm}
 {$ENDIF}
-
-uses
-  BVE.SVG2Intf;
 
 const
   svg_text =

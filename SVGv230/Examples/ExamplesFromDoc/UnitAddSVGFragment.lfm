@@ -1,0 +1,23 @@
+object frmAddSVGFragment: TfrmAddSVGFragment
+  Left = 538
+  Height = 311
+  Top = 468
+  Width = 635
+  Caption = 'Add an SVG fragment'
+  ClientHeight = 311
+  ClientWidth = 635
+  Color = clBtnFace
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'Tahoma'
+  OnCreate = FormCreate
+  LCLVersion = '2.0.10.0'
+  object SVG2Image1: TSVG2Image
+    Left = 0
+    Height = 311
+    Top = 0
+    Width = 635
+    Align = alClient
+    OnClick = SVG2Image1Click
+  end
+end
