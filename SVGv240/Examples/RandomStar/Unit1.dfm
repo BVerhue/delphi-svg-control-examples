@@ -1,0 +1,39 @@
+object Form1: TForm1
+  Left = 0
+  Top = 0
+  Caption = 'Form1'
+  ClientHeight = 340
+  ClientWidth = 416
+  Color = clBlack
+  DoubleBuffered = True
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'Tahoma'
+  Font.Style = []
+  OldCreateOrder = False
+  PixelsPerInch = 96
+  TextHeight = 13
+  object SVG2Image1: TSVG2Image
+    Left = 0
+    Top = 0
+    Width = 416
+    Height = 340
+    Align = alClient
+    Color = clBtnFace
+    ParentColor = False
+    OnClick = SVG2Image1Click
+    BufferQuality = bqHighQuality
+    AutoViewBox = True
+    ExplicitLeft = 88
+    ExplicitTop = 104
+    ExplicitWidth = 100
+    ExplicitHeight = 41
+  end
+  object Timer1: TTimer
+    Interval = 25
+    OnTimer = Timer1Timer
+    Left = 16
+    Top = 16
+  end
+end

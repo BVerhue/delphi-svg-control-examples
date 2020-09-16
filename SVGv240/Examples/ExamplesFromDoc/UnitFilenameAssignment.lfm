@@ -1,0 +1,24 @@
+object frmFilenameAssignment: TfrmFilenameAssignment
+  Left = 507
+  Height = 299
+  Top = 327
+  Width = 635
+  Caption = 'frmFilenameAssignment'
+  ClientHeight = 299
+  ClientWidth = 635
+  Color = clBtnFace
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'Tahoma'
+  OnCreate = FormCreate
+  LCLVersion = '1.8.4.0'
+  object SVG2Image1: TSVG2Image
+    Left = 0
+    Height = 299
+    Top = 0
+    Width = 635
+    Align = alClient
+    BufferQuality = bqHighQuality
+    AutoViewBox = True
+  end
+end

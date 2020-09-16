@@ -1,0 +1,170 @@
+object Form2: TForm2
+  Left = 436
+  Height = 486
+  Top = 181
+  Width = 665
+  Caption = 'Form2'
+  ClientHeight = 486
+  ClientWidth = 665
+  OnCreate = FormCreate
+  LCLVersion = '2.0.4.0'
+  object PageControl1: TPageControl
+    Left = 0
+    Height = 438
+    Top = 48
+    Width = 665
+    ActivePage = TabSheet2
+    Align = alClient
+    TabIndex = 1
+    TabOrder = 0
+    object TabSheet1: TTabSheet
+      Caption = 'SVG'
+      ClientHeight = 432
+      ClientWidth = 657
+      object mSVG: TMemo
+        Left = 0
+        Height = 432
+        Top = 0
+        Width = 657
+        Align = alClient
+        Font.CharSet = ANSI_CHARSET
+        Font.Height = -13
+        Font.Name = 'Courier New'
+        Font.Pitch = fpFixed
+        Font.Quality = fqDraft
+        Lines.Strings = (
+          'mSVG'
+        )
+        ParentFont = False
+        ScrollBars = ssAutoBoth
+        TabOrder = 0
+      end
+    end
+    object TabSheet2: TTabSheet
+      Caption = 'Info'
+      ClientHeight = 410
+      ClientWidth = 657
+      object Panel1: TPanel
+        Left = 0
+        Height = 130
+        Top = 0
+        Width = 657
+        Align = alTop
+        ClientHeight = 130
+        ClientWidth = 657
+        TabOrder = 0
+        object cbAutoViewbox: TCheckBox
+          Left = 43
+          Height = 19
+          Top = 15
+          Width = 93
+          Caption = 'Auto viewbox'
+          TabOrder = 0
+        end
+        object cbClippaths: TCheckBox
+          Left = 44
+          Height = 19
+          Top = 41
+          Width = 70
+          Caption = 'Clippaths'
+          TabOrder = 1
+        end
+        object cbFilters: TCheckBox
+          Left = 45
+          Height = 19
+          Top = 67
+          Width = 51
+          Caption = 'Filters'
+          TabOrder = 2
+        end
+        object eWidth: TEdit
+          Left = 248
+          Height = 23
+          Top = 15
+          Width = 80
+          NumbersOnly = True
+          TabOrder = 3
+        end
+        object eHeight: TEdit
+          Left = 248
+          Height = 23
+          Top = 41
+          Width = 80
+          NumbersOnly = True
+          TabOrder = 4
+        end
+        object Label1: TLabel
+          Left = 184
+          Height = 15
+          Top = 19
+          Width = 32
+          Caption = 'Width'
+          ParentColor = False
+        end
+        object Label2: TLabel
+          Left = 184
+          Height = 15
+          Top = 45
+          Width = 36
+          Caption = 'Height'
+          ParentColor = False
+        end
+        object cbEvents: TCheckBox
+          Left = 45
+          Height = 19
+          Top = 93
+          Width = 54
+          Caption = 'Events'
+          TabOrder = 5
+        end
+      end
+      object mInfo: TMemo
+        Left = 0
+        Height = 280
+        Top = 130
+        Width = 657
+        Align = alClient
+        Font.CharSet = ANSI_CHARSET
+        Font.Height = -13
+        Font.Name = 'Courier New'
+        Font.Pitch = fpFixed
+        Font.Quality = fqDraft
+        Lines.Strings = (
+          'mInfo'
+        )
+        ParentFont = False
+        TabOrder = 1
+      end
+    end
+  end
+  object ToolBar1: TToolBar
+    Left = 0
+    Height = 26
+    Top = 0
+    Width = 665
+    Caption = 'ToolBar1'
+    ShowCaptions = True
+    TabOrder = 1
+    object ToolButton1: TToolButton
+      Left = 1
+      Top = 2
+      Action = aParse
+    end
+  end
+  object Panel2: TPanel
+    Left = 0
+    Height = 22
+    Top = 26
+    Width = 665
+    Align = alTop
+    BevelOuter = bvNone
+    TabOrder = 2
+  end
+  object ActionList1: TActionList
+    left = 528
+    top = 56
+    object aParse: TAction
+      Caption = 'Parse SVG'
+    end
+  end
+end

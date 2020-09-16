@@ -1,0 +1,22 @@
+object frmRenderProgrammatically: TfrmRenderProgrammatically
+  Left = 575
+  Height = 290
+  Top = 272
+  Width = 466
+  ClientHeight = 290
+  ClientWidth = 466
+  LCLVersion = '1.8.4.0'
+  object Button1: TButton
+    Left = 16
+    Height = 25
+    Top = 8
+    Width = 75
+    Caption = 'Button1'
+    OnClick = Button1Click
+    TabOrder = 0
+  end
+  object OpenDialog1: TOpenDialog
+    left = 112
+    top = 8
+  end
+end

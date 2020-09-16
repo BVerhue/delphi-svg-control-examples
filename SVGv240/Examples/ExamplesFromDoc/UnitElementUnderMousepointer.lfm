@@ -1,0 +1,21 @@
+object frmElementUnderMousepointer: TfrmElementUnderMousepointer
+  Left = 585
+  Height = 451
+  Top = 348
+  Width = 802
+  ClientHeight = 451
+  ClientWidth = 802
+  LCLVersion = '1.8.4.0'
+  object SVG2Image1: TSVG2Image
+    Left = 0
+    Height = 451
+    Top = 0
+    Width = 802
+    Align = alClient
+    OnMouseDown = SVG2Image1MouseDown
+    BufferQuality = bqHighQuality
+    RenderOptions = [sroClippath, sroEvents]
+    AutoViewBox = True
+    FileName = '..\..\..\..\Img\animated-clock.svg'
+  end
+end

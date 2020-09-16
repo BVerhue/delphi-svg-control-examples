@@ -1,0 +1,20 @@
+object frmAddRemoveElements: TfrmAddRemoveElements
+  Left = 603
+  Height = 389
+  Top = 365
+  Width = 573
+  ClientHeight = 389
+  ClientWidth = 573
+  OnCreate = FormCreate
+  LCLVersion = '1.8.4.0'
+  object SVG2Image1: TSVG2Image
+    Left = 0
+    Height = 389
+    Top = 0
+    Width = 573
+    Align = alClient
+    OnClick = SVG2Image1Click
+    BufferQuality = bqHighQuality
+    AutoViewBox = True
+  end
+end

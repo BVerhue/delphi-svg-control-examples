@@ -1,0 +1,27 @@
+object frmChangeAttribute: TfrmChangeAttribute
+  Left = 452
+  Height = 434
+  Top = 278
+  Width = 507
+  ClientHeight = 434
+  ClientWidth = 507
+  OnCreate = FormCreate
+  LCLVersion = '1.8.4.0'
+  object SVG2Image1: TSVG2Image
+    Left = 0
+    Height = 434
+    Top = 0
+    Width = 507
+    Align = alClient
+    BufferQuality = bqHighQuality
+    AutoViewBox = True
+    OnAfterParse = SVG2Image1AfterParse
+  end
+  object Timer1: TTimer
+    Enabled = False
+    Interval = 25
+    OnTimer = Timer1Timer
+    left = 16
+    top = 16
+  end
+end

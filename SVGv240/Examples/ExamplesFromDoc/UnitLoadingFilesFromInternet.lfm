@@ -1,0 +1,70 @@
+object frmLoadingFilesFromInternet: TfrmLoadingFilesFromInternet
+  Left = 324
+  Height = 479
+  Top = 183
+  Width = 998
+  ClientHeight = 479
+  ClientWidth = 998
+  OnCreate = FormCreate
+  LCLVersion = '1.8.4.0'
+  object SVG2Image1: TSVG2Image
+    Left = 8
+    Height = 360
+    Top = 78
+    Width = 480
+    BufferQuality = bqHighQuality
+    AutoViewBox = True
+  end
+  object Image1: TImage
+    Left = 494
+    Height = 360
+    Top = 78
+    Width = 480
+  end
+  object Label2: TLabel
+    Left = 8
+    Height = 15
+    Top = 59
+    Width = 57
+    Caption = 'SVG image'
+    ParentColor = False
+  end
+  object Label3: TLabel
+    Left = 494
+    Height = 15
+    Top = 59
+    Width = 57
+    Caption = 'Png image'
+    ParentColor = False
+  end
+  object Panel1: TPanel
+    Left = 0
+    Height = 41
+    Top = 0
+    Width = 998
+    Align = alTop
+    ClientHeight = 41
+    ClientWidth = 998
+    TabOrder = 0
+    object Label1: TLabel
+      Left = 1
+      Height = 39
+      Top = 1
+      Width = 996
+      Align = alClient
+      Alignment = taCenter
+      Caption = 'Requirements for downloading files directly from the internet: Define InternetAccess must be enabeld in CompilerSettings.inc. For SSL (https) libeay32.dll and ssleay32.dll must  be available on the system. Download from https://indy.fulgan.com/SSL/'
+      ParentColor = False
+      WordWrap = True
+    end
+  end
+  object Button1: TButton
+    Left = 8
+    Height = 25
+    Top = 444
+    Width = 75
+    Caption = 'Next'
+    OnClick = Button1Click
+    TabOrder = 1
+  end
+end

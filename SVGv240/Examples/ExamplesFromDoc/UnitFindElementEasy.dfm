@@ -1,0 +1,32 @@
+object frmFindElementEasy: TfrmFindElementEasy
+  Left = 0
+  Top = 0
+  Caption = 'frmFindElementEasy'
+  ClientHeight = 299
+  ClientWidth = 635
+  Color = clBtnFace
+  DoubleBuffered = True
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'Tahoma'
+  Font.Style = []
+  OldCreateOrder = False
+  OnCreate = FormCreate
+  OnKeyDown = FormKeyDown
+  PixelsPerInch = 96
+  TextHeight = 13
+  object SVG2Image1: TSVG2Image
+    Left = 0
+    Top = 0
+    Width = 635
+    Height = 299
+    Align = alClient
+    BufferQuality = bqHighQuality
+    AutoViewBox = True
+    ExplicitLeft = 168
+    ExplicitTop = 64
+    ExplicitWidth = 105
+    ExplicitHeight = 105
+  end
+end

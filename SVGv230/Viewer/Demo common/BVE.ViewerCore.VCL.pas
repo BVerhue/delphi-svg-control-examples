@@ -412,6 +412,8 @@ type
     procedure ActionExportExecute(Sender: TObject);
     procedure ActionAboutExecute(Sender: TObject);
     procedure ActionNewExecute(Sender: TObject);
+    procedure ActionAnimationStartExecute(Sender: TObject);
+    procedure ActionAnimationPauseExecute(Sender: TObject);
 
     procedure SetCurrSelectControl(const Value: TSVGSelectControl); virtual;
     function GetCurrSelectControl: TSVGSelectControl; virtual;
@@ -1517,6 +1519,16 @@ end;
 procedure TSVGViewerForm.ActionAboutExecute(Sender: TObject);
 begin
   FormAbout.ShowModal;
+end;
+
+procedure TSVGViewerForm.ActionAnimationPauseExecute(Sender: TObject);
+begin
+
+end;
+
+procedure TSVGViewerForm.ActionAnimationStartExecute(Sender: TObject);
+begin
+
 end;
 
 procedure TSVGViewerForm.ActionAutoViewBoxExecute(Sender: TObject);

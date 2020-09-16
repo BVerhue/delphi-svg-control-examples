@@ -1,0 +1,111 @@
+object frmViewer: TfrmViewer
+  Left = 0
+  Top = 0
+  Caption = 'SVG Viewer FMX'
+  ClientHeight = 640
+  ClientWidth = 923
+  Visible = False
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
+  OnKeyDown = FormKeyDown
+  OnResize = FormResize
+  StyleLookup = 'backgroundstyle'
+  object OpenDialog1: TOpenDialog
+    Left = 184
+    Top = 40
+  end
+  object sb: TScrollBox
+    Align = alClient
+    Position.Point = '(0,30)'
+    Width = 923.000000000000000000
+    Height = 610.000000000000000000
+    TabOrder = 0
+    object lSize: TLayout
+      Width = 769.000000000000000000
+      Height = 505.000000000000000000
+      object lZoom: TLayout
+        Width = 753.000000000000000000
+        Height = 481.000000000000000000
+      end
+    end
+  end
+  object Panel1: TPanel
+    Align = alTop
+    Width = 923.000000000000000000
+    Height = 30.000000000000000000
+    TabOrder = 1
+    object bLoad: TButton
+      Align = alLeft
+      Position.Point = '(4,4)'
+      Width = 80.000000000000000000
+      Height = 22.000000000000000000
+      Padding.Rect = '(4,4,4,4)'
+      OnClick = bLoadClick
+      TabOrder = 0
+      Text = 'Load'
+    end
+    object bProperties: TButton
+      Align = alLeft
+      Position.Point = '(92,4)'
+      Width = 80.000000000000000000
+      Height = 22.000000000000000000
+      Padding.Rect = '(4,4,4,4)'
+      OnClick = bPropertiesClick
+      TabOrder = 1
+      Text = 'Properties'
+    end
+    object bCopy: TButton
+      Align = alLeft
+      Position.Point = '(180,4)'
+      Width = 80.000000000000000000
+      Height = 22.000000000000000000
+      Padding.Rect = '(4,4,4,4)'
+      OnClick = bCopyClick
+      TabOrder = 2
+      Text = 'Copy'
+    end
+    object bExit: TButton
+      Align = alLeft
+      Position.Point = '(268,4)'
+      Width = 80.000000000000000000
+      Height = 22.000000000000000000
+      Padding.Rect = '(4,4,4,4)'
+      OnClick = bExitClick
+      TabOrder = 3
+      Text = 'Exit'
+    end
+    object Label2: TLabel
+      Align = alLeft
+      Position.Point = '(352,0)'
+      Width = 49.000000000000000000
+      Height = 30.000000000000000000
+      Margins.Rect = '(0,0,10,0)'
+      TabOrder = 4
+      TextAlign = taCenter
+      Text = 'Zoom'
+    end
+    object tbZoom: TTrackBar
+      Align = alLeft
+      Position.Point = '(405,0)'
+      Width = 168.000000000000000000
+      Height = 30.000000000000000000
+      Padding.Rect = '(4,0,4,0)'
+      TabOrder = 5
+      Min = 0.009999999776482582
+      Max = 10.000000000000000000
+      Orientation = orHorizontal
+      Value = 1.000000000000000000
+      OnChange = tbZoomChange
+    end
+    object bReset: TButton
+      Align = alLeft
+      Position.Point = '(581,4)'
+      Width = 80.000000000000000000
+      Height = 22.000000000000000000
+      Padding.Rect = '(4,4,4,4)'
+      OnClick = bResetClick
+      TabOrder = 6
+      Text = 'Rest'
+    end
+  end
+end

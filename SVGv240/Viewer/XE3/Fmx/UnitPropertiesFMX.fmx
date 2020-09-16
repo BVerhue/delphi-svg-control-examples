@@ -1,0 +1,251 @@
+object frmProperties: TfrmProperties
+  Left = 0
+  Top = 0
+  Caption = 'Properties'
+  ClientHeight = 481
+  ClientWidth = 721
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [dkDesktop]
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
+  OnShow = FormShow
+  object Panel2: TPanel
+    Align = alTop
+    Height = 30.000000000000000000
+    Width = 721.000000000000000000
+    object Button1: TButton
+      Action = aParseSVG
+      Align = alLeft
+      DisableFocusEffect = False
+      Height = 22.000000000000000000
+      Margins.Left = 4.000000000000000000
+      Margins.Top = 4.000000000000000000
+      Margins.Right = 4.000000000000000000
+      Margins.Bottom = 4.000000000000000000
+      Padding.Left = 4.000000000000000000
+      Padding.Top = 4.000000000000000000
+      Padding.Right = 4.000000000000000000
+      Padding.Bottom = 4.000000000000000000
+      Position.X = 4.000000000000000000
+      Position.Y = 4.000000000000000000
+      Width = 80.000000000000000000
+    end
+  end
+  object Label1: TLabel
+    Align = alTop
+    Font.Style = [fsBold]
+    Height = 17.000000000000000000
+    Position.Y = 30.000000000000000000
+    Text = 'Label1'
+    TextAlign = taCenter
+    Width = 721.000000000000000000
+  end
+  object TabControl1: TTabControl
+    Align = alClient
+    Height = 434.000000000000000000
+    Position.Y = 47.000000000000000000
+    TabIndex = 0
+    Width = 721.000000000000000000
+    object TabItem1: TTabItem
+      WordWrap = False
+      Height = 24.000000000000000000
+      IsSelected = True
+      Position.X = 1.000000000000000000
+      Text = 'Structure'
+      Width = 64.000000000000000000
+      object TreeView1: TTreeView
+        Touch.InteractiveGestures = [igPan]
+        Align = alLeft
+        Height = 410.000000000000000000
+        Width = 337.000000000000000000
+        OnClick = TreeView1Click
+      end
+      object Splitter1: TSplitter
+        Align = alLeft
+        Cursor = crHSplit
+        Height = 410.000000000000000000
+        MinSize = 20.000000000000000000
+        Position.X = 337.000000000000000000
+        Width = 4.000000000000000000
+      end
+      object Layout1: TLayout
+        Align = alClient
+        Height = 410.000000000000000000
+        Position.X = 341.000000000000000000
+        Width = 380.000000000000000000
+        object Memo2: TMemo
+          Touch.InteractiveGestures = [igPan]
+          Align = alBottom
+          Height = 98.000000000000000000
+          Position.Y = 282.000000000000000000
+          Width = 380.000000000000000000
+          DisableFocusEffect = False
+          KeyboardType = vktDefault
+        end
+        object Panel1: TPanel
+          Align = alBottom
+          Height = 30.000000000000000000
+          Position.Y = 380.000000000000000000
+          Width = 380.000000000000000000
+          object Button2: TButton
+            Action = aAttributeChange
+            Align = alLeft
+            DisableFocusEffect = False
+            Height = 22.000000000000000000
+            Margins.Left = 4.000000000000000000
+            Margins.Top = 4.000000000000000000
+            Margins.Right = 4.000000000000000000
+            Margins.Bottom = 4.000000000000000000
+            Padding.Left = 4.000000000000000000
+            Padding.Top = 4.000000000000000000
+            Padding.Right = 4.000000000000000000
+            Padding.Bottom = 4.000000000000000000
+            Position.X = 4.000000000000000000
+            Position.Y = 4.000000000000000000
+            Width = 80.000000000000000000
+          end
+        end
+        object Splitter2: TSplitter
+          Align = alBottom
+          Cursor = crVSplit
+          Height = 4.000000000000000000
+          MinSize = 20.000000000000000000
+          Position.Y = 278.000000000000000000
+          Width = 380.000000000000000000
+        end
+        object StringGrid1: TStringGrid
+          Touch.InteractiveGestures = [igPan]
+          Align = alClient
+          Height = 278.000000000000000000
+          StyleLookup = 'gridstyle'
+          Width = 380.000000000000000000
+          OnClick = StringGrid1Click
+          RowCount = 3
+          RowHeight = 21.000000000000000000
+          object StringColumn1: TStringColumn
+            Header = 'Attribute'
+            Height = 253.000000000000000000
+            Width = 150.000000000000000000
+          end
+          object StringColumn2: TStringColumn
+            Header = 'Value'
+            Height = 253.000000000000000000
+            Position.X = 150.000000000000000000
+            Width = 200.000000000000000000
+          end
+        end
+      end
+    end
+    object TabItem2: TTabItem
+      WordWrap = False
+      Height = 24.000000000000000000
+      IsSelected = False
+      Position.X = 65.000000000000000000
+      Text = 'Text'
+      Width = 39.000000000000000000
+      object Memo1: TMemo
+        Touch.InteractiveGestures = [igPan]
+        Align = alClient
+        Height = 50.000000000000000000
+        Width = 50.000000000000000000
+        DisableFocusEffect = False
+        KeyboardType = vktDefault
+        OnChange = Memo1Change
+      end
+    end
+    object TabItem3: TTabItem
+      WordWrap = False
+      Height = 24.000000000000000000
+      IsSelected = False
+      Position.X = 104.000000000000000000
+      Text = 'Renderer options'
+      Width = 104.000000000000000000
+      object GroupBox1: TGroupBox
+        Align = alTop
+        Height = 105.000000000000000000
+        Margins.Left = 10.000000000000000000
+        Margins.Top = 20.000000000000000000
+        Margins.Right = 10.000000000000000000
+        Margins.Bottom = 10.000000000000000000
+        Padding.Left = 10.000000000000000000
+        Padding.Top = 16.000000000000000000
+        Padding.Right = 10.000000000000000000
+        Padding.Bottom = 10.000000000000000000
+        Position.X = 10.000000000000000000
+        Position.Y = 16.000000000000000000
+        Text = 'Render options'
+        Width = 30.000000000000000000
+        object cbClippaths: TCheckBox
+          Align = alTop
+          DisableFocusEffect = False
+          Height = 19.000000000000000000
+          IsChecked = True
+          Margins.Left = 8.000000000000000000
+          Margins.Top = 4.000000000000000000
+          Margins.Right = 8.000000000000000000
+          Margins.Bottom = 4.000000000000000000
+          Position.X = 10.000000000000000000
+          Position.Y = 39.000000000000000000
+          Text = 'Clippaths'
+          Width = 10.000000000000000000
+          OnChange = cbClippathsChange
+        end
+        object cbFilters: TCheckBox
+          Align = alTop
+          DisableFocusEffect = False
+          Height = 19.000000000000000000
+          Margins.Left = 8.000000000000000000
+          Margins.Top = 4.000000000000000000
+          Margins.Right = 8.000000000000000000
+          Margins.Bottom = 4.000000000000000000
+          Position.X = 10.000000000000000000
+          Position.Y = 20.000000000000000000
+          Text = 'Filters'
+          Width = 10.000000000000000000
+          OnChange = cbFiltersChange
+        end
+        object cbAutoViewbox: TCheckBox
+          Align = alTop
+          DisableFocusEffect = False
+          Height = 19.000000000000000000
+          IsChecked = True
+          Margins.Left = 8.000000000000000000
+          Margins.Top = 4.000000000000000000
+          Margins.Right = 8.000000000000000000
+          Margins.Bottom = 4.000000000000000000
+          Position.X = 10.000000000000000000
+          Position.Y = 58.000000000000000000
+          Text = 'Auto viewbox'
+          Width = 10.000000000000000000
+          OnChange = cbAutoViewboxChange
+        end
+      end
+      object Memo3: TMemo
+        Touch.InteractiveGestures = [igPan]
+        Align = alClient
+        Margins.Left = 10.000000000000000000
+        Margins.Top = 10.000000000000000000
+        Margins.Right = 10.000000000000000000
+        Margins.Bottom = 10.000000000000000000
+        Position.Y = 131.000000000000000000
+        Width = 50.000000000000000000
+        DisableFocusEffect = False
+        KeyboardType = vktDefault
+        Font.Family = 'Courier New'
+      end
+    end
+  end
+  object ActionList1: TActionList
+    Left = 480
+    Top = 21
+    object aParseSVG: TAction
+      Text = 'Parse SVG'
+      OnExecute = aParseSVGExecute
+    end
+    object aAttributeChange: TAction
+      Text = 'Change'
+      OnExecute = aAttributeChangeExecute
+    end
+  end
+end

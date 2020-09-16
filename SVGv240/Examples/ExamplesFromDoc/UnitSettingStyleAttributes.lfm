@@ -1,0 +1,20 @@
+object frmSettingStyleAttributes: TfrmSettingStyleAttributes
+  Left = 570
+  Height = 338
+  Top = 232
+  Width = 451
+  ClientHeight = 338
+  ClientWidth = 451
+  OnCreate = FormCreate
+  LCLVersion = '1.8.4.0'
+  object SVG2Image1: TSVG2Image
+    Left = 0
+    Height = 338
+    Top = 0
+    Width = 451
+    Align = alClient
+    OnClick = SVG2Image1Click
+    BufferQuality = bqHighQuality
+    AutoViewBox = True
+  end
+end

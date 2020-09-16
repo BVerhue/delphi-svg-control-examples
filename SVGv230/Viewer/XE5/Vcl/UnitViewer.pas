@@ -98,14 +98,7 @@ type
     OpenPictureDialog1: TOpenPictureDialog;
     SavePictureDialog1: TSavePictureDialog;
     SVG2LinkedImageList1: TSVG2LinkedImageList;
-    ToolBar1: TToolBar;
-    lblTime: TLabel;
-    ToolButton1: TToolButton;
-    ToolButton2: TToolButton;
-    ToolButton3: TToolButton;
     SVG2LinkedImageList2: TSVG2LinkedImageList;
-    aAnimationStart: TAction;
-    aAnimationPause: TAction;
     procedure FormCreate(Sender: TObject);
   end;
 

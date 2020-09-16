@@ -1,0 +1,21 @@
+object frmMouseEvents: TfrmMouseEvents
+  Left = 545
+  Height = 367
+  Top = 330
+  Width = 613
+  ClientHeight = 367
+  ClientWidth = 613
+  OnCreate = FormCreate
+  LCLVersion = '1.8.4.0'
+  object SVG2Image1: TSVG2Image
+    Left = 0
+    Height = 367
+    Top = 0
+    Width = 613
+    Align = alClient
+    BufferQuality = bqHighQuality
+    RenderOptions = [sroClippath, sroEvents]
+    AutoViewBox = True
+    OnSVGEvent = SVG2Image1SVGEvent
+  end
+end
