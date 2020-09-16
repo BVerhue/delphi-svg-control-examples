@@ -74,15 +74,12 @@ end;
 procedure TfrmAddSVGFragment.SVG2Image1Click(Sender: TObject);
 var
   Element: ISVGElement;
-  Temp: string;
 begin
   Element := SVG2Image1.SVGRoot.Element['text'];
   if assigned(Element) then
   begin
     Element.ChildNodes.Clear;
     Element.AddFragment('<tspan fill="yellow">Button <tspan fill="red" font-weight="bold" text-decoration="underline">clicked!</tspan></tspan>');
-
-    Temp := SVG2Image1.SVGRoot.Doc.XML.Text;
 
     SVG2Image1.Repaint;
   end;

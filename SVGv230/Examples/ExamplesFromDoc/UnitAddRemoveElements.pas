@@ -4,12 +4,6 @@ unit UnitAddRemoveElements;
   {$MODE Delphi}
 {$ENDIF}
 
-{$IFnDEF FPC}
-  {$I 'CompilerSettings.inc'}
-{$ELSE}
-  {$Define SVGLibVersion2400Up}
-{$ENDIF}
-
 interface
 uses
 {$IFnDEF FPC}
@@ -22,9 +16,6 @@ uses
   Vcl.Controls,
   Vcl.Forms,
   Vcl.Dialogs,
-  {$IFDEF SVGLibVersion2400Up}
-  BVE.SVG2Doc,
-  {$ENDIF}
   BVE.SVG2Image.VCL,
   BVE.SVG2Control.VCL;
 {$ELSE}
@@ -35,9 +26,6 @@ uses
   Controls,
   Forms,
   Dialogs,
-  {$IFDEF SVGLibVersion2400Up}
-  BVE.SVG2Doc,
-  {$ENDIF}
   BVE.SVG2Image.FPC,
   BVE.SVG2Control.FPC;
 {$ENDIF}
@@ -80,23 +68,11 @@ end;
 procedure TfrmAddRemoveElements.SVG2Image1Click(Sender: TObject);
 var
   Node: IXMLNode;
-  {$IFDEF SVGLibVersion2400Up}
-  Doc: ISVGXMLDocument;
-  {$ENDIF}
 begin
   case FSTep of
   0: begin
-       {$IFDEF SVGLibVersion2400Up}
-       SVG2Image1.SVGRoot.Clear;
-
-       Doc := SVG2Image1.SVGRoot.CreateSVGXMLDocument;
-       SVG2Image1.SVGRoot.DocAdd(Doc);
-
-       Node := Doc.DocumentElement;
-       {$ELSE}
        Node := SVGCreateElement(el_svg);
        SVG2Image1.SVGRoot.SVGList.Add(Node);
-       {$ENDIF}
 
        Node.Attributes['width'] := '10cm';
        Node.Attributes['height'] := '8cm';
@@ -107,12 +83,8 @@ begin
      end;
 
   1: begin
-       {$IFDEF SVGLibVersion2400Up}
-       Node := SVG2Image1.SVGRoot.SVG.AddChild(el_rect, ns_uri_svg);
-       {$ELSE}
        Node := SVGCreateElement(el_rect);
        SVG2Image1.SVGRoot.SVG.ChildNodes.Add(Node);
-       {$ENDIF}
 
        Node.Attributes['id'] := 'rect';
        Node.Attributes['x'] := 0;
@@ -126,12 +98,8 @@ begin
      end;
 
   2: begin
-       {$IFDEF SVGLibVersion2400Up}
-       Node := SVG2Image1.SVGRoot.SVG.AddChild(el_ellipse, ns_uri_svg);
-       {$ELSE}
        Node := SVGCreateElement(el_ellipse);
        SVG2Image1.SVGRoot.SVG.ChildNodes.Add(Node);
-       {$ENDIF}
 
        Node.Attributes['cx'] := 50;
        Node.Attributes['cy'] := 40;
@@ -144,12 +112,8 @@ begin
      end;
 
   3: begin
-       {$IFDEF SVGLibVersion2400Up}
-       Node := SVG2Image1.SVGRoot.SVG.AddChild(el_text, ns_uri_svg);
-       {$ELSE}
        Node := SVGCreateElement(el_text);
        SVG2Image1.SVGRoot.SVG.ChildNodes.Add(Node);
-       {$ENDIF}
 
        Node.Attributes['x'] := 50;
        Node.Attributes['y'] := 45;
