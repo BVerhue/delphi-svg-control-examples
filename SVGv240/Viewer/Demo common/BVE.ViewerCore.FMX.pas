@@ -40,9 +40,6 @@ unit BVE.ViewerCore.FMX;
 
 {$Include '..\Common\CompilerSettings.inc'}
 
-// Enable this to test the custom filter functionality. "Filters" (sroFilters)
-// must be enabled in the RenderOptions (doesn't work on ex2).
-
 interface
 uses
   System.Types,

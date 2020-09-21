@@ -113,6 +113,7 @@
         <Debugger_DebugSourcePath>D:\Crash20140412\Documenten\Delphi\AggPasMod\Source\;$(Debugger_DebugSourcePath)</Debugger_DebugSourcePath>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
+        <DCC_DebugDCUs>false</DCC_DebugDCUs>
         <Icon_MainIcon>..\..\Img\Application icons\SVGViewer\SVGViewer.ico</Icon_MainIcon>
         <Icns_MainIcns>..\..\Img\Application icons\SVGViewer\SVGViewer.icns</Icns_MainIcns>
         <DCC_MapFile>3</DCC_MapFile>
