@@ -119,6 +119,7 @@ type
     CheckBox3: TCheckBox;
     CheckBox4: TCheckBox;
     CheckBox5: TCheckBox;
+    lblRenderContext: TLabel;
     procedure FormCreate(Sender: TObject);
   end;
 
@@ -153,7 +154,8 @@ begin
     Scrollbox1,
     Statusbar1,
     TrackBar1,
-    lblTime);
+    lblTime,
+    lblRenderContext);
 end;
 
 end.

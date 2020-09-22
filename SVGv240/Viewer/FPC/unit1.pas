@@ -80,10 +80,16 @@ type
   { TForm1 }
 
   TForm1 = class(TSVGViewerForm)
+    aAnimationPause: TAction;
+    aAnimationStart: TAction;
     aCopy: TAction;
     aCopyDirect: TAction;
     aAbout: TAction;
     aAutoViewbox: TAction;
+    aEnableClippaths: TAction;
+    aEnableEvents: TAction;
+    aEnablePersistentBuffers: TAction;
+    aEnableTextToPath: TAction;
     aExport: TAction;
     aRemove: TAction;
     aEnableFilters: TAction;
@@ -92,7 +98,11 @@ type
     aEdit: TAction;
     aOpen: TAction;
     ActionList1: TActionList;
+    lblTime: TLabel;
     OpenPictureDialog1: TOpenPictureDialog;
+    Panel1: TPanel;
+    Panel2: TPanel;
+    Panel3: TPanel;
     ScrollBox1: TScrollBox;
     StatusBar1: TStatusBar;
     SVG2ImageList1: TSVG2ImageList;
@@ -100,9 +110,13 @@ type
     ilDisabled: TSVG2LinkedImageList;
     ilHot: TSVG2LinkedImageList;
     ToolBar1: TToolBar;
+    ToolBar2: TToolBar;
     ToolButton1: TToolButton;
     ToolButton10: TToolButton;
     ToolButton11: TToolButton;
+    ToolButton12: TToolButton;
+    ToolButton13: TToolButton;
+    ToolButton14: TToolButton;
     ToolButton2: TToolButton;
     ToolButton3: TToolButton;
     ToolButton4: TToolButton;
@@ -111,6 +125,7 @@ type
     ToolButton7: TToolButton;
     ToolButton8: TToolButton;
     ToolButton9: TToolButton;
+    TrackBar1: TTrackBar;
     procedure FormCreate(Sender: TObject);
   public
 
@@ -130,21 +145,29 @@ uses
 procedure TForm1.FormCreate(Sender: TObject);
 begin
   ConnectControls(
-    aOpen,
-    aEdit,
-    aCopy,
-    aNew,
-    aPaste,
-    aCopyDirect,
-    aAbout,
-    aEnableFilters,
-    aRemove,
-    aAutoViewBox,
-    aExport,
-    SVG2ImageList1,
-    OpenPictureDialog1,
-    Scrollbox1,
-    Statusbar1);
+     aOpen,
+     aEdit,
+     aCopy,
+     aNew,
+     aPaste,
+     aCopyDirect,
+     aAbout,
+     aRemove,
+     aAutoViewBox,
+     aExport,
+     aEnableFilters,
+     aEnableClippaths,
+     aEnableEvents,
+     aEnablePersistentBuffers,
+     aEnableTextToPath,
+     aAnimationStart,
+     aAnimationPause,
+     OpenPictureDialog1,
+     Scrollbox1,
+     Statusbar1,
+     TrackBar1,
+     lblTime,
+     lblRenderContext);
 end;
 
 end.

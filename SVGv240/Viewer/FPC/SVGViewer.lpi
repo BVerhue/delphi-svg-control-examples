@@ -226,7 +226,7 @@
     </Target>
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir);..\..\..\..\..\graphics32-master\Source;..\..\..\..\..\bgrabitmap-master\bgrabitmap;..\..\..\..\delphi-svg-control\SVGv230\Common;..\..\..\..\delphi-svg-control\SVGv230\Common\FPC"/>
-      <OtherUnitFiles Value="..\..\..\..\..\AggPasMod\Source;..\..\..\..\..\AggPasMod\Source\Platform;..\..\..\..\..\graphics32-master\Source;..\Demo common;..\..\..\..\..\bgrabitmap-master\bgrabitmap;..\..\..\..\delphi-svg-control\SVGv230\Common;..\..\..\..\delphi-svg-control\SVGv230\Common\FPC;..\..\..\..\delphi-svg-control\SVGv230\Common\Platform"/>
+      <OtherUnitFiles Value="..\Demo common"/>
       <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
     <Linking>

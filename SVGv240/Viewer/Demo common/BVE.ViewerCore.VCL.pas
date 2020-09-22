@@ -357,6 +357,8 @@ type
     FLabelTime: TLabel;
     FTrackBar: TTrackBar;
 
+    FLabelRenderContext: TLabel;
+
     FImageListList: TList<TSVG2BaseImageList>;
 
     FFormProperties: TSVGViewerPropertiesForm;
@@ -391,11 +393,6 @@ type
     {$IFnDEF FPC}
     procedure WMDROPFILES(var Msg: TWMDropFiles); message WM_DROPFILES;
     procedure WMClipboardUpdate(var Msg: TMessage); message WM_CLIPBOARDUPDATE;
-    procedure SetActionEnableClippaths(const Value: TAction);
-    procedure SetActionEnableEvents(const Value: TAction);
-    procedure SetActionEnableFilters(const Value: TAction);
-    procedure SetActionEnablePersistentBuffers(const Value: TAction);
-    procedure SetActionEnableTextToPath(const Value: TAction);
     {$ELSE}
     procedure OnDropFiles(Sender: TObject; const FileNames: array of String);
     {$ENDIF}
@@ -417,6 +414,12 @@ type
     procedure SetActionOpen(const Value: TAction);
     procedure SetActionPaste(const Value: TAction);
     procedure SetActionRemove(const Value: TAction);
+    procedure SetActionEnableClippaths(const Value: TAction);
+    procedure SetActionEnableEvents(const Value: TAction);
+    procedure SetActionEnableFilters(const Value: TAction);
+    procedure SetActionEnablePersistentBuffers(const Value: TAction);
+    procedure SetActionEnableTextToPath(const Value: TAction);
+    procedure SetLabelRenderContext(const Value: TLabel);
     procedure SetFilters(const Value: boolean);
     procedure SetFormAbout(const Value: TSVGViewerAboutForm);
     procedure SetFormProperties(const Value: TSVGViewerPropertiesForm);
@@ -482,7 +485,8 @@ type
       aScrollBox: TScrollBox;
       aStatusBar: TStatusBar;
       aTrackbar: TTrackbar;
-      aLabelTime: TLabel);
+      aLabelTime: TLabel;
+      aLabelRenderContext: TLabel);
 
     function CheckClipboard: boolean;
 
@@ -529,6 +533,7 @@ type
     property ScrollBox: TScrollBox read FScrollBox write SetScrollBox;
     property TrackBar: TTrackbar read FTrackBar write SetTrackBar;
     property LabelTime: TLabel read FLabelTime write SetLabelTime;
+    property LabelRenderContext: TLabel read FLabelRenderContext write SetLabelRenderContext;
   end;
 
   TSVGViewerPropertiesForm = class(TForm)
@@ -1891,7 +1896,8 @@ procedure TSVGViewerForm.ConnectControls(
   aScrollBox: TScrollBox;
   aStatusBar: TStatusBar;
   aTrackBar: TTrackBar;
-  aLabelTime: TLabel);
+  aLabelTime: TLabel;
+  aLabelRenderContext: TLabel);
 begin
   ActionOpen := aActionOpen;
   ActionEdit := aActionEdit;
@@ -1915,6 +1921,7 @@ begin
   ScrollBox := aScrollbox;
   StatusBar := aStatusBar;
   LabelTime := aLabelTime;
+  LabelRenderContext := aLabelRenderContext;
 end;
 
 procedure TSVGViewerForm.Copy;
@@ -2481,6 +2488,33 @@ procedure TSVGViewerForm.SetFormProperties(
   const Value: TSVGViewerPropertiesForm);
 begin
   FFormProperties := Value;
+end;
+
+procedure TSVGViewerForm.SetLabelRenderContext(const Value: TLabel);
+begin
+  FLabelRenderContext := Value;
+
+  if assigned(FLabelRenderContext) then
+  begin
+    case TSVGRenderContextManager.RenderContextType of
+      rcNone:
+        FLabelRenderContext.Caption := 'Rendercontext: none';
+      rcGDIPlus:
+        FLabelRenderContext.Caption := 'Rendercontext: GDI+';
+      rcDirect2D:
+        FLabelRenderContext.Caption := 'Rendercontext: Direct2D';
+      rcAgg:
+        FLabelRenderContext.Caption := 'Rendercontext: Agg';
+      rcGR32:
+        FLabelRenderContext.Caption := 'Rendercontext: GR32';
+      rcFMXCanvas:
+        FLabelRenderContext.Caption := 'Rendercontext: FMX canvas';
+      rcQuartz:
+        FLabelRenderContext.Caption := 'Rendercontext: Quartz';
+      rcBGRA:
+        FLabelRenderContext.Caption := 'Rendercontext: BGRA';
+    end;
+  end;
 end;
 
 procedure TSVGViewerForm.SetLabelTime(const Value: TLabel);

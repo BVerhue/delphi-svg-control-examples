@@ -32,7 +32,6 @@ object Form1: TForm1
     ParentDoubleBuffered = False
     ParentFont = False
     TabOrder = 0
-    ExplicitHeight = 396
   end
   object ActionToolBar1: TActionToolBar
     Left = 0
@@ -61,8 +60,6 @@ object Form1: TForm1
     Height = 19
     Panels = <>
     SimplePanel = True
-    ExplicitLeft = 24
-    ExplicitTop = 468
   end
   object Panel1: TPanel
     Left = 0
@@ -72,9 +69,6 @@ object Form1: TForm1
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 3
-    ExplicitLeft = -23
-    ExplicitTop = 447
-    ExplicitWidth = 862
     object lblTime: TLabel
       AlignWithMargins = True
       Left = 712
@@ -98,7 +92,6 @@ object Form1: TForm1
       Max = 10000
       Frequency = 1000
       TabOrder = 0
-      ExplicitWidth = 650
     end
     object ToolBar1: TToolBar
       Left = 0
@@ -141,13 +134,19 @@ object Form1: TForm1
     Color = clBtnShadow
     ParentBackground = False
     TabOrder = 4
-    ExplicitTop = 34
     object Label1: TLabel
       Left = 9
       Top = 8
       Width = 74
       Height = 13
       Caption = 'Renderoptions:'
+    end
+    object lblRenderContext: TLabel
+      Left = 632
+      Top = 8
+      Width = 84
+      Height = 13
+      Caption = 'lblRenderContext'
     end
     object CheckBox1: TCheckBox
       Left = 89
@@ -243,6 +242,7 @@ object Form1: TForm1
           end
           item
             Action = aEnableFilters
+            Caption = '&Filters'
             ImageIndex = 4
           end
           item
@@ -659,7 +659,7 @@ object Form1: TForm1
     Left = 608
     Top = 119
     Bitmap = {
-      494C01011E006800840018001800FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C01011E006800880018001800FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000060000000C000000001002000000000000020
       0100000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -3065,7 +3065,7 @@ object Form1: TForm1
     Left = 608
     Top = 162
     Bitmap = {
-      494C01010F0064006C0018001800FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C01010F006400700018001800FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000600000006000000001002000000000000090
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -4270,7 +4270,7 @@ object Form1: TForm1
     Left = 608
     Top = 208
     Bitmap = {
-      494C01010F002000280018001800FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C01010F0020002C0018001800FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000600000006000000001002000000000000090
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
