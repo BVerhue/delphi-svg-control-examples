@@ -97,15 +97,28 @@ type
     aExport: TAction;
     OpenPictureDialog1: TOpenPictureDialog;
     SavePictureDialog1: TSavePictureDialog;
-    SVG2LinkedImageList1: TSVG2LinkedImageList;
-    ToolBar1: TToolBar;
+    ilNormal: TSVG2LinkedImageList;
+    ilDisabled: TSVG2LinkedImageList;
+    aAnimationStart: TAction;
+    aAnimationPause: TAction;
+    Panel1: TPanel;
     lblTime: TLabel;
+    TrackBar1: TTrackBar;
+    ToolBar1: TToolBar;
     ToolButton1: TToolButton;
     ToolButton2: TToolButton;
     ToolButton3: TToolButton;
-    SVG2LinkedImageList2: TSVG2LinkedImageList;
-    aAnimationStart: TAction;
-    aAnimationPause: TAction;
+    Panel2: TPanel;
+    Label1: TLabel;
+    aEnableClippaths: TAction;
+    aEnableEvents: TAction;
+    aEnablePersistentBuffers: TAction;
+    aEnableTextToPath: TAction;
+    CheckBox1: TCheckBox;
+    CheckBox2: TCheckBox;
+    CheckBox3: TCheckBox;
+    CheckBox4: TCheckBox;
+    CheckBox5: TCheckBox;
     procedure FormCreate(Sender: TObject);
   end;
 
@@ -126,16 +139,20 @@ begin
     aPaste,
     aCopyDirect,
     aAbout,
-    aEnableFilters,
     aRemove,
     aAutoViewBox,
     aExport,
+    aEnableFilters,
+    aEnableClippaths,
+    aEnableEvents,
+    aEnablePersistentBuffers,
+    aEnableTextToPath,
     aAnimationStart,
     aAnimationPause,
-    SVG2ImageList1,
     OpenPictureDialog1,
     Scrollbox1,
     Statusbar1,
+    TrackBar1,
     lblTime);
 end;
 

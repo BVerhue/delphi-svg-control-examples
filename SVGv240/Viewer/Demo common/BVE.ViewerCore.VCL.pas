@@ -35,19 +35,7 @@ unit BVE.ViewerCore.VCL;
 //  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ///  <summary>
-///
 ///    This unit contains the core functionality of the "SVG Viewer demo".
-///
-///    Add the following paths to the project search path or library path:
-///
-///    1. In case of demo:
-///        <Root folder>\<Delphi version>\Dcu
-///
-///    2. In case of full version with source code:
-///        <Root folder>\Common
-///        <Root folder>\Common\Vcl
-///        <Root folder>\Common\Platform
-///
 ///  </summary>
 
 {$IFDEF FPC}
@@ -235,14 +223,21 @@ type
     procedure MouseUp(Button: TMouseButton; Shift: TShiftState;
       X, Y: integer); override;
     procedure Resize; override;
+    {$IFnDEF FPC}
     {$IFDEF Ver310Up}
     procedure ChangeScale(M, D: Integer; isDpiChange: Boolean); override;
     {$ELSE}
     procedure ChangeScale(M, D: Integer); override;
     {$ENDIF}
+    {$ENDIF}
   public
     constructor Create(AOwner: TComponent; aSelectionList: TSVGSelectionList); reintroduce; virtual;
     destructor Destroy; override;
+
+    {$IFDEF FPC}
+    procedure AutoAdjustLayout(AMode: TLayoutAdjustmentPolicy;
+      const AFromPPI, AToPPI, AOldFormWidth, ANewFormWidth: Integer); override;
+    {$ENDIF}
 
     function CreateCopy(aSelectionList : TSVGSelectionList): TSVGSelectControl;
     procedure Assign(Source: TPersistent); override;
@@ -300,16 +295,16 @@ type
     FHandHour: ISVGObject;
     FPathhandHour: ISVGObject;
 
-    FHour, FMin, FSec: single;
+    FHour, FMin, FSec: TSVGFloat;
     FTimer: TTimer;
 
     FMouseDownPoint: TPoint;
     FSelectedObject: ISVGObject;
 
-    procedure SetLayoutAngle(aLayout: ISVGObject; aAngle: single);
-    procedure AddDeltaSec(const aD: Single);
-    procedure AddDeltaMin(const aD: Single);
-    procedure AddDeltaHour(const aD: Single);
+    procedure SetLayoutAngle(aLayout: ISVGObject; aAngle: TSVGFloat);
+    procedure AddDeltaSec(const aD: TSVGFloat);
+    procedure AddDeltaMin(const aD: TSVGFloat);
+    procedure AddDeltaHour(const aD: TSVGFloat);
     procedure UpdateClock;
     procedure SetTime(Sender: TObject);
     function GetValid: boolean;
@@ -343,18 +338,26 @@ type
     FActionPaste: TAction;
     FActionCopyDirect: TAction;
     FActionAbout: TAction;
-    FActionEnableFilters: TAction;
     FActionRemove: TAction;
     FActionAutoViewBox: TAction;
     FActionExport: TAction;
+
+    FActionEnableFilters: TAction;
+    FActionEnableClippaths: TAction;
+    FActionEnableEvents: TAction;
+    FActionEnablePersistentBuffers: TAction;
+    FActionEnableTextToPath: TAction;
+
     FActionAnimationPause: TAction;
     FActionAnimationStart: TAction;
 
     FScrollBox: TScrollBox;
-    FImageList: TSVG2ImageList;
     FOpenDialog: TOpenDialog;
     FStatusBar: TStatusBar;
     FLabelTime: TLabel;
+    FTrackBar: TTrackBar;
+
+    FImageListList: TList<TSVG2BaseImageList>;
 
     FFormProperties: TSVGViewerPropertiesForm;
     FFormAbout: TSVGViewerAboutForm;
@@ -365,8 +368,8 @@ type
     function NewSVGSelectControl: TSVGSelectControl;
     procedure CheckValidSVG(const aSvg: string);
     function RenderToBitmap: TBitmap;
-    procedure ImageListScale(aImageList: TSVG2ImageList; M, D: Integer);
-    procedure ImageListTheme(aImageList: TSVG2ImageList);
+    procedure ImageListScale(aImageList: TSVG2BaseImageList; M, D: Integer);
+    procedure ImageListTheme(aImageList: TSVG2BaseImageList);
 
     procedure AfterParse(Sender: TObject);
     {$IFDEF Ver290Down}
@@ -384,13 +387,25 @@ type
       Shift: TShiftState; X, Y: Integer);
     procedure SVGSelectMouseUp(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
+    procedure TrackBarChange(Sender: TObject);
     {$IFnDEF FPC}
     procedure WMDROPFILES(var Msg: TWMDropFiles); message WM_DROPFILES;
     procedure WMClipboardUpdate(var Msg: TMessage); message WM_CLIPBOARDUPDATE;
+    procedure SetActionEnableClippaths(const Value: TAction);
+    procedure SetActionEnableEvents(const Value: TAction);
+    procedure SetActionEnableFilters(const Value: TAction);
+    procedure SetActionEnablePersistentBuffers(const Value: TAction);
+    procedure SetActionEnableTextToPath(const Value: TAction);
     {$ELSE}
     procedure OnDropFiles(Sender: TObject; const FileNames: array of String);
     {$ENDIF}
   public
+    function GetAutoViewBox: boolean;
+    function GetFilters: boolean;
+
+    procedure SetAutoViewBox(const Value: boolean);
+    procedure SetActionAnimationPause(const Value: TAction);
+    procedure SetActionAnimationStart(const Value: TAction);
     procedure SeActionEnableFilters(const Value: TAction);
     procedure SetActionAbout(const Value: TAction);
     procedure SetActionAutoViewBox(const Value: TAction);
@@ -402,19 +417,14 @@ type
     procedure SetActionOpen(const Value: TAction);
     procedure SetActionPaste(const Value: TAction);
     procedure SetActionRemove(const Value: TAction);
+    procedure SetFilters(const Value: boolean);
+    procedure SetFormAbout(const Value: TSVGViewerAboutForm);
+    procedure SetFormProperties(const Value: TSVGViewerPropertiesForm);
+    procedure SetLabelTime(const Value: TLabel);
     procedure SetStatusBar(const Value: TStatusBar);
     procedure SetOpenDialog(const Value: TOpenDialog);
-    procedure SetImageList(const Value: TSVG2ImageList);
+    procedure SetTrackBar(const Value: TTrackbar);
     procedure SetScrollBox(const Value: TScrollBox);
-    function GetAutoViewBox: boolean;
-    procedure SetAutoViewBox(const Value: boolean);
-    function GetFilters: boolean;
-    procedure SetFilters(const Value: boolean);
-    procedure SetFormProperties(const Value: TSVGViewerPropertiesForm);
-    procedure SetFormAbout(const Value: TSVGViewerAboutForm);
-    procedure SetActionAnimationPause(const Value: TAction);
-    procedure SetActionAnimationStart(const Value: TAction);
-    procedure SetLabelTime(const Value: TLabel);
   protected
     procedure DoCreate; override;
     procedure DoDestroy; override;
@@ -433,7 +443,11 @@ type
     procedure ActionCopyDirectExecute(Sender: TObject);
     procedure ActionPasteExecute(Sender: TObject);
     procedure ActionAutoViewBoxExecute(Sender: TObject);
+    procedure ActionEnableClippathsExecute(Sender: TObject);
+    procedure ActionEnableEventsExecute(Sender: TObject);
     procedure ActionEnableFiltersExecute(Sender: TObject);
+    procedure ActionEnablePersistentBuffersExecute(Sender: TObject);
+    procedure ActionEnableTextToPathExecute(Sender: TObject);
     procedure ActionExportExecute(Sender: TObject);
     procedure ActionAboutExecute(Sender: TObject);
     procedure ActionNewExecute(Sender: TObject);
@@ -443,7 +457,7 @@ type
     procedure SetCurrSelectControl(const Value: TSVGSelectControl); virtual;
     function GetCurrSelectControl: TSVGSelectControl; virtual;
   public
-    constructor Create(AOwnder: TComponent); override;
+    constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
 
     procedure ConnectControls(
@@ -454,19 +468,25 @@ type
       aActionPaste: TAction;
       aActionCopyDirect: TAction;
       aActionAbout: TAction;
-      aActionEnableFilters: TAction;
       aActionRemove: TAction;
       aActionAutoViewBox: TAction;
       aActionExport: TAction;
+      aActionEnableFilters: TAction;
+      aActionEnableClippaths: TAction;
+      aActionEnableEvents: TAction;
+      aActionEnablePersistentBuffers: TAction;
+      aActionEnableTextToPath: TAction;
       aActionAnimationStart: TAction;
       aActionAnimationPause: TAction;
-      aImageList: TSVG2ImageList;
       aOpenDialog: TOpenDialog;
       aScrollBox: TScrollBox;
       aStatusBar: TStatusBar;
+      aTrackbar: TTrackbar;
       aLabelTime: TLabel);
 
     function CheckClipboard: boolean;
+
+    procedure RegisterImageList(aImageList: TSVG2BaseImageList);
 
     procedure Copy;
     procedure CopyDirect;
@@ -485,10 +505,16 @@ type
     property ActionPaste: TAction read FActionPaste write SetActionPaste;
     property ActionCopyDirect: TAction read FActionCopyDirect write SetActionCopyDirect;
     property ActionAbout: TAction read FActionAbout write SetActionAbout;
-    property ActionEnableFilters: TAction read FActionEnableFilters write SeActionEnableFilters;
     property ActionRemove: TAction read FActionRemove write SetActionRemove;
     property ActionAutoViewBox: TAction read FActionAutoViewBox write SetActionAutoViewBox;
     property ActionExport: TAction read FActionExport write SetActionExport;
+
+    property ActionEnableFilters: TAction read FActionEnableFilters write SetActionEnableFilters;
+    property ActionEnableClippaths: TAction read FActionEnableClippaths write SetActionEnableClippaths;
+    property ActionEnableEvents: TAction read FActionEnableEvents write SetActionEnableEvents;
+    property ActionEnablePersistentBuffers: TAction read FActionEnablePersistentBuffers write SetActionEnablePersistentBuffers;
+    property ActionEnableTextToPath: TAction read FActionEnableTextToPath write SetActionEnableTextToPath;
+
     property ActionAnimationStart: TAction read FActionAnimationStart write SetActionAnimationStart;
     property ActionAnimationPause: TAction read FActionAnimationPause write SetActionAnimationPause;
 
@@ -496,13 +522,12 @@ type
     property StatusBar: TStatusBar read FStatusBar write SetStatusBar;
 
     property AutoViewBox: boolean read GetAutoViewBox write SetAutoViewBox;
-    property Filters: boolean read GetFilters write SetFilters;
     property FormAbout: TSVGViewerAboutForm read FFormAbout write SetFormAbout;
     property FormProperties: TSVGViewerPropertiesForm read FFormProperties write SetFormProperties;
     property CurrSelectControl: TSVGSelectControl read GetCurrSelectControl write SetCurrSelectControl;
     property SelectionList: TSVGSelectionList read FSelectionList;
     property ScrollBox: TScrollBox read FScrollBox write SetScrollBox;
-    property ImageList: TSVG2ImageList read FImageList write SetImageList;
+    property TrackBar: TTrackbar read FTrackBar write SetTrackBar;
     property LabelTime: TLabel read FLabelTime write SetLabelTime;
   end;
 
@@ -991,6 +1016,18 @@ begin
     Height - Padding.Bottom);
 end;
 
+{$IFDEF FPC}
+procedure TSVGSelectControl.AutoAdjustLayout(AMode: TLayoutAdjustmentPolicy;
+  const AFromPPI, AToPPI, AOldFormWidth, ANewFormWidth: Integer);
+var
+  i: integer;
+begin
+  inherited;
+
+  for i := 0 to FBoundsMarkerList.Count - 1 do
+    FBoundsMarkerList[i].Dimension := Round(4 * Scale);
+end;
+{$ELSE}
 {$IFDEF Ver310Up}
 procedure TSVGSelectControl.ChangeScale(M, D: Integer; isDpiChange: Boolean);
 {$ELSE}
@@ -1004,6 +1041,7 @@ begin
   for i := 0 to FBoundsMarkerList.Count - 1 do
     FBoundsMarkerList[i].Dimension := Round(4 * Scale);
 end;
+{$ENDIF}
 
 procedure TSVGSelectControl.ClearBoundsMarkers;
 var
@@ -1480,7 +1518,7 @@ begin
   end;
 end;
 
-procedure TSVGAnimatedClock.AddDeltaSec(const aD: single);
+procedure TSVGAnimatedClock.AddDeltaSec(const aD: TSVGFloat);
 begin
   FTimer.Enabled := False;
 
@@ -1499,7 +1537,7 @@ begin
   UpdateClock;
 end;
 
-procedure TSVGAnimatedClock.AddDeltaMin(const aD: single);
+procedure TSVGAnimatedClock.AddDeltaMin(const aD: TSVGFloat);
 begin
   FTimer.Enabled := False;
 
@@ -1518,7 +1556,7 @@ begin
   UpdateClock;
 end;
 
-procedure TSVGAnimatedClock.AddDeltaHour(const aD: single);
+procedure TSVGAnimatedClock.AddDeltaHour(const aD: TSVGFloat);
 begin
   FTimer.Enabled := False;
 
@@ -1537,8 +1575,8 @@ end;
 
 procedure TSVGAnimatedClock.UpdateClock;
 var
-  HandSec, Gear7_5, HandMin, Gear180, HandHour: Single;
-  TotalSec: Single;
+  HandSec, Gear7_5, HandMin, Gear180, HandHour: TSVGFloat;
+  TotalSec: TSVGFloat;
 begin
   if not GetValid then
     Exit;
@@ -1563,7 +1601,7 @@ begin
   Repaint;
 end;
 
-procedure TSVGAnimatedClock.SetLayoutAngle(aLayout: ISVGObject; aAngle: single);
+procedure TSVGAnimatedClock.SetLayoutAngle(aLayout: ISVGObject; aAngle: TSVGFloat);
 begin
   aLayout.Attributes['transform'] := Format('rotate(%f)', [aAngle], USFormatSettings);
 end;
@@ -1633,9 +1671,78 @@ begin
   FormProperties.Show;
 end;
 
+procedure TSVGViewerForm.ActionEnableClippathsExecute(Sender: TObject);
+begin
+  ActionEnableClippaths.Checked := not ActionEnableClippaths.Checked;
+
+  if assigned(CurrSelectControl) then
+  begin
+    if ActionEnableClippaths.Checked then
+      CurrSelectControl.RenderOptions := CurrSelectControl.RenderOptions + [sroClippath]
+    else
+      CurrSelectControl.RenderOptions := CurrSelectControl.RenderOptions - [sroClippath];
+  end;
+
+  UpdateControls;
+end;
+
+procedure TSVGViewerForm.ActionEnableEventsExecute(Sender: TObject);
+begin
+  ActionEnableEvents.Checked := not ActionEnableEvents.Checked;
+
+  if assigned(CurrSelectControl) then
+  begin
+    if ActionEnableEvents.Checked then
+      CurrSelectControl.RenderOptions := CurrSelectControl.RenderOptions + [sroEvents]
+    else
+      CurrSelectControl.RenderOptions := CurrSelectControl.RenderOptions - [sroEvents];
+  end;
+
+  UpdateControls;
+end;
+
 procedure TSVGViewerForm.ActionEnableFiltersExecute(Sender: TObject);
 begin
-  Filters := not Filters;
+  ActionEnableFilters.Checked := not ActionEnableFilters.Checked;
+
+  if assigned(CurrSelectControl) then
+  begin
+    if ActionEnableFilters.Checked then
+      CurrSelectControl.RenderOptions := CurrSelectControl.RenderOptions + [sroFilters]
+    else
+      CurrSelectControl.RenderOptions := CurrSelectControl.RenderOptions - [sroFilters];
+  end;
+
+  UpdateControls;
+end;
+
+procedure TSVGViewerForm.ActionEnablePersistentBuffersExecute(Sender: TObject);
+begin
+  ActionEnablePersistentBuffers.Checked := not ActionEnablePersistentBuffers.Checked;
+
+  if assigned(CurrSelectControl) then
+  begin
+    if ActionEnablePersistentBuffers.Checked then
+      CurrSelectControl.RenderOptions := CurrSelectControl.RenderOptions + [sroPersistentBuffers]
+    else
+      CurrSelectControl.RenderOptions := CurrSelectControl.RenderOptions - [sroPersistentBuffers];
+  end;
+
+  UpdateControls;
+end;
+
+procedure TSVGViewerForm.ActionEnableTextToPathExecute(Sender: TObject);
+begin
+  ActionEnableTextToPath.Checked := not ActionEnableTextToPath.Checked;
+
+  if assigned(CurrSelectControl) then
+  begin
+    if ActionEnableTextToPath.Checked then
+      CurrSelectControl.RenderOptions := CurrSelectControl.RenderOptions + [sroTextToPath]
+    else
+      CurrSelectControl.RenderOptions := CurrSelectControl.RenderOptions - [sroTextToPath];
+  end;
+
   UpdateControls;
 end;
 
@@ -1695,8 +1802,11 @@ end;
 
 procedure TSVGViewerForm.BeforeMonitorDpiChanged(Sender: TObject; OldDPI,
   NewDPI: Integer);
+var
+  ImageList: TSVG2BaseImageList;
 begin
-  ImageListScale(FImageList, NewDPI, OldDPI);
+  for ImageList in FImageListList do
+    ImageListScale(ImageList, NewDPI, OldDPI);
 end;
 
 procedure TSVGViewerForm.AfterParse(Sender: TObject);
@@ -1767,16 +1877,20 @@ procedure TSVGViewerForm.ConnectControls(
   aActionPaste: TAction;
   aActionCopyDirect: TAction;
   aActionAbout: TAction;
-  aActionEnableFilters: TAction;
   aActionRemove: TAction;
   aActionAutoViewBox: TAction;
   aActionExport: TAction;
+  aActionEnableFilters: TAction;
+  aActionEnableClippaths: TAction;
+  aActionEnableEvents: TAction;
+  aActionEnablePersistentBuffers: TAction;
+  aActionEnableTextToPath: TAction;
   aActionAnimationStart: TAction;
   aActionAnimationPause: TAction;
-  aImageList: TSVG2ImageList;
   aOpenDialog: TOpenDialog;
   aScrollBox: TScrollBox;
   aStatusBar: TStatusBar;
+  aTrackBar: TTrackBar;
   aLabelTime: TLabel);
 begin
   ActionOpen := aActionOpen;
@@ -1786,13 +1900,17 @@ begin
   ActionPaste := aActionPaste;
   ActionCopyDirect := aActionCopyDirect;
   ActionAbout := aActionAbout;
-  ActionEnableFilters := aActionEnableFilters;
   ActionRemove := aActionRemove;
   ActionAutoViewBox := aActionAutoViewBox;
   ActionExport := aActionExport;
+  ActionEnableFilters := aActionEnableFilters;
+  ActionEnableClippaths := aActionEnableClippaths;
+  ActionEnableEvents := aActionEnableEvents;
+  ActionEnablePersistentBuffers := aActionEnablePersistentBuffers;
+  ActionEnableTextToPath := aActionEnableTextToPath;
   ActionAnimationStart := aActionAnimationStart;
   ActionAnimationPause := aActionAnimationPause;
-  ImageList := aImageList;
+  TrackBar := aTrackBar;
   OpenDialog := aOpenDialog;
   ScrollBox := aScrollbox;
   StatusBar := aStatusBar;
@@ -1833,10 +1951,11 @@ begin
   AddSVGControl(CurrSelectControl.CreateCopy(FSelectionList));
 end;
 
-constructor TSVGViewerForm.Create(AOwnder: TComponent);
+constructor TSVGViewerForm.Create(AOwner: TComponent);
 begin
   inherited;
 
+  FImageListList := TList<TSVG2BaseImageList>.Create;
   FSelectionList := TSVGSelectionList.Create;
 end;
 
@@ -1850,6 +1969,7 @@ end;
 destructor TSVGViewerForm.Destroy;
 begin
   FSelectionList.Free;
+  FImageListList.Free;
 
   inherited;
 end;
@@ -1905,8 +2025,14 @@ begin
   if not assigned(CurrSelectControl) then
     Exit;
 
-  LabelTime.Caption := Format('FPS: %3.0f Time: %5.1f ',
-    [CurrSelectControl.AnimationFPS, CurrSelectControl.AnimationTime / 1000]);
+  LabelTime.Caption := Format(' Time: %5.1f   FPS: %3.0f ',
+    [CurrSelectControl.AnimationTime / 1000, CurrSelectControl.AnimationFPS]);
+
+  if CurrSelectControl.AnimationTime > Trackbar.Max then
+    Trackbar.Max := Trackbar.Max + 5000;
+
+  if not CurrSelectControl.AnimationIsPaused then
+    Trackbar.Position := CurrSelectControl.AnimationTime;
 end;
 
 procedure TSVGViewerForm.ExportSVG;
@@ -1976,7 +2102,7 @@ begin
   Statusbar.SimpleText := Application.Hint;
 end;
 
-procedure TSVGViewerForm.ImageListScale(aImageList: TSVG2ImageList; M,
+procedure TSVGViewerForm.ImageListScale(aImageList: TSVG2BaseImageList; M,
   D: Integer);
 begin
   {$IFnDEF FPC}
@@ -1984,7 +2110,7 @@ begin
   {$ENDIF}
 end;
 
-procedure TSVGViewerForm.ImageListTheme(aImageList: TSVG2ImageList);
+procedure TSVGViewerForm.ImageListTheme(aImageList: TSVG2BaseImageList);
 begin
   {$IFnDEF FPC}
   if not StyleServices.Enabled then
@@ -2067,6 +2193,25 @@ begin
   FSelectionList.UnselectAll;
 
   AddSVGControl(CreateSVGSelectControl(Clipboard.AsText));
+end;
+
+procedure TSVGViewerForm.RegisterImageList(aImageList: TSVG2BaseImageList);
+begin
+  if assigned(aImageList) then
+  begin
+    FImageListList.Add(aImageList);
+
+    {$IFDEF Ver310Up}
+    // Berlin
+    ImageListScale(aImageList, Monitor.PixelsPerInch, GetDesignDPI);
+    {$ELSE}
+    {$IFDEF Ver300Down}
+    // Seattle
+    ImageListScale(aImageList, PixelsPerInch, 96);
+    {$ENDIF}
+    {$ENDIF}
+    ImageListTheme(aImageList);
+  end;
 end;
 
 procedure TSVGViewerForm.RemoveSVGControl;
@@ -2220,6 +2365,41 @@ begin
     FActionEdit.OnExecute := ActionEditExecute;
 end;
 
+procedure TSVGViewerForm.SetActionEnableClippaths(const Value: TAction);
+begin
+  FActionEnableClippaths := Value;
+  if assigned(FActionEnableClippaths) then
+    FActionEnableClippaths.OnExecute := ActionEnableClippathsExecute;
+end;
+
+procedure TSVGViewerForm.SetActionEnableEvents(const Value: TAction);
+begin
+  FActionEnableEvents := Value;
+  if assigned(FActionEnableEvents) then
+    FActionEnableEvents.OnExecute := ActionEnableEventsExecute;
+end;
+
+procedure TSVGViewerForm.SetActionEnableFilters(const Value: TAction);
+begin
+  FActionEnableFilters := Value;
+  if assigned(FActionEnableFilters) then
+    FActionEnableFilters.OnExecute := ActionEnableFiltersExecute;
+end;
+
+procedure TSVGViewerForm.SetActionEnablePersistentBuffers(const Value: TAction);
+begin
+  FActionEnablePersistentBuffers := Value;
+  if assigned(FActionEnablePersistentBuffers) then
+    FActionEnablePersistentBuffers.OnExecute := ActionEnablePersistentBuffersExecute;
+end;
+
+procedure TSVGViewerForm.SetActionEnableTextToPath(const Value: TAction);
+begin
+  FActionEnableTextToPath := Value;
+  if assigned(FActionEnableTextToPath) then
+    FActionEnableTextToPath.OnExecute := ActionEnableTextToPathExecute;
+end;
+
 procedure TSVGViewerForm.SetActionExport(const Value: TAction);
 begin
   FActionExport := Value;
@@ -2303,25 +2483,6 @@ begin
   FFormProperties := Value;
 end;
 
-procedure TSVGViewerForm.SetImageList(const Value: TSVG2ImageList);
-begin
-  FImageList := Value;
-
-  if assigned(FImageList) then
-  begin
-    {$IFDEF Ver310Up}
-    // Berlin
-    ImageListScale(FImageList, Monitor.PixelsPerInch, GetDesignDPI);
-    {$ELSE}
-    {$IFDEF Ver300Down}
-    // Seattle
-    ImageListScale(FImageList, PixelsPerInch, 96);
-    {$ENDIF}
-    {$ENDIF}
-    ImageListTheme(FImageList);
-  end;
-end;
-
 procedure TSVGViewerForm.SetLabelTime(const Value: TLabel);
 begin
   FLabelTime := Value;
@@ -2345,6 +2506,14 @@ begin
   FStatusBar := Value;
 end;
 
+procedure TSVGViewerForm.SetTrackBar(const Value: TTrackbar);
+begin
+  FTrackBar := Value;
+
+  if assigned(FTrackBar) then
+    FTrackBar.OnChange := TrackBarChange;
+end;
+
 procedure TSVGViewerForm.SVGEvent(Sender: TObject; aSVGRoot: ISVGRoot;
   aEvent: ISVGEvent; const aValue: string);
 begin
@@ -2357,6 +2526,18 @@ begin
   CurrSelectControl := Sender as TSVGSelectControl;
 end;
 
+procedure TSVGViewerForm.TrackBarChange(Sender: TObject);
+begin
+  if assigned(CurrSelectControl) then
+  begin
+    if CurrSelectControl.AnimationIsPaused then
+    begin
+      CurrSelectControl.AnimationTime := FTrackbar.Position;
+      DoTimer(Self);
+    end;
+  end;
+end;
+
 procedure TSVGViewerForm.UpdateControls;
 var
   HasAnimations: Boolean;
@@ -2367,14 +2548,23 @@ begin
   ActionCopy.Enabled := True;
   ActionCopyDirect.Enabled := True;
   ActionEnableFilters.Enabled := True;
+  ActionEnableClippaths.Enabled := True;
+  ActionEnableEvents.Enabled := True;
+  ActionEnablePersistentBuffers.Enabled := True;
+  ActionEnableTextToPath.Enabled := True;
   ActionAutoViewbox.Enabled := True;
   ActionRemove.Enabled := True;
   ActionAnimationStart.Enabled := True;
   ActionAnimationPause.Enabled := True;
+  Trackbar.Enabled := True;
 
   if assigned(CurrSelectControl) then
   begin
     ActionEnableFilters.Checked := sroFilters in CurrSelectControl.RenderOptions;
+    ActionEnableClippaths.Checked := sroClippath in CurrSelectControl.RenderOptions;
+    ActionEnableEvents.Checked := sroEvents in CurrSelectControl.RenderOptions;
+    ActionEnablePersistentBuffers.Checked := sroPersistentBuffers in CurrSelectControl.RenderOptions;
+    ActionEnableTextToPath.Checked := sroTextToPath in CurrSelectControl.RenderOptions;
     ActionAutoViewbox.Checked := CurrSelectControl.AutoViewbox;
 
     HasAnimations := CurrSelectControl.HasAnimations;
@@ -2390,6 +2580,10 @@ begin
 
   end else begin
     ActionEnableFilters.Checked := False;
+    ActionEnableClippaths.Checked := False;
+    ActionEnableEvents.Checked := False;
+    ActionEnablePersistentBuffers.Checked := False;
+    ActionEnableTextToPath.Checked := False;
     ActionAutoViewbox.Checked := False;
     ActionAnimationStart.Checked := False;
     ActionAnimationPause.Checked := False;
@@ -2398,12 +2592,17 @@ begin
     ActionCopy.Enabled := False;
     ActionCopyDirect.Enabled := False;
     ActionEnableFilters.Enabled := False;
+    ActionEnableClippaths.Enabled := False;
+    ActionEnableEvents.Enabled := False;
+    ActionEnablePersistentBuffers.Enabled := False;
+    ActionEnableTextToPath.Enabled := False;
     ActionAutoViewbox.Enabled := False;
     ActionRemove.Enabled := False;
   end;
 
   ActionAnimationStart.Enabled := HasAnimations;
   ActionAnimationPause.Enabled := HasAnimations;
+  Trackbar.Enabled := HasAnimations;
 
   ActionExport.Enabled := SelectionList.SelectedCount > 0
 end;
