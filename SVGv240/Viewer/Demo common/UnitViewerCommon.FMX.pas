@@ -88,6 +88,7 @@ uses
   FMX.ActnList,
   BVE.SVG2Intf,
   BVE.SVG2Types,
+  BVE.SVG2Doc,
   BVE.SVG2Control.FMX,
   BVE.SVG2Image.FMX,
   BVE.SVG2ImageList.FMX;
@@ -100,6 +101,7 @@ type
     function GetForm: TForm;
     function GetScrollbox: TScrollbox;
     function GetSelection: TSVGSelection;
+
     procedure SetSelection(const Value: TSVGSelection);
 
     procedure AlignControls;
@@ -132,8 +134,10 @@ type
   TSVGSelection = class(TSelection)
   private
     FViewer: ISVGViewer;
-    FSelected: boolean;
-    FHasEvents: boolean;
+    FSelected: Boolean;
+    FHasEvents: Boolean;
+
+    FAnimationTimer: TSVG2AnimationTimer;
 
     FLastLocation: TPointF;
     FLastDistance: Single;
@@ -149,26 +153,37 @@ type
     FSVGControl: TSVG2Control;
 {$ENDIF}
 {$ENDIF}
-    function GetImageIndex: integer;
-    function GetImages: TSVG2ImageList;
-    procedure SetImageIndex(const Value: integer);
-    procedure SetImages(const Value: TSVG2ImageList);
-    function GetFilename: string;
-    procedure SetFileName(const Value: string);
-    procedure SetSelected(const Value: boolean);
-    procedure SetOpacity(const Value: Single);
-    function GetAutoViewbox: boolean;
-    function GetOpacity: Single;
-    procedure SetAutoViewbox(const Value: boolean);
+    function GetAnimationFPS: TSVGFloat;
+    function GetAnimationIsPaused: Boolean;
+    function GetAnimationIsStarted: Boolean;
+    function GetAnimationTime: Cardinal;
     function GetAspectRatioAlign: TSVGAspectRatioAlign;
     function GetAspectRatioMeetOrSlice: TSVGAspectRatioMeetOrSlice;
+    function GetAutoViewbox: boolean;
+    function GetFilename: string;
+    function GetImageIndex: integer;
+    function GetImages: TSVG2ImageList;
+    function GetOnAnimationSample: TNotifyEvent;
+    function GetOnSVGEvent: TSVGEvent;
+    function GetOpacity: Single;
+    function GetRenderOptions: TSVGRenderOptions;
+
+    procedure SetAnimationIsPaused(const Value: Boolean);
+    procedure SetAnimationIsStarted(const Value: Boolean);
+    procedure SetAnimationTime(const Value: Cardinal);
     procedure SetAspectRatioAlign(const Value: TSVGAspectRatioAlign);
     procedure SetAspectRatioMeetOrSlice(
       const Value: TSVGAspectRatioMeetOrSlice);
-    function GetRenderOptions: TSVGRenderOptions;
-    procedure SetRenderOptions(const Value: TSVGRenderOptions);
-    function GetOnSVGEvent: TSVGEvent;
+    procedure SetAutoViewbox(const Value: boolean);
+    procedure SetImageIndex(const Value: integer);
+    procedure SetImages(const Value: TSVG2ImageList);
+    procedure SetFileName(const Value: string);
+    procedure SetOnAnimationSample(const Value: TNotifyEvent);
     procedure SetOnSVGEvent(const Value: TSVGEvent);
+    procedure SetOpacity(const Value: Single);
+    procedure SetSelected(const Value: boolean);
+    procedure SetRenderOptions(const Value: TSVGRenderOptions);
+    function GetHasAnimations: Boolean;
   protected
     function GetSVG: string;
     procedure SetSVG(const Value: string);
@@ -197,17 +212,23 @@ type
     procedure MouseMove(Shift: TShiftState; X, Y: Single); override;
     procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
 
+    property AnimationFPS: TSVGFloat read GetAnimationFPS;
+    property AnimationIsStarted: Boolean read GetAnimationIsStarted write SetAnimationIsStarted;
+    property AnimationIsPaused: Boolean read GetAnimationIsPaused write SetAnimationIsPaused;
+    property AnimationTime: Cardinal read GetAnimationTime write SetAnimationTime;
     property AspectRatioAlign: TSVGAspectRatioAlign read GetAspectRatioAlign write SetAspectRatioAlign;
     property AspectRatioMeetOrSlice: TSVGAspectRatioMeetOrSlice read GetAspectRatioMeetOrSlice write SetAspectRatioMeetOrSlice;
     property AutoViewbox: boolean read GetAutoViewbox write SetAutoViewbox;
     property Filename: string read GetFilename write SetFileName;
     property Images: TSVG2ImageList read GetImages write SetImages;
-    property ImageIndex: integer read GetImageIndex write SetImageIndex;
+    property ImageIndex: Integer read GetImageIndex write SetImageIndex;
+    property HasAnimations: Boolean read GetHasAnimations;
     property Opacity: Single read GetOpacity write SetOpacity;
     property RenderOptions: TSVGRenderOptions read GetRenderOptions write SetRenderOptions;
     property Selected: boolean read FSelected write SetSelected;
     property SVG: string read GetSVG write SetSVG;
 
+    property OnAnimationSample: TNotifyEvent read GetOnAnimationSample write SetOnAnimationSample;
     property OnSVGEvent: TSVGEvent read GetOnSVGEvent write SetOnSVGEvent;
   end;
 
@@ -240,6 +261,12 @@ type
     FActionZoomDec: TAction;
     FActionZoomInc: TAction;
 
+    FActionAnimationPause: TButton;
+    FActionAnimationStart: TButton;
+
+    FAnimationTrackBar: TTrackBar;
+    FLabelTime: TLabel;
+
     FCheckboxAutoViewbox: TCheckBox;
     FCheckboxClippath: TCheckBox;
     FCheckboxFilters: TCheckBox;
@@ -262,7 +289,7 @@ type
     FImageList2: TSVG2ImageList;
     FLabelInfo: TLabel;
     FOpenDialog: TOpenDialog;
-    FTrackBar: TTrackBar;
+    FZoomTrackBar: TTrackBar;
 
     FZoomBox: TSVGZoomBox;
 
@@ -286,6 +313,8 @@ type
     procedure ActionZoomResetExecute(Sender: TObject);
     procedure ActionZoomDecExecute(Sender: TObject);
     procedure ActionZoomIncExecute(Sender: TObject);
+    procedure ActionAnimationStartExecute(Sender: TObject);
+    procedure ActionAnimationPauseExecute(Sender: TObject);
 
     procedure ScrollBoxDragOver(Sender: TObject; const Data: TDragObject;
       const Point: TPointF; var Operation: TDragOperation);
@@ -304,8 +333,12 @@ type
     procedure TimerZoomTimer(Sender: TObject);
     procedure TrackBarChange(Sender: TObject);
 
+    procedure AnimationTrackbarChange(aSender: TObject);
+    procedure DoTimer(aSender: TObject);
+    procedure DoShow; override;
     procedure SVGEvent(Sender: TObject; aSVGRoot: ISVGRoot; aEvent: ISVGEvent;
       const aValue: string);
+
 
     procedure AlignControls;
 
@@ -337,6 +370,8 @@ type
       aActionZoomReset: TAction;
       aActionZoomDec: TAction;
       aActionZoomInc: TAction;
+      aActionAnimationStart: TButton;
+      aActionAnimationPause: TButton;
       aCheckboxAutoViewbox: TCheckBox;
       aCheckboxClippath: TCheckBox;
       aCheckboxFilters: TCheckBox;
@@ -353,8 +388,12 @@ type
       aImageList1: TSVG2ImageList;
       aImageList2: TSVG2ImageList;
       aOpenDialog: TOpenDialog;
-      aTrackBar: TTrackBar;
-      aLabelInfo: TLabel);
+      aZoomTrackBar: TTrackBar;
+      aLabelInfo: TLabel;
+      aAnimationTrackbar: TTrackbar;
+      aLabelTime: TLabel);
+
+    procedure UpdateControls;
 
     procedure KeyDown(var Key: Word; var KeyChar: System.WideChar; Shift: TShiftState); override;
 
@@ -558,6 +597,8 @@ begin
 
   FViewer := aViewer;
 
+  FAnimationTimer := TSVG2AnimationTimer.Create(nil);
+
 {$IFDEF SVGLINKEDIMAGE}
   FSVGLinkedImage := TSVG2LinkedImage.Create(Self);
   FSVGLinkedImage.Parent := Self;
@@ -566,6 +607,7 @@ begin
   FSVGLinkedImage.Position.Y := 0.0;
   FSVGLinkedImage.Scale.X := 1.0;
   FSVGLinkedImage.Scale.Y := 1.0;
+  FSVGLinkedImage.AnimationTimer := FAnimationTimer;
   FSVGLinkedImage.OnMouseDown := ContentMouseDown;
   FSVGLinkedImage.OnMouseMove := ContentMouseMove;
   FSVGLinkedImage.OnMouseUp := ContentMouseUp;
@@ -578,6 +620,7 @@ begin
   FSVGImage.Position.X := 0.0;
   FSVGImage.Position.Y := 0.0;
   FSVGImage.AutoViewbox := True;
+  FSVGImage.AnimationTimer := FAnimationTimer;
   FSVGImage.OnMouseDown := ContentMouseDown;
   FSVGImage.OnMouseMove := ContentMouseMove;
   FSVGImage.OnMouseUp := ContentMouseUp;
@@ -591,6 +634,7 @@ begin
   FSVGControl.AutoViewbox := True;
   FSVGControl.RenderOptions := [sroFilters, sroClippath, sroEvents];
   FSVGControl.Opacity := 1.0;
+  FSVGControl.AnimationTimer := FAnimationTimer;
   FSVGControl.OnMouseDown := ContentMouseDown;
   FSVGControl.OnMouseMove := ContentMouseMove;
   FSVGControl.OnMouseUp := ContentMouseUp;
@@ -622,6 +666,7 @@ end;
 
 destructor TSVGSelection.Destroy;
 begin
+  FAnimationTimer.Free;
   inherited;
 end;
 
@@ -723,6 +768,34 @@ begin
   Result.Inflate((GripSize + 1) * AbsoluteScale.X, (GripSize + 1) * AbsoluteScale.Y);
 end;
 
+function TSVGSelection.GetAnimationFPS: TSVGFloat;
+begin
+  Result := FAnimationTimer.FPS;
+end;
+
+function TSVGSelection.GetAnimationIsPaused: Boolean;
+begin
+  Result := FAnimationTimer.IsPaused;
+end;
+
+function TSVGSelection.GetAnimationIsStarted: Boolean;
+begin
+  Result := FAnimationTimer.IsStarted;
+end;
+
+function TSVGSelection.GetAnimationTime: Cardinal;
+begin
+{$IFDEF SVGLINKEDIMAGE}
+  Result := FSVGLinkedImage.AnimationTime;
+{$ELSE}
+{$IFDEF SVGIMAGE}
+  Result := FSVGImage.AnimationTime;
+{$ELSE}
+  Result := FSVGControl.AnimationTime;
+{$ENDIF}
+{$ENDIF}
+end;
+
 function TSVGSelection.GetAspectRatioAlign: TSVGAspectRatioAlign;
 begin
 {$IFDEF SVGLINKEDIMAGE}
@@ -775,6 +848,19 @@ begin
 {$ENDIF}
 end;
 
+function TSVGSelection.GetHasAnimations: Boolean;
+begin
+{$IFDEF SVGLINKEDIMAGE}
+  Result := FSVGLinkedImage.HasAnimations;
+{$ELSE}
+{$IFDEF SVGIMAGE}
+  Result := FSVGImage.HasAnimations;
+{$ELSE}
+  Result := FSVGControl.HasAnimations;
+{$ENDIF}
+{$ENDIF}
+end;
+
 function TSVGSelection.GetImageIndex: integer;
 begin
 {$IFDEF SVGLINKEDIMAGE}
@@ -799,6 +885,11 @@ begin
   Result := nil;
 {$ENDIF}
 {$ENDIF}
+end;
+
+function TSVGSelection.GetOnAnimationSample: TNotifyEvent;
+begin
+  Result := FAnimationTimer.OnSample;
 end;
 
 function TSVGSelection.GetOnSVGEvent: TSVGEvent;
@@ -945,6 +1036,29 @@ begin
   FTimerUpdate.Enabled := True;
 end;
 
+procedure TSVGSelection.SetAnimationIsPaused(const Value: Boolean);
+begin
+  FAnimationTimer.IsPaused := Value;
+end;
+
+procedure TSVGSelection.SetAnimationIsStarted(const Value: Boolean);
+begin
+  FAnimationTimer.IsStarted := Value;
+end;
+
+procedure TSVGSelection.SetAnimationTime(const Value: Cardinal);
+begin
+{$IFDEF SVGLINKEDIMAGE}
+  FSVGLinkedImage.AnimationTime := Value;
+{$ELSE}
+{$IFDEF SVGIMAGE}
+  FSVGImage.AnimationTime := Value;
+{$ELSE}
+  FSVGControl.AnimationTime := Value;
+{$ENDIF}
+{$ENDIF}
+end;
+
 procedure TSVGSelection.SetAspectRatioAlign(const Value: TSVGAspectRatioAlign);
 begin
 {$IFDEF SVGLINKEDIMAGE}
@@ -1037,6 +1151,11 @@ begin
 {$ELSE}
 {$ENDIF}
 {$ENDIF}
+end;
+
+procedure TSVGSelection.SetOnAnimationSample(const Value: TNotifyEvent);
+begin
+  FAnimationTimer.OnSample := Value;
 end;
 
 procedure TSVGSelection.SetOnSVGEvent(const Value: TSVGEvent);
@@ -1242,7 +1361,23 @@ end;
 
 procedure TSVGViewerForm.ActionAddOkExecute(Sender: TObject);
 begin
+  //
+end;
 
+procedure TSVGViewerForm.ActionAnimationPauseExecute(Sender: TObject);
+begin
+  if assigned(FSelection) then
+    FSelection.AnimationIsPaused := FActionAnimationPause.IsPressed;
+
+  UpdateControls;
+end;
+
+procedure TSVGViewerForm.ActionAnimationStartExecute(Sender: TObject);
+begin
+  if assigned(FSelection) then
+    FSelection.AnimationIsStarted := FActionAnimationStart.IsPressed;
+
+  UpdateControls;
 end;
 
 procedure TSVGViewerForm.ActionCopyDirectExecute(Sender: TObject);
@@ -1318,7 +1453,7 @@ begin
         Selection.SVG := Value.ToString;
         Selection.OnSVGEvent := SVGEvent;
 
-        FTrackBar.Max := MaxZoom(FLayoutZoom);
+        FZoomTrackBar.Max := MaxZoom(FLayoutZoom);
       end
     end;
   end;
@@ -1332,7 +1467,7 @@ begin
     Selection.Free;
     Selection := nil;
 
-    FTrackBar.Max := MaxZoom(FLayoutZoom);
+    FZoomTrackBar.Max := MaxZoom(FLayoutZoom);
   end;
 end;
 
@@ -1340,29 +1475,29 @@ procedure TSVGViewerForm.ActionZoomDecExecute(Sender: TObject);
 var
   NewValue: Single;
 begin
-  NewValue := FTrackBar.Value / 1.2;
+  NewValue := FZoomTrackBar.Value / 1.2;
 
-  if NewValue < FTrackbar.Min then
-    FTrackBar.Value := FTrackbar.Min
+  if NewValue < FZoomTrackBar.Min then
+    FZoomTrackBar.Value := FZoomTrackBar.Min
   else
-    FTrackBar.Value := NewValue;
+    FZoomTrackBar.Value := NewValue;
 end;
 
 procedure TSVGViewerForm.ActionZoomIncExecute(Sender: TObject);
 var
   NewValue: Single;
 begin
-  NewValue := FTrackBar.Value * 1.2;
+  NewValue := FZoomTrackBar.Value * 1.2;
 
-  if NewValue > FTrackbar.Max then
-    FTrackBar.Value := FTrackbar.Max
+  if NewValue > FZoomTrackBar.Max then
+    FZoomTrackBar.Value := FZoomTrackBar.Max
   else
-    FTrackBar.Value := NewValue;
+    FZoomTrackBar.Value := NewValue;
 end;
 
 procedure TSVGViewerForm.ActionZoomResetExecute(Sender: TObject);
 begin
-  FTrackBar.Value := 1.0;
+  FZoomTrackBar.Value := 1.0;
 end;
 
 function TSVGViewerForm.AddSVG(const aFilename: string): boolean;
@@ -1391,7 +1526,7 @@ begin
     Selection.Filename := aFilename;
     Selection.OnSVGEvent := SVGEvent;
 
-    FTrackBar.Max := MaxZoom(FLayoutZoom);
+    FZoomTrackBar.Max := MaxZoom(FLayoutZoom);
   end;
 end;
 
@@ -1413,12 +1548,24 @@ begin
   end;
   Selection.OnSVGEvent := SVGEvent;
 
-  FTrackBar.Max := MaxZoom(FLayoutZoom);
+  FZoomTrackBar.Max := MaxZoom(FLayoutZoom);
 end;
 
 procedure TSVGViewerForm.AlignControls;
 begin
   FZoomBox.CalcLayoutDimensions;
+end;
+
+procedure TSVGViewerForm.AnimationTrackbarChange(aSender: TObject);
+begin
+  if assigned(FSelection) then
+  begin
+    if FSelection.AnimationIsPaused then
+    begin
+      FSelection.AnimationTime := Round(FAnimationTrackbar.Value);
+      DoTimer(Self);
+    end;
+  end;
 end;
 
 procedure TSVGViewerForm.CheckboxAutoViewboxChange(Sender: TObject);
@@ -1485,6 +1632,8 @@ procedure TSVGViewerForm.ConnectControls(
   aActionZoomReset,
   aActionZoomDec,
   aActionZoomInc: TAction;
+  aActionAnimationStart,
+  aActionAnimationPause: TButton;
   aCheckboxAutoViewbox,
   aCheckboxClippath,
   aCheckboxFilters,
@@ -1500,8 +1649,10 @@ procedure TSVGViewerForm.ConnectControls(
   aImageList1,
   aImageList2: TSVG2ImageList;
   aOpenDialog: TOpenDialog;
-  aTrackBar: TTrackBar;
-  aLabelInfo: TLabel);
+  aZoomTrackBar: TTrackBar;
+  aLabelInfo: TLabel;
+  aAnimationTrackbar: TTrackbar;
+  aLabelTime: TLabel);
 begin
   FActionAddOk := aActionAddOk;
   FActionAddCancel := aActionAddCancel;
@@ -1515,6 +1666,8 @@ begin
   FActionZoomReset := aActionZoomReset;
   FActionZoomDec := aActionZoomDec;
   FActionZoomInc := aActionZoomInc;
+  FActionAnimationPause := aActionAnimationPause;
+  FActionAnimationStart := aActionAnimationStart;
   FCheckboxAutoViewbox := aCheckboxAutoViewbox;
   FCheckboxClippath := aCheckboxClippath;
   FCheckboxFilters := aCheckboxFilters;
@@ -1531,8 +1684,10 @@ begin
   FImageList1 := aImageList1;
   FImageList2 := aImageList2;
   FOpenDialog := aOpenDialog;
-  FTrackBar := aTrackBar;
+  FZoomTrackBar := aZoomTrackBar;
   FLabelInfo := aLabelInfo;
+  FAnimationTrackBar := aAnimationTrackbar;
+  FLabelTime := aLabelTime;
 
   // If the cachesize is too small, images in the list might have to be
   // rerendered wich can make the application slow down.
@@ -1566,6 +1721,9 @@ begin
   FActionZoomReset.OnExecute := ActionZoomResetExecute;
   FActionZoomDec.OnExecute := ActionZoomDecExecute;
   FActionZoomInc.OnExecute := ActionZoomIncExecute;
+  FActionAnimationPause.OnClick := ActionAnimationPauseExecute;
+  FActionAnimationStart.OnClick := ActionAnimationStartExecute;
+
   FCheckboxAutoViewbox.OnChange := CheckboxAutoViewboxChange;
   FCheckboxClippath.OnChange := CheckboxClippathChange;
   FCheckboxFilters.OnChange := CheckboxFiltersChange;
@@ -1574,9 +1732,10 @@ begin
   FComboboxMeetOrSlice.OnChange := ComboboxMeetOrSliceChange;
   FSpinboxRotate.OnChange := SpinboxRotateChange;
   FSpinboxOpacity.OnChange := SpinboxOpacityChange;
-  FTrackBar.OnChange := TrackBarChange;
+  FZoomTrackBar.OnChange := TrackBarChange;
   FScrollbox.OnDragDrop := ScrollBoxDragDrop;
   FScrollbox.OnDragOver := ScrollBoxDragOver;
+  FAnimationTrackBar.OnChange := AnimationTrackbarChange;
 
   FZoomBox := TSVGZoomBox.Create(Self, FLayoutSize, FLayoutZoom, FScrollbox);
 end;
@@ -1614,6 +1773,28 @@ end;
 destructor TSVGViewerForm.Destroy;
 begin
   inherited;
+end;
+
+procedure TSVGViewerForm.DoShow;
+begin
+  inherited;
+
+  UpdateControls;
+end;
+
+procedure TSVGViewerForm.DoTimer(aSender: TObject);
+begin
+  if not assigned(FSelection) then
+    Exit;
+
+  FLabelTime.Text := Format(' Time: %5.1f   FPS: %3.0f ',
+    [FSelection.AnimationTime / 1000, FSelection.AnimationFPS]);
+
+  if FSelection.AnimationTime > FAnimationTrackbar.Max then
+    FAnimationTrackbar.Max := FAnimationTrackbar.Max + 5000;
+
+  if not FSelection.AnimationIsPaused then
+    FAnimationTrackbar.Value := FSelection.AnimationTime;
 end;
 
 function TSVGViewerForm.GetForm: TForm;
@@ -1676,13 +1857,17 @@ end;
 procedure TSVGViewerForm.SetSelection(const Value: TSVGSelection);
 begin
   if assigned(FSelection) then
+  begin
     FSelection.Selected := False;
+    FSelection.OnAnimationSample := nil;
+  end;
 
   FSelection := Value;
 
   if assigned(FSelection) then
   begin
     FSelection.Selected := True;
+    FSelection.OnAnimationSample := DoTimer;
 
     FCheckboxAutoViewbox.IsChecked := FSelection.AutoViewbox;
     FCheckboxClippath.IsChecked := sroClippath in FSelection.RenderOptions;
@@ -1693,6 +1878,8 @@ begin
     FComboboxAspectRatio.ItemIndex := Ord(FSelection.AspectRatioAlign);
     FComboboxMeetOrSlice.ItemIndex := Ord(FSelection.AspectRatioMeetOrSlice);
   end;
+
+  UpdateControls;
 end;
 
 procedure TSVGViewerForm.ShowInfo(const aValue: string);
@@ -1803,7 +1990,7 @@ end;
 procedure TSVGViewerForm.TimerZoomTimer(Sender: TObject);
 begin
   FTimerZoom.Enabled := False;
-  FZoomBox.Zoom := FTrackbar.Value;
+  FZoomBox.Zoom := FZoomTrackbar.Value;
 end;
 
 procedure TSVGViewerForm.TrackBarChange(Sender: TObject);
@@ -1813,7 +2000,64 @@ begin
     FTimerZoom.Enabled := False;
     FTimerZoom.Enabled := True;
   end else
-    FZoomBox.Zoom := FTrackbar.Value;
+    FZoomBox.Zoom := FZoomTrackbar.Value;
+end;
+
+procedure TSVGViewerForm.UpdateControls;
+var
+  HasAnimations: Boolean;
+begin
+  HasAnimations := False;
+
+  FActionCopy.Enabled := True;
+  FActionCopyDirect.Enabled := True;
+  FCheckboxFilters.Enabled := True;
+  FCheckboxClippath.Enabled := True;
+  FCheckboxMouseEvents.Enabled := True;
+  FCheckboxAutoViewbox.Enabled := True;
+  FActionRemove.Enabled := True;
+  FActionAnimationStart.Enabled := True;
+  FActionAnimationPause.Enabled := True;
+  FAnimationTrackbar.Enabled := True;
+
+  if assigned(FSelection) then
+  begin
+    FCheckboxFilters.IsChecked := sroFilters in FSelection.RenderOptions;
+    FCheckboxClippath.IsChecked := sroClippath in FSelection.RenderOptions;
+    FCheckboxMouseEvents.IsChecked := sroEvents in FSelection.RenderOptions;
+    FCheckboxAutoViewbox.IsChecked := FSelection.AutoViewbox;
+
+    HasAnimations := FSelection.HasAnimations;
+
+    if HasAnimations then
+    begin
+      FActionAnimationStart.IsPressed := FSelection.AnimationIsStarted;
+      FActionAnimationPause.IsPressed := FSelection.AnimationIsPaused;
+    end else begin
+      FActionAnimationStart.IsPressed := False;
+      FActionAnimationPause.IsPressed := False;
+    end;
+
+  end else begin
+    FCheckboxFilters.IsChecked := False;
+    FCheckboxClippath.IsChecked := False;
+    FCheckboxMouseEvents.IsChecked := False;
+    FCheckboxAutoViewbox.IsChecked := False;
+    FActionAnimationStart.IsPressed := False;
+    FActionAnimationPause.IsPressed := False;
+
+    FActionCopy.Enabled := False;
+    FActionCopyDirect.Enabled := False;
+    FCheckboxFilters.Enabled := False;
+    FCheckboxClippath.Enabled := False;
+    FCheckboxMouseEvents.Enabled := False;
+    FCheckboxAutoViewbox.Enabled := False;
+    FActionRemove.Enabled := False;
+  end;
+
+  FActionAnimationStart.Enabled := HasAnimations;
+  FActionAnimationPause.Enabled := HasAnimations;
+  FAnimationTrackbar.Enabled := HasAnimations;
 end;
 
 // -----------------------------------------------------------------------------
