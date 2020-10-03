@@ -124,6 +124,13 @@ type
     Button11: TButton;
     Button12: TButton;
     aInfo: TAction;
+    aAnimationStart: TAction;
+    aAnimationPause: TAction;
+    Panel2: TPanel;
+    TrackBar2: TTrackBar;
+    LabelTime: TLabel;
+    bAnimationStart: TButton;
+    bAnimationPause: TButton;
     procedure FormCreate(Sender: TObject);
   end;
 
@@ -149,6 +156,8 @@ begin
     aZoomReset,
     aZoomDec,
     aZoomInc,
+    bAnimationStart,
+    bAnimationPause,
     cbAutoViewbox,
     cbClippath,
     cbFilters,
@@ -166,7 +175,9 @@ begin
     SVG2ImageList2,
     OpenDialog1,
     TrackBar1,
-    Label1);
+    Label1,
+    Trackbar2,
+    LabelTime);
 end;
 
 end.

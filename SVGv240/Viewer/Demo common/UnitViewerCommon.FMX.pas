@@ -1423,14 +1423,32 @@ begin
 end;
 
 procedure TSVGViewerForm.ActionLoadExecute(Sender: TObject);
+{$IFDEF IOS}
+var
+  sr: TSearchRec;
+{$ENDIF}
 begin
 {$IFDEF ANDROID}
   LaunchLoadFile
+{$ELSE}
+{$IFDEF IOS}
+
+  // Load all files in the documents folder, these need to be "deployed" first
+  if FindFirst(TPath.GetDocumentsPath + PathDelim + '*.svg', faArchive, sr) = 0 then
+  begin
+    repeat
+      AddSVG(TPath.GetDocumentsPath + PathDelim + sr.Name);
+    until FindNext(sr) <> 0;
+
+    FindClose(sr);
+  end;
+
 {$ELSE}
   if FOpenDialog.Execute then
   begin
     AddSVG(FOpenDialog.FileName);
   end;
+{$ENDIF}
 {$ENDIF}
 end;
 
@@ -2103,7 +2121,11 @@ begin
 {$ENDIF MSWINDOWS}
 
 {$IFDEF MACOS}
+{$IFNDEF IOS}
   _system(PAnsiChar('open '+'"'+AnsiString(FilePath)+'"'));
+{$ELSE}
+  SharedApplication.OpenURL(StrToNSUrl(FilePath));
+{$ENDIF}
 {$ENDIF MACOS}
 
 {$IFDEF ANDROID}
@@ -2111,10 +2133,6 @@ begin
   Intent.setAction(TJIntent.JavaClass.ACTION_VIEW);
   Intent.setData(StrToJURI(FilePath));
   SharedActivity.startActivity(Intent);
-{$ENDIF}
-
-{$IFDEF IOS}
-  SharedApplication.OpenURL(StrToNSUrl(URL));
 {$ENDIF}
 end;
 
