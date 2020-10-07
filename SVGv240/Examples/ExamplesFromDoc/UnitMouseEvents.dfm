@@ -20,9 +20,7 @@ object frmMouseEvents: TfrmMouseEvents
     Width = 635
     Height = 299
     Align = alClient
-    BufferQuality = bqHighQuality
     RenderOptions = [sroClippath, sroEvents]
-    AutoViewBox = True
     OnSVGEvent = SVG2Image1SVGEvent
     ExplicitLeft = 288
     ExplicitTop = 104

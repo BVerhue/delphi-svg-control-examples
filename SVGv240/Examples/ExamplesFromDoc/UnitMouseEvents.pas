@@ -28,7 +28,7 @@ uses
   Dialogs,
   BVE.SVG2Image.FPC,
 {$ENDIF}
-  BVE.SVG2Intf;
+  BVE.SVG2Intf, BVE.SVG2Control.VCL;
 
 type
 
@@ -81,6 +81,7 @@ procedure TfrmMouseEvents.SVG2Image1SVGEvent(Sender: TObject;
   aSVGRoot: ISVGRoot; aEvent: ISVGEvent; const aValue: string);
 var
   Info: string;
+  MouseEvent: ISVGMouseEvent;
 begin
   if aEvent.EventType <> etNone then
   begin
@@ -103,6 +104,10 @@ begin
       etMouseOver:
         Info := Info + 'mouseOver';
     end;
+
+    if Supports(aEvent, ISVGMouseEvent, MouseEvent) then
+      Info := Info + Format(' x = %3.1f y = %3.1f', [MouseEvent.ScreenX, MouseEvent.ScreenY]);
+
   end else
     Info := '';
 
