@@ -58,6 +58,7 @@ uses
   BVE.SVG2Elements.FPC,
 {$ENDIF}
   BVE.SVG2Intf,
+  BVE.SVG2Types,
   BVE.SVG2SaxParser;
 
 procedure TfrmRenderProgrammatically.Button1Click(Sender: TObject);
@@ -67,6 +68,7 @@ var
   SVGParser: TSVGSaxParser;
   SVGRoot: ISVGRoot;
   Bitmap: TBitmap;
+  R: TSVGRect;
 begin
   // Code for Delphi VCL
 
@@ -93,10 +95,13 @@ begin
       try
         Bitmap.PixelFormat := TPixelFormat.pf32bit;   // 32bit bitmap
         Bitmap.AlphaFormat := TAlphaFormat.afDefined; // Enable alpha channel
-        Bitmap.SetSize(480, 320);                     // Set desired size
+
+        R := SVGRoot.CalcIntrinsicSize(SVGRect(0, 0, Width, Height)); // Calc size of SVG Graphic passing the height of the container (Form)
+
+        Bitmap.SetSize(Round(R.Width), Round(R.Height)); // Set the bitmap size
 
         Bitmap.Canvas.Brush.Color := clNone; // Fill background with transparent
-        Bitmap.Canvas.FillRect(Rect(0, 0, 480, 320));
+        Bitmap.Canvas.FillRect(Rect(0, 0, Bitmap.Width, Bitmap.Height));
 
         // Render the SVG onto the bitmap
 
@@ -106,7 +111,7 @@ begin
           );
 
         // Do something with the bitmap...
-        Canvas.Draw(30, 30, Bitmap);
+        Canvas.Draw(0, 0, Bitmap);
 
       finally
         Bitmap.Free;
