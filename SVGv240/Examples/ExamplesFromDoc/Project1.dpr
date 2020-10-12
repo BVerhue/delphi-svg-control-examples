@@ -24,7 +24,9 @@ uses
   UnitElementUnderMousepointer in 'UnitElementUnderMousepointer.pas' {frmElementUnderMousepointer},
   UnitMouseEvents in 'UnitMouseEvents.pas' {frmMouseEvents},
   UnitLoadingFilesFromInternet in 'UnitLoadingFilesFromInternet.pas' {frmLoadingFilesFromInternet},
-  UnitAddSVGFragment in 'UnitAddSVGFragment.pas' {frmAddSVGFragment};
+  UnitAddSVGFragment in 'UnitAddSVGFragment.pas' {frmAddSVGFragment},
+  UnitAnimationControl in 'UnitAnimationControl.pas' {frmAnimationControl},
+  UnitTextToPath in 'UnitTextToPath.pas' {frmTextToPath};
 
 {$R *.res}
 

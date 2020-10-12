@@ -1,11 +1,11 @@
 object Form1: TForm1
-  Left = 152
-  Height = 387
-  Top = 259
+  Left = 227
+  Height = 442
+  Top = 168
   Width = 320
-  ClientHeight = 387
+  ClientHeight = 442
   ClientWidth = 320
-  LCLVersion = '2.0.10.0'
+  LCLVersion = '2.1.0.0'
   object Button1: TButton
     Left = 0
     Height = 25
@@ -145,5 +145,25 @@ object Form1: TForm1
     Caption = 'Add an SVG fragment'
     OnClick = Button14Click
     TabOrder = 13
+  end
+  object Button15: TButton
+    Left = 0
+    Height = 25
+    Top = 350
+    Width = 320
+    Align = alTop
+    Caption = 'Animation control'
+    OnClick = Button15Click
+    TabOrder = 14
+  end
+  object Button16: TButton
+    Left = 0
+    Height = 25
+    Top = 375
+    Width = 320
+    Align = alTop
+    Caption = 'Text to path'
+    OnClick = Button16Click
+    TabOrder = 15
   end
 end

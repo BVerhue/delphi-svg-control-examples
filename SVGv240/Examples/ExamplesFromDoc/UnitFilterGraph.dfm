@@ -21,8 +21,6 @@ object frmFilterGraph: TfrmFilterGraph
     Width = 635
     Height = 299
     Align = alClient
-    BufferQuality = bqHighQuality
-    AutoViewBox = True
     ExplicitLeft = 152
     ExplicitTop = 24
     ExplicitWidth = 105

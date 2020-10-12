@@ -1,0 +1,164 @@
+<svg width="100%" height="100%" viewBox="0 0 750 1000"
+     xmlns="http://www.w3.org/2000/svg" 
+     xmlns:xlink="http://www.w3.org/1999/xlink">
+     
+  <desc>
+    Animated Rectangle Robot kicking its heals
+    
+    CSS animation of 16 separate body parts 
+    
+    original work: https://openclipart.org/detail/302737/rectangular-robot
+    
+    Jay Nick
+    STEAMcoded.org
+  </desc>
+     
+  
+  <style type="text/css"><![CDATA[
+   @keyframes head { from {transform:rotate(0deg)} to {transform:rotate(60deg)}}
+   @keyframes body { from {transform:rotate(0deg)} to {transform:rotate(-40deg)}}
+   @keyframes neck { from {transform:rotate(0deg)} to {transform:rotate(20deg)}}
+   @keyframes trunk { from {transform:rotate(0deg)} to {transform:rotate(20deg)}}
+   
+   @keyframes leftarm { from {transform:rotate(0deg)} to {transform:rotate(-60deg)}}
+   @keyframes leftelbow { from {transform:rotate(0deg)} to {transform:rotate(60deg)}}
+   @keyframes lefthand { from {transform:rotate(0deg)} to {transform:rotate(40deg)}}
+   
+   @keyframes rightarm { from {transform:rotate(0deg)} to {transform:rotate(-30deg)}}
+   @keyframes rightelbow { from {transform:rotate(0deg)} to {transform:rotate(-90deg)}}
+   @keyframes righthand { from {transform:rotate(0deg)} to {transform:rotate(70deg)}}
+
+   @keyframes leftleg { from {transform:rotate(0deg)} to {transform:rotate(-20deg)}}
+   @keyframes leftknee { from {transform:rotate(0deg)} to {transform:rotate(55deg)}}
+   @keyframes leftshoe { from {transform:rotate(0deg)} to {transform:rotate(-34deg)}}
+
+   @keyframes rightleg { from {transform:rotate(0deg)} to {transform:rotate(20deg)}}
+   @keyframes rightknee { from {transform:rotate(0deg)} to {transform:rotate(-52deg)}}
+   @keyframes rightshoe { from {transform:rotate(0deg)} to {transform:rotate(30deg)}}
+   
+   .robot {animation:body 1s linear infinite alternate;transform-origin:330px 500px;}
+   .head {fill:yellow;animation:head 1s linear infinite alternate;transform-origin:400px 230px;}
+   .neck {fill:yellow;stroke:#333333;stroke-width:8;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;}
+   .neck {animation:neck 1s linear infinite alternate;transform-origin:400px 250px;}
+   .trunk {fill:blue;animation:trunk 1s linear infinite alternate;transform-origin:330px 510px;}
+
+   .leftArm {fill:blue;animation:leftarm 1s linear infinite alternate;transform-origin:480px 330px;}
+   .leftElbow {fill:blue;animation:leftelbow 1s linear infinite alternate;transform-origin:530px 470px;}
+   .leftHand {fill:blue;animation:lefthand 1s linear infinite alternate;transform-origin:625px 430px;}
+
+   .rightArm {fill:blue;animation:rightarm 1s linear infinite alternate;transform-origin:320px 250px;}
+   .rightElbow {fill:blue;animation:rightelbow 1s linear infinite alternate;transform-origin:170px 370px;}
+   .rightHand {fill:blue;animation:righthand 1s linear infinite alternate;transform-origin:120px 500px;}
+
+   .leftLeg {fill:blue;animation:leftleg 1s linear infinite alternate;transform-origin:370px 530px;}
+   .leftKnee {fill:blue;animation:leftknee 1s linear infinite alternate;transform-origin:450px 720px;}
+   .leftShoe {fill:blue;animation:leftshoe 1s linear infinite alternate;transform-origin:450px 930px;}
+
+   .rightLeg {fill:blue;animation:rightleg 1s linear infinite alternate;transform-origin:280px 500px;}
+   .rightKnee {fill:blue;animation:rightknee 1s linear infinite alternate;transform-origin:240px 720px;}
+   .rightShoe {fill:blue;animation:rightshoe 1s linear infinite alternate;transform-origin:270px 930px;}
+   
+   .body {fill:red;stroke:#333333;stroke-width:7.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;}
+   .leg {fill:lime;stroke:#333333;stroke-width:7.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;}
+   .finger {fill:yellow;stroke:#333333;stroke-width:7.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;}
+   .hand {fill:magenta;stroke:#333333;stroke-width:7.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;}
+   .trunk {fill:red;stroke:#333333;stroke-width:7.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;}
+   .arm {fill:lime;stroke:#333333;stroke-width:7.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;}
+   .elbow {fill:cyan;stroke:#333333;stroke-width:7.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;}
+   .shoulder {fill:cyan;stroke:#333333;stroke-width:7.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;}
+   .knee {fill:cyan;stroke:#333333;stroke-width:7.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;}
+   .shoe {fill:magenta;stroke:#333333;stroke-width:7.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;}
+   .teeth {fill:none;stroke:#333333;stroke-width:4;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;}
+   .eye {fill-rule:nonzero;stroke:none;stroke-width:4;marker:none;enable-background:accumulate}
+  ]]>
+  </style>
+
+  <g class="robot">
+
+    <g class="leftLeg">
+      <rect class="leg" width="39.413044" height="232.95486" x="95.903648" y="618.01196" rx="0.00015719842" ry="0.013171262" transform="matrix(0.89826499,-0.43945421,0.40967997,0.91222932,0,0)"/>
+      <g class="leftKnee">
+        <rect class="leg" ry="0.013268054" rx="0.00015596893" y="696.55768" x="-506.43619" height="234.66678" width="39.104786" transform="matrix(-0.99839427,-0.05664691,-0.05201366,0.99864637,0,0)" />
+        <rect class="knee" ry="8.4683819" rx="8.1136484" y="703.60706" x="418.58917" height="61.041691" width="53.852486"/>
+        <g class="leftShoe">
+          <rect class="shoe" width="52.330799" height="40.944077" x="481.15768" y="886.82483" rx="8.1159773" ry="8.4661503" transform="matrix(0.99649668,0.0836323,-0.07681475,0.99704538,0,0)"/>
+          <rect class="shoe" width="103.79974" height="33.07291" x="397.58511" y="955.10077" rx="0.00041400382" ry="0.0018699414"/>
+        </g>
+      </g>
+    </g>
+	
+    <g class="trunk">
+      <rect ry="8.466732" rx="8.1153708" y="483.00589" x="328.56198" height="61.029797" width="53.863914" transform="matrix(0.99741028,0.07192171,-0.06604932,0.99781636,0,0)"/>
+    </g>
+	
+    <g class="rightLeg">
+      <rect class="leg" ry="0.013248682" rx="0.0001562165" y="427.95267" x="347.79794" height="234.32416" width="39.166855" transform="matrix(0.97887232,0.20447244,-0.18832123,0.98210749,0,0)"/>
+      <g class="rightKnee">
+        <rect class="leg" transform="matrix(0.98764891,-0.15668319,0.14411003,0.98956167,0,0)" width="39.139065" height="234.47769" x="110.19665" y="742.39404" rx="0.00015610566" ry="0.013257362"/>
+        <rect class="knee" width="53.852486" height="61.041691" x="212.82491" y="684.54431" rx="8.1136484" ry="8.4683819"/>
+        <g class="rightShoe">
+          <rect class="shoe" ry="8.4683819" rx="8.1136484" y="928.19647" x="240.64313" height="40.954868" width="52.315788"/>
+          <rect class="shoe" ry="0.0018699414" rx="0.00041400382" y="953.27496" x="193.83344" height="33.07291" width="103.79974"/>
+        </g>
+      </g>
+    </g>
+  
+    <g class="body">
+      <rect class="neck" transform="matrix(0.99999993,-3.6594939e-4,-0.00270503,0.99999634,0,0)" width="39.099533" height="96.163841" x="387.54333" y="202.61571" rx="0.00015594799" ry="0.0054371008"/>
+      <rect transform="matrix(0.94455317,0.32835852,-0.30401477,0.95266732,0,0)" ry="0.013215201" rx="0.00055723259" y="207.14375" x="418.8056" height="143.74155" width="98.597893"/>
+      <rect width="144.42366" height="113.57968" x="393.82379" y="161.87807" rx="0.00055723259" ry="0.013215201" transform="matrix(0.94455317,0.32835852,-0.30401477,0.95266732,0,0)"/>
+      <rect width="174.2868" height="37.789207" x="379.41006" y="341.66281" rx="0.00069514057" ry="0.0021366009" transform="matrix(0.94455317,0.32835852,-0.30401477,0.95266732,0,0)"/>
+      <rect transform="matrix(0.94455317,0.32835852,-0.30401477,0.95266732,0,0)" ry="0.0021366009" rx="0.00069514057" y="132.06798" x="380.49911" height="37.789207" width="174.2868"/>
+    </g>
+ 
+    <g class="leftArm"> 
+      <rect class="arm" ry="0.0094792545" rx="0.00015631184" y="424.08643" x="377.96106" height="167.65581" width="39.190758" transform="matrix(0.9712421,-0.23809408,0.21745344,0.97607069,0,0)"/>
+      <rect class="shoulder" transform="matrix(0.96331949,-0.26835716,0.247753,0.96882323,0,0)" ry="9.375" rx="9.375" y="422.07529" x="358.64926" height="60.874985" width="54.012245"/>
+      <g class="leftElbow">
+        <rect class="arm" transform="matrix(0.55690184,0.83057831,-0.80995801,0.58648787,0,0)" width="40.25499" height="126.73088" x="692.05438" y="-285.94101" rx="0.0001605565" ry="0.0071653603"/>
+        <rect class="elbow" width="55.727859" height="59.022961" x="-205.39978" y="652.51221" rx="9.375" ry="9.375" transform="matrix(0.43960604,-0.8981907,0.88241374,0.47047422,0,0)"/>
+        <g class="leftHand">
+          <rect class="finger" transform="matrix(-0.69812672,0.71597422,-0.68546812,-0.72810264,0,0)" width="55.021648" height="16.222" x="-250.44257" y="-757.42694" rx="8.2897997" ry="8.2960224"/>
+          <rect class="finger" ry="8.1882315" rx="8.396287" y="-756.99982" x="-9.2944193" height="16.011225" width="55.728436" transform="matrix(-0.43933819,0.89832174,-0.88256121,-0.47019753,0,0)"/>
+          <rect class="finger" transform="matrix(-0.13616119,0.9906867,-0.98897666,-0.14807151,0,0)" width="56.160446" height="15.879671" x="241.16072" y="-680.29834" rx="8.4613762" ry="8.1209545"/>
+          <rect class="hand" transform="matrix(0.43960604,-0.8981907,0.88241374,0.47047422,0,0)" ry="9.375" rx="9.375" y="720.03339" x="-96.69735" height="59.022961" width="55.727859"/>
+          <rect class="finger" ry="8.1218596" rx="8.4605064" y="-547.32593" x="446.67267" height="15.881442" width="56.154678" transform="matrix(0.14437277,0.98952337,-0.98760373,0.15696775,0,0)"/>
+        </g>
+      </g>
+    </g>
+
+    <g class="rightArm"> 
+      <rect class="arm" transform="matrix(-0.49703303,-0.86773162,-0.8471832,0.53130088,0,0)" width="40.36591" height="162.86838" x="-406.3067" y="-137.44043" rx="0.0001609989" ry="0.009208574"/>
+      <rect class="shoulder" width="55.552303" height="59.217831" x="-414.0834" y="-149.18678" rx="9.375" ry="9.375" transform="matrix(-0.51509624,-0.85713235,-0.83666156,0.54772022,0,0)"/>
+      <g class="rightElbow">
+        <rect class="arm" ry="0.0073281834" rx="0.00015697989" y="278.1925" x="-312.99399" height="129.61067" width="39.358253" transform="matrix(-0.91663595,-0.39972308,-0.36796797,0.92983847,0,0)"/>
+        <rect class="elbow" transform="matrix(-0.91868554,-0.39498973,-0.3671247,0.93017173,0,0)" ry="9.375" rx="9.375" y="233.56236" x="-320.66913" height="60.677418" width="54.200405"/>
+        <g class="rightHand">
+          <rect class="finger" transform="matrix(-0.92036915,-0.39105067,0.36337282,-0.93164381,0,0)" width="54.193436" height="16.462202" x="-362.89673" y="-402.70605" rx="8.1650171" ry="8.4188643"/>
+          <rect class="finger" ry="8.2224092" rx="8.3628206" y="-196.66472" x="-560.33246" height="16.078056" width="55.506306" transform="matrix(-0.53321681,-0.84597863,0.82438261,-0.56603297,0,0)"/>
+          <rect class="finger" transform="matrix(-0.51585828,-0.85667394,0.83615567,-0.5484922,0,0)" width="55.550396" height="16.064835" x="-573.17609" y="-165.48396" rx="8.369463" ry="8.2156477"/>
+          <rect class="finger" ry="8.2172461" rx="8.3678932" y="-148.66116" x="-566.065" height="16.067961" width="55.539978" transform="matrix(-0.52000895,-0.85416081,0.83338416,-0.55269417,0,0)"/>
+          <rect class="hand" width="55.551041" height="59.219223" x="463.85986" y="127.66216" rx="9.375" ry="9.375" transform="matrix(0.51560117,0.85682871,-0.83632646,0.54823174,0,0)"/>
+        </g>
+      </g>
+    </g>
+
+    <g class="head">
+      <rect style="fill-rule:nonzero;stroke:#333333;stroke-width:7.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;" width="94.258774" height="151.87262" x="229.81139" y="253.54237" rx="9.375" ry="9.375" transform="matrix(0.88755023,-0.46071096,0.43016476,0.9027504,0,0)"/>
+      <rect id="mouth" style="fill:#ffffff;fill-rule:nonzero;stroke:#333333;stroke-width:7.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;" width="69.182022" height="24.004406" x="243.41206" y="368.38144" rx="14.0625" ry="14.0625" transform="matrix(0.88873885,-0.45841384,0.42794642,0.90380411,0,0)"/>
+      <rect style="fill-rule:nonzero;stroke:#333333;stroke-width:7.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;" transform="matrix(0.88397168,-0.46754045,0.4285037,0.90354003,0,0)" ry="3.2640996" rx="0.79898459" y="208.85942" x="274.84387" height="59.020569" width="9.2008972"/>
+      <rect style="fill:#ffffff;fill-rule:nonzero;stroke:#333333;stroke-width:7.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;" y="362.00113" x="243.41206" height="14.972836" width="69.182022" transform="matrix(0.88873885,-0.45841384,0.42794642,0.90380411,0,0)"/>
+      <rect class="teeth" width="40.630157" height="29.999762" x="252.85481" y="362.05551" rx="2.776279e-005" ry="0.0013427504" transform="matrix(0.88873885,-0.45841384,0.42794642,0.90380411,0,0)"/>
+      <rect class="teeth" ry="0.0013427504" rx="9.7138072e-006" y="362.05551" x="265.09732" height="29.999762" width="14.215919" transform="matrix(0.88873885,-0.45841384,0.42794642,0.90380411,0,0)"/>
+      <rect class="teeth" width="38.477093" height="29.999762" x="265.09726" y="362.05551" rx="2.6291591e-005" ry="0.0013427504" transform="matrix(0.88873885,-0.45841384,0.42794642,0.90380411,0,0)"/>
+      <rect style="fill-rule:nonzero;stroke:#333333;stroke-width:7.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;" transform="matrix(0.43055084,0.90256633,-0.88772687,0.46037051,0,0)" ry="9.375" rx="9.375" y="-350.27594" x="265.97955" height="148.00075" width="82.377174"/>
+      <rect style="fill:#1a1a1a;fill-rule:nonzero;stroke:#333333;stroke-width:7.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;" width="58.46291" height="124.02628" x="277.83817" y="-338.12534" rx="5.0767827" ry="6.8592038" transform="matrix(0.43102137,0.90234172,-0.88788209,0.46007108,0,0)"/>
+      <rect class="eye" style="fill:#ffffff;" width="30.399542" height="38.999687" x="235.9597" y="286.7561" rx="13.599775" ry="12.024905" transform="matrix(0.88873885,-0.45841384,0.42794642,0.9038041,0,0)"/>
+      <rect class="eye" style="fill:#ffffff;" ry="12.024905" rx="13.599775" y="286.7561" x="-315.46625" height="38.999687" width="30.399542" transform="matrix(-0.88873885,0.45841384,0.42794642,0.9038041,0,0)"/>
+      <rect class="eye" style="fill:#1a1a1a;" width="7.4591231" height="15.899873" x="-312.76511" y="296.95602" rx="3.3369713" ry="4.9024615" transform="matrix(-0.88873885,0.45841384,0.42794642,0.9038041,0,0)"/>
+      <rect class="eye" style="fill:#1a1a1a;" transform="matrix(-0.88873885,0.45841384,0.42794642,0.9038041,0,0)" ry="4.9024615" rx="3.3369713" y="290.65607" x="-250.79684" height="15.899873" width="7.4591231"/>
+      <rect style="fill-rule:nonzero;stroke:#333333;stroke-width:7.5;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;" ry="4.6875" rx="9.375" y="200.3568" x="264.02081" height="26.999784" width="30.399542" transform="matrix(0.88873885,-0.45841384,0.42794642,0.90380411,0,0)"/>
+    </g>
+	
+  </g>
+</svg>

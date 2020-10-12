@@ -17,6 +17,7 @@ uses
   Vcl.Controls,
   Vcl.Forms,
   Vcl.Dialogs,
+  BVE.SVG2Control.VCL,
   BVE.SVG2Image.VCL,
 {$ELSE}
   SysUtils,
@@ -26,9 +27,10 @@ uses
   Controls,
   Forms,
   Dialogs,
+  BVE.SVG2Control.FPC,
   BVE.SVG2Image.FPC,
 {$ENDIF}
-  BVE.SVG2Intf, BVE.SVG2Control.VCL;
+  BVE.SVG2Intf;
 
 type
 

@@ -51,6 +51,8 @@ type
     Button12: TButton;
     Button13: TButton;
     Button14: TButton;
+    Button15: TButton;
+    Button16: TButton;
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
     procedure Button3Click(Sender: TObject);
@@ -65,6 +67,8 @@ type
     procedure Button12Click(Sender: TObject);
     procedure Button13Click(Sender: TObject);
     procedure Button14Click(Sender: TObject);
+    procedure Button15Click(Sender: TObject);
+    procedure Button16Click(Sender: TObject);
   private
     { Private declarations }
   public
@@ -89,7 +93,9 @@ uses
   UnitElementUnderMousepointer,
   UnitMouseEvents,
   UnitLoadingFilesFromInternet,
-  UnitAddSVGFragment;
+  UnitAddSVGFragment,
+  UnitAnimationControl,
+  UnitTextToPath;
 
 {$IFnDEF FPC}
   {$R *.dfm}
@@ -120,6 +126,16 @@ end;
 procedure TForm1.Button14Click(Sender: TObject);
 begin
   ShowForm(TfrmAddSVGFragment);
+end;
+
+procedure TForm1.Button15Click(Sender: TObject);
+begin
+  ShowForm(TfrmAnimationControl);
+end;
+
+procedure TForm1.Button16Click(Sender: TObject);
+begin
+  ShowForm(TfrmTextToPath);
 end;
 
 procedure TForm1.Button1Click(Sender: TObject);

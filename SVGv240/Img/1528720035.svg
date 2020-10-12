@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="100%" height="100%"
+	viewBox="150 150 100 100"
+	xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+	<style type="text/css"><![CDATA[
+		.numbers {fill:#999;font-size:10px;}
+	]]>
+	</style>
+<defs>
+ <path id="k" 
+        d="m20 0 c -44,-22 -11,-44 0,-80 11,33 44,60 0,80 z" />
+  <mask id="m2">
+   <rect width="600" height="600" x="-201" y="-201" style="fill:white;" />
+   <use xlink:href="#k"  fill="#000" />
+   <use xlink:href="#k" transform="rotate(7.347 20 20)" fill="#000" />
+  </mask>
+  
+ <g id="rad" transform="translate(-20,-20)">
+    <use xlink:href="#k" fill="#f00" />
+	<use transform="rotate(7.347 20 20)"  fill="#ff1f00" xlink:href="#k" />
+	<use transform="rotate(14.694 20 20)"  fill="#ff1f00" xlink:href="#k" />
+	<use transform="rotate(22.041 20 20)"  fill="#ff3e00" xlink:href="#k" />
+	<use transform="rotate(29.388 20 20)"  fill="#ff5e00" xlink:href="#k" />
+	<use transform="rotate(36.735 20 20)"  fill="#ff7d00" xlink:href="#k" />
+	<use transform="rotate(44.082 20 20)"  fill="#ff9c00" xlink:href="#k" />
+	<use transform="rotate(51.429 20 20)"  fill="#fb0" xlink:href="#k" />
+	<use transform="rotate(58.776 20 20)"  fill="#ffdb00" xlink:href="#k" />
+	<use transform="rotate(66.122 20 20)"  fill="#fffa00" xlink:href="#k" />
+	<use transform="rotate(73.469 20 20)"  fill="#e5ff00" xlink:href="#k" />
+	<use transform="rotate(80.816 20 20)"  fill="#c6ff00" xlink:href="#k" />
+	<use transform="rotate(88.163 20 20)"  fill="#a7ff00" xlink:href="#k" />
+	<use transform="rotate(95.510 20 20)"  fill="#87ff00" xlink:href="#k" />
+	<use transform="rotate(102.857 20 20)"  fill="#68ff00" xlink:href="#k" />
+	<use transform="rotate(110.204 20 20)"  fill="#49ff00" xlink:href="#k" />
+	<use transform="rotate(117.551 20 20)"  fill="#2aff00" xlink:href="#k" />
+	<use transform="rotate(124.898 20 20)"  fill="#0aff00" xlink:href="#k" />
+	<use transform="rotate(132.245 20 20)"  fill="#00ff15" xlink:href="#k" />
+	<use transform="rotate(139.592 20 20)"  fill="#00ff34" xlink:href="#k" />
+	<use transform="rotate(146.939 20 20)"  fill="#00ff53" xlink:href="#k" />
+	<use transform="rotate(154.286 20 20)"  fill="#00ff72" xlink:href="#k" />
+	<use transform="rotate(161.633 20 20)"  fill="#00ff92" xlink:href="#k" />
+	<use transform="rotate(168.980 20 20)"  fill="#00ffb1" xlink:href="#k" />
+	<use transform="rotate(176.327 20 20)"  fill="#00ffd0" xlink:href="#k" />
+	<g style="mask:url(#m2)">
+	<use transform="rotate(183.673 20 20)"  fill="#00ffef" xlink:href="#k" />
+	<use transform="rotate(191.020 20 20)"  fill="#00efff" xlink:href="#k" />
+	<use transform="rotate(198.367 20 20)"  fill="#00d0ff" xlink:href="#k" />
+	<use transform="rotate(205.714 20 20)"  fill="#00b1ff" xlink:href="#k" />
+	<use transform="rotate(213.061 20 20)"  fill="#0092ff" xlink:href="#k" />
+	<use transform="rotate(220.408 20 20)"  fill="#0072ff" xlink:href="#k" />
+	<use transform="rotate(227.755 20 20)"  fill="#0053ff" xlink:href="#k" />
+	<use transform="rotate(235.102 20 20)"  fill="#0034ff" xlink:href="#k" />
+	<use transform="rotate(242.449 20 20)"  fill="#0015ff" xlink:href="#k" />
+	<use transform="rotate(249.796 20 20)"  fill="#0a00ff" xlink:href="#k" />
+	<use transform="rotate(257.143 20 20)"  fill="#2a00ff" xlink:href="#k" />
+	<use transform="rotate(264.490 20 20)"  fill="#4900ff" xlink:href="#k" />
+	<use transform="rotate(271.837 20 20)"  fill="#6800ff" xlink:href="#k" />
+	<use transform="rotate(279.184 20 20)"  fill="#8700ff" xlink:href="#k" />
+	<use transform="rotate(286.531 20 20)"  fill="#a700ff" xlink:href="#k" />
+	<use transform="rotate(293.878 20 20)"  fill="#c600ff" xlink:href="#k" />
+	<use transform="rotate(301.224 20 20)"  fill="#e500ff" xlink:href="#k" />
+	<use transform="rotate(308.571 20 20)"  fill="#ff00fa" xlink:href="#k" />
+	<use transform="rotate(315.918 20 20)"  fill="#ff00db" xlink:href="#k" />
+	<use transform="rotate(323.265 20 20)"  fill="#f0b" xlink:href="#k" />
+	<use transform="rotate(330.612 20 20)"  fill="#ff009c" xlink:href="#k" />
+	<use transform="rotate(337.959 20 20)"  fill="#ff007d" xlink:href="#k" />
+	<use transform="rotate(345.306 20 20)"  fill="#ff005e" xlink:href="#k" />
+	<use transform="rotate(352.653 20 20)"  fill="#ff003e" xlink:href="#k" />
+	</g>
+ </g>
+</defs>
+<g transform="translate(200,200)">
+	<g >
+	<circle r="22" fill="red">
+	<animate attributeName="fill" dur="3s" repeatDur="indefinite"
+              values="#f00;#ff1f00;#ff3e00;#ff5e00;#ff7d00;#ff9c00;#fb0;#ffdb00;#fffa00;#e5ff00;#c6ff00;#a7ff00;#87ff00;#68ff00;#49ff00;#2aff00;#0aff00;#00ff15;#00ff34;#00ff53;#00ff72;#00ff92;#00ffb1;#00ffd0;#00ffef;#00efff;#00d0ff;#00b1ff;#0092ff;#0072ff;#0053ff;#0034ff;#0015ff;#0a00ff;#2a00ff;#4900ff;#6800ff;#8700ff;#a700ff;#c600ff;#e500ff;#ff00fa;#ff00db;#f0b;#ff009c;#ff007d;#ff005e;#ff003e;#ff001f;" />
+	</circle>
+	<use xlink:href="#rad" />
+ 	<animateTransform
+    attributeName="transform"
+    type="rotate"
+    from="0"
+    to="360"
+    dur="19s"
+    repeatCount="indefinite" />
+	<animateTransform
+    attributeName="transform"
+	dur="23s" 
+	additive="sum"
+    type="scale"
+    values="1;1.7;0.6,-1;2.1;-1,1;1;1.5;1,-1;1,-2.1;1"
+    repeatCount="indefinite" />	</g>
+</g>
+
+</svg>

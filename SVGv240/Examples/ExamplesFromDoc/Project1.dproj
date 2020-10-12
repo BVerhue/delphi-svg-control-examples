@@ -147,6 +147,14 @@
             <Form>frmAddSVGFragment</Form>
             <FormType>dfm</FormType>
         </DCCReference>
+        <DCCReference Include="UnitAnimationControl.pas">
+            <Form>frmAnimationControl</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="UnitTextToPath.pas">
+            <Form>frmTextToPath</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

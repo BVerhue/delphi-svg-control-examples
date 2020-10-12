@@ -2,7 +2,7 @@ object Form1: TForm1
   Left = 0
   Top = 0
   Caption = 'Form1'
-  ClientHeight = 394
+  ClientHeight = 417
   ClientWidth = 221
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -122,7 +122,6 @@ object Form1: TForm1
     Caption = 'Find element under the mousepointer'
     TabOrder = 10
     OnClick = Button11Click
-    ExplicitTop = 250
   end
   object Button12: TButton
     Left = 0
@@ -133,7 +132,6 @@ object Form1: TForm1
     Caption = 'Using mouse events'
     TabOrder = 11
     OnClick = Button12Click
-    ExplicitTop = 275
   end
   object Button13: TButton
     Left = 0
@@ -144,7 +142,6 @@ object Form1: TForm1
     Caption = 'Loading files from internet'
     TabOrder = 12
     OnClick = Button13Click
-    ExplicitTop = 300
   end
   object Button14: TButton
     Left = 0
@@ -155,6 +152,30 @@ object Form1: TForm1
     Caption = 'Add an SVG fragment'
     TabOrder = 13
     OnClick = Button14Click
-    ExplicitTop = 244
+  end
+  object Button15: TButton
+    Left = 0
+    Top = 350
+    Width = 221
+    Height = 25
+    Align = alTop
+    Caption = 'Animation control'
+    TabOrder = 14
+    OnClick = Button15Click
+    ExplicitLeft = -8
+    ExplicitTop = 381
+  end
+  object Button16: TButton
+    Left = 0
+    Top = 375
+    Width = 221
+    Height = 25
+    Align = alTop
+    Caption = 'Text to path'
+    TabOrder = 15
+    OnClick = Button16Click
+    ExplicitLeft = 48
+    ExplicitTop = 384
+    ExplicitWidth = 75
   end
 end
