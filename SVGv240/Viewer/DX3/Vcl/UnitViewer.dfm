@@ -32,7 +32,6 @@ object Form1: TForm1
     ParentDoubleBuffered = False
     ParentFont = False
     TabOrder = 0
-    ExplicitHeight = 425
   end
   object ActionToolBar1: TActionToolBar
     Left = 0
@@ -163,6 +162,7 @@ object Form1: TForm1
       Width = 51
       Height = 17
       Action = aEnableFilters
+      Caption = 'Filters'
       TabOrder = 1
     end
     object CheckBox3: TCheckBox

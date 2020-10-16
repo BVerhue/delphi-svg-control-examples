@@ -64,24 +64,30 @@ var
   Bitmap: TBitmap;
   RC: ISVGRenderContext;
   ParentBounds, Bounds: TSVGRect;
-  StateRoot, State: ISVGObjectState;
-  Stroke: ISVGBrush;
 
-  function FindID(aParent: ISVGObjectState; const aID: string): ISVGObjectState;
+  procedure DrawBounds(const aID: string; const aColor: TSVGColor);
   var
-    Child: ISVGObjectState;
+    SVGObject: ISVGObject;
+    i: Integer;
   begin
-    // Find first occurence of aID in object state tree
-
-    for Child in aParent.Children do
+    if Supports(SVGRoot.FindElement(aID), ISVGObject, SVGObject)
+    and (SVGObject.CacheList.Count > 0) then
     begin
-      if Child.SVGObject.ID = aID then
+      for i := 0 to SVGObject.CacheList.Count - 1 do
       begin
-        Result := Child;
-        Exit;
-      end else
-        Result := FindID(Child, aID);
+        Bounds := SVGObject.CacheList[i].ScreenBBox;
+        Bounds.Inflate(5, 5);
+
+        // Create a brush for stroking the outline
+
+        RC.ApplyStroke(TSVGSolidBrush.Create(aColor), 2.0);
+
+        // Draw a rectangle around the element
+
+        RC.DrawRect(Bounds, 5, 5);
+      end;
     end;
+
   end;
 
 begin
@@ -110,20 +116,13 @@ begin
 
   Bitmap := TBitmap.Create;
   try
-
-    Bitmap.SetSize(1, 1);
-
-    // Now create a render context for the bitmap
-
-    RC := TSVGRenderContextManager.CreateRenderContextBitmap(Bitmap);
-
     // Define some parent bounds, in case the SVG graphic has dimensions in percentages
 
     ParentBounds := SVGRect(0, 0, Image1.Width, Image1.Height);
 
     // Now we can calculate the dimensions of the SVG graphic
 
-    Bounds := SVGRoot.CalcIntrinsicSize(RC, ParentBounds);
+    Bounds := SVGRoot.CalcIntrinsicSize(ParentBounds);
 
     // Resize the bitmap and make it 32bit transparent
 
@@ -152,55 +151,14 @@ begin
         FALSE          // No auto scaling in this case
         );
 
-      // Step 4
-      // Create a brush for stroking the outline
-
-      // Get a reference to the object state tree
-
-      StateRoot := SVGRoot.SVG.ObjectStateRoot;
-
       // Find the text element on ID and return the screen bounding box
-
-      State := FindID(StateRoot, 'txt');
-      if assigned(State) then
-      begin
-        // Get the screen bounds of the element
-
-        Bounds := State.ScreenBBox;
-        Bounds.Inflate(5, 5);
-
-        RC.ApplyStroke(TSVGSolidBrush.Create(SVGColorRed), 2.0);
-
-        // Draw a rectangle around the element
-
-        RC.DrawRect(Bounds, 5, 5);
-      end;
+      DrawBounds('txt', SVGColorRed);
 
       // Find the star group element on ID and return the screen bounding box
-
-      State := FindID(StateRoot, 'star_group');
-      if assigned(State) then
-      begin
-        Bounds := State.ScreenBBox;
-        Bounds.Inflate(5, 5);
-
-        RC.ApplyStroke(TSVGSolidBrush.Create(SVGColorBlue), 2.0);
-
-        RC.DrawRect(Bounds, 5, 5);
-      end;
+      DrawBounds('star_group', SVGColorBlue);
 
       // Find the ellipse element on ID and return the screen bounding box
-
-      State := FindID(StateRoot, 'ellipse');
-      if assigned(State) then
-      begin
-        Bounds := State.ScreenBBox;
-        Bounds.Inflate(5, 5);
-
-        RC.ApplyStroke(TSVGSolidBrush.Create(SVGColorGreen), 2.0);
-
-        RC.DrawRect(Bounds, 5, 5);
-      end;
+      DrawBounds('ellipse', SVGColorGreen);
 
     finally
       RC.EndScene;
