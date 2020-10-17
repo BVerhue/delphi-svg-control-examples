@@ -97,7 +97,14 @@ type
     aExport: TAction;
     OpenPictureDialog1: TOpenPictureDialog;
     SavePictureDialog1: TSavePictureDialog;
-    SVG2LinkedImageList1: TSVG2LinkedImageList;
+    ilDisabled: TSVG2LinkedImageList;
+    ilNormal: TSVG2LinkedImageList;
+    aAnimationStart: TAction;
+    aAnimationPause: TAction;
+    aEnableClippaths: TAction;
+    aEnableEvents: TAction;
+    aEnablePersistentBuffers: TAction;
+    aEnableTextToPath: TAction;
     procedure FormCreate(Sender: TObject);
   end;
 
