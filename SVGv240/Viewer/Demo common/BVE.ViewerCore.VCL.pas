@@ -69,7 +69,9 @@ uses
   Vcl.Themes,
   Vcl.Dialogs,
 {$ELSE}
+  {$IFDEF MSWINDOWS}
   Windows,
+  {$ENDIF}
   Types,
   Classes,
   SysUtils,
@@ -3130,8 +3132,10 @@ begin
   case aEvent.EventType of
     etClick:
       begin
+        {$IFDEF MSWINDOWS}
         if aEvent.Target.ID = 'link' then
           ShellExecute(0, nil, pchar('www.bverhue.nl/delphisvg/'), nil, nil, sw_restore);
+        {$ENDIF}
       end;
     etMouseOut:
       begin
@@ -3172,7 +3176,9 @@ begin
             ImageElement.X := TSVGDimension.Init(280);
             ImageElement.Y := TSVGDimension.Init(10);
             FSVGImage.Repaint;
+            {$IFDEF MSWINDOWS}
             ShellExecute(0, nil, pchar('https://www.w3.org/TR/SVG11/'), nil, nil, sw_restore);
+            {$ENDIF}
           end;
         end;
       end;

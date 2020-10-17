@@ -98,6 +98,13 @@ type
     aEdit: TAction;
     aOpen: TAction;
     ActionList1: TActionList;
+    CheckBox1: TCheckBox;
+    CheckBox2: TCheckBox;
+    CheckBox3: TCheckBox;
+    CheckBox4: TCheckBox;
+    CheckBox5: TCheckBox;
+    Label1: TLabel;
+    lblRenderContext: TLabel;
     lblTime: TLabel;
     OpenPictureDialog1: TOpenPictureDialog;
     Panel1: TPanel;
