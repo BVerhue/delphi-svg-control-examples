@@ -3,12 +3,12 @@
         <ProjectGuid>{72B4896C-C1AD-4242-B0C8-215E73E5019E}</ProjectGuid>
         <MainSource>SVGViewerFMX.dpr</MainSource>
         <Base>True</Base>
-        <Config Condition="'$(Config)'==''">Debug</Config>
+        <Config Condition="'$(Config)'==''">Release</Config>
         <TargetedPlatforms>1167</TargetedPlatforms>
         <AppType>Application</AppType>
         <FrameworkType>FMX</FrameworkType>
         <ProjectVersion>18.4</ProjectVersion>
-        <Platform Condition="'$(Platform)'==''">iOSSimulator</Platform>
+        <Platform Condition="'$(Platform)'==''">OSX32</Platform>
         <Profile Condition="'$(Platform)'=='iOSDevice64'">IOS symulator 19-2</Profile>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
@@ -233,10 +233,11 @@
         <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName)</VerInfo_Keys>
         <VerInfo_Locale>1033</VerInfo_Locale>
         <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
-        <Icon_MainIcon>SVGViewerFMX_Icon.ico</Icon_MainIcon>
+        <Icon_MainIcon>..\..\Img\Application icons\SVGViewer\SVGViewer.ico</Icon_MainIcon>
         <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
         <UWP_DelphiLogo44>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_44.png</UWP_DelphiLogo44>
         <UWP_DelphiLogo150>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_150.png</UWP_DelphiLogo150>
+        <Icns_MainIcns>..\..\Img\Application icons\SVGViewer\SVGViewer.icns</Icns_MainIcns>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win64)'!=''">
         <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
@@ -265,7 +266,8 @@
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_Locale>1033</VerInfo_Locale>
         <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName)</VerInfo_Keys>
-        <Icon_MainIcon>..\..\..\Img\Application icons\SVGViewer\SVGViewer.ico</Icon_MainIcon>
+        <Icon_MainIcon>..\..\Img\Application icons\SVGViewer\SVGViewer.ico</Icon_MainIcon>
+        <Icns_MainIcns>..\..\Img\Application icons\SVGViewer\SVGViewer.icns</Icns_MainIcns>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win64)'!=''">
         <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
@@ -273,7 +275,8 @@
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_Locale>1033</VerInfo_Locale>
         <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
-        <Icon_MainIcon>..\..\..\Img\Application icons\SVGViewer\SVGViewer.ico</Icon_MainIcon>
+        <Icon_MainIcon>..\..\Img\Application icons\SVGViewer\SVGViewer.ico</Icon_MainIcon>
+        <Icns_MainIcns>..\..\Img\Application icons\SVGViewer\SVGViewer.icns</Icns_MainIcns>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2)'!=''">
         <DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
@@ -306,7 +309,6 @@
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_Locale>1033</VerInfo_Locale>
         <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName)</VerInfo_Keys>
-        <Icon_MainIcon>..\..\..\Img\Application icons\SVGViewer\SVGViewer.ico</Icon_MainIcon>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Win64)'!=''">
         <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
@@ -344,9 +346,9 @@
                     <Source Name="MainSource">SVGViewerFMX.dpr</Source>
                 </Source>
                 <Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Bruno\Downloads\SVGDemoDX2_DX3_230\DX2\Bpl\DclSVG2DemoPackageCommonDX2.bpl">SVG control package v2.3 common demo</Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Bruno\Downloads\SVGDemoDX2_DX3_230\DX2\Bpl\DclSVG2DemoPackageFmxDX2.bpl">SVG control package v2.3 Fmx demo</Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Bruno\Downloads\SVGDemoDX2_DX3_230\DX2\Bpl\DclSVG2DemoPackageVclDX2.bpl">SVG control package v2.3 Vcl demo</Excluded_Packages>
+                    <Excluded_Packages Name="C:\Users\Bruno\Downloads\SVGDemoDX2_DX3_230\DX2\Bpl\DclSVG2DemoPackageCommonDX2.bpl">File C:\Users\Bruno\Downloads\SVGDemoDX2_DX3_230\DX2\Bpl\DclSVG2DemoPackageCommonDX2.bpl not found</Excluded_Packages>
+                    <Excluded_Packages Name="C:\Users\Bruno\Downloads\SVGDemoDX2_DX3_230\DX2\Bpl\DclSVG2DemoPackageFmxDX2.bpl">File C:\Users\Bruno\Downloads\SVGDemoDX2_DX3_230\DX2\Bpl\DclSVG2DemoPackageFmxDX2.bpl not found</Excluded_Packages>
+                    <Excluded_Packages Name="C:\Users\Bruno\Downloads\SVGDemoDX2_DX3_230\DX2\Bpl\DclSVG2DemoPackageVclDX2.bpl">File C:\Users\Bruno\Downloads\SVGDemoDX2_DX3_230\DX2\Bpl\DclSVG2DemoPackageVclDX2.bpl not found</Excluded_Packages>
                     <Excluded_Packages Name="$(BDSBIN)\dcloffice2k250.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
                     <Excluded_Packages Name="$(BDSBIN)\dclofficexp250.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
                 </Excluded_Packages>
@@ -494,7 +496,6 @@
                 </DeployFile>
                 <DeployFile LocalName="$(BDS)\Redist\iossimulator\libcgunwind.1.0.dylib" Class="DependencyModule">
                     <Platform Name="iOSSimulator">
-                        <RemoteDir>.\</RemoteDir>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
