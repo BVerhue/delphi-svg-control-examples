@@ -1,10 +1,26 @@
 unit Unit1;
 
-interface
+//------------------------------------------------------------------------------
+//
+//                          SVG Control Package 2.0
+//
+//                      Example render SVG to EMF file
+//
+//------------------------------------------------------------------------------
 
+
+interface
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls;
+  Winapi.Windows,
+  Winapi.Messages,
+  System.SysUtils,
+  System.Variants,
+  System.Classes,
+  Vcl.Graphics,
+  Vcl.Controls,
+  Vcl.Forms,
+  Vcl.Dialogs,
+  Vcl.StdCtrls;
 
 type
   TForm1 = class(TForm)
@@ -48,52 +64,86 @@ var
   procedure Render;
   var
     RC: ISVGRenderContext;
+    RCGP: TSVGContextGP;
   begin
-    // Define a size
+    // Define a size...
 
     W := 250;
     H := 250;
 
-    // or calc the inttrinsic size of the SVG (optional)
+    // ...or calc the intrinsic size of the SVG (optional)
 
     RC := TSVGContextGP.Create(W, H);
     R := SVGRoot.CalcIntrinsicSize(RC, SVGRect(0, 0, W, H));
 
-    RC := TSVGContextGP.Create(Filename, Round(R.Width), Round(R.Height));
+    // Now we create the GDI+ rendercontext for rendering to EMF
+
+    RCGP := TSVGContextGP.Create(Filename, Round(R.Width), Round(R.Height));
+    RC := RCGP;
+
+    // Choose how text should be rendered in the EMF file
+
+    // All glyphs will be converted to paths, so there will be no text in the
+    // EMF file.
+
+    //RCGP.TextFormattingOptions := [];
+
+    // Every placed character will start a new chunk of text
+
+    //RCGP.TextFormattingOptions := [tfoStrings];
+
+    // If all characters in the text are placed, this is considered one chunk (default)
+
+    RCGP.TextFormattingOptions := [tfoStringsWithPlacedCharacters];
+
+    // Render the EMF file
+
     RC.BeginScene;
     try
       SVGRenderToRenderContext(
         SVGRoot,
         RC,
-        Round(R.Width), Round(R.Height));
+        Round(R.Width), Round(R.Height),
+        [
+          // Choose if you need filters, or clippaths. These will result in
+          // parts of the EMF file being replaced with bitmaps.
+
+          //sroFilters,
+          //sroClippath
+        ]
+        );
     finally
       RC.EndScene;
     end;
   end;
 
 begin
-
-  // Instructions:
-  //
-  // Compile application with {$Define SVGGDIP} enabled in ..\Vcl\ContextSettingsVCL.inc
-  //
   // Render to EMF is GDI+ functionality.
   // - The radial gradient is not very good in GDI+.
   // - Filters, clippaths etc will be rendered to a embedded bitmap
 
+  // Instructions:
+
+  // Compile application with only {$Define SVGGDIP} and {$Define SVGFontGDI}
+  // enabled in ..\Vcl\ContextSettingsVCL.inc
+
+
   // Create a root to store the SVG rendering tree
+
   SVGRoot := TSVGRootVCL.Create;
 
   // Create a SAX parser instance
+
   SVGParser := TSVGSaxParser.Create(nil);
   try
+
     Filename := ChangeFileExt(aFilename, '.emf');
 
     // Parse SVG document and build the rendering tree
+
     SVGParser.Parse(aFileName, SVGRoot);
 
     Render;
-
 
   finally
     SVGParser.Free;
