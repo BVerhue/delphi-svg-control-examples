@@ -2,7 +2,7 @@ object Form1: TForm1
   Left = 0
   Top = 0
   Caption = 'Form1'
-  ClientHeight = 417
+  ClientHeight = 443
   ClientWidth = 221
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -162,8 +162,6 @@ object Form1: TForm1
     Caption = 'Animation control'
     TabOrder = 14
     OnClick = Button15Click
-    ExplicitLeft = -8
-    ExplicitTop = 381
   end
   object Button16: TButton
     Left = 0
@@ -174,8 +172,18 @@ object Form1: TForm1
     Caption = 'Text to path'
     TabOrder = 15
     OnClick = Button16Click
-    ExplicitLeft = 48
-    ExplicitTop = 384
+  end
+  object Button17: TButton
+    Left = 0
+    Top = 400
+    Width = 221
+    Height = 25
+    Align = alTop
+    Caption = 'Parse and render in thread'
+    TabOrder = 16
+    OnClick = Button17Click
+    ExplicitLeft = 40
+    ExplicitTop = 424
     ExplicitWidth = 75
   end
 end

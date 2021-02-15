@@ -8,7 +8,7 @@ uses
   {$IFnDEF FPC}
   Vcl.Forms,
   {$ELSE}
-  Forms, Interfaces,
+  Forms,
   {$ENDIF }
   Unit1 in 'Unit1.pas' {Form1},
   UnitFilenameAssignment in 'UnitFilenameAssignment.pas' {frmFilenameAssignment},
@@ -26,7 +26,8 @@ uses
   UnitLoadingFilesFromInternet in 'UnitLoadingFilesFromInternet.pas' {frmLoadingFilesFromInternet},
   UnitAddSVGFragment in 'UnitAddSVGFragment.pas' {frmAddSVGFragment},
   UnitAnimationControl in 'UnitAnimationControl.pas' {frmAnimationControl},
-  UnitTextToPath in 'UnitTextToPath.pas' {frmTextToPath};
+  UnitTextToPath in 'UnitTextToPath.pas' {frmTextToPath},
+  UnitParseAndRenderInThread in 'UnitParseAndRenderInThread.pas' {frmParseAndRenderInThread};
 
 {$R *.res}
 
