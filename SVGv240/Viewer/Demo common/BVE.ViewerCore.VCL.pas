@@ -1471,7 +1471,7 @@ end;
 procedure TSVGAnimatedClock.MouseDown(Button: TMouseButton; Shift: TShiftState;
   X, Y: Integer);
 var
-  P: TPointF;
+  P: TSVGPoint;
 begin
   if ssLeft in Shift then
   begin
