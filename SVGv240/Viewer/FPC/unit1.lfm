@@ -1,24 +1,24 @@
 object Form1: TForm1
-  Left = 554
+  Left = 328
   Height = 517
-  Top = 303
+  Top = 250
   Width = 888
   AllowDropFiles = True
   Caption = 'Form1'
   ClientHeight = 517
   ClientWidth = 888
   OnCreate = FormCreate
-  LCLVersion = '2.0.0.4'
+  LCLVersion = '2.1.0.0'
   object StatusBar1: TStatusBar
     Left = 0
-    Height = 15
-    Top = 502
+    Height = 23
+    Top = 494
     Width = 888
     Panels = <>
   end
   object ScrollBox1: TScrollBox
     Left = 0
-    Height = 390
+    Height = 382
     Top = 50
     Width = 888
     HorzScrollBar.Page = 1
@@ -75,27 +75,27 @@ object Form1: TForm1
       Action = aCopyDirect
     end
     object ToolButton7: TToolButton
-      Left = 331
+      Left = 320
       Top = 2
       Action = aRemove
     end
     object ToolButton8: TToolButton
-      Left = 389
+      Left = 371
       Top = 2
       Action = aAutoViewbox
     end
     object ToolButton9: TToolButton
-      Left = 483
+      Left = 452
       Top = 2
       Action = aEnableFilters
     end
     object ToolButton10: TToolButton
-      Left = 573
+      Left = 527
       Top = 2
       Action = aExport
     end
     object ToolButton11: TToolButton
-      Left = 623
+      Left = 577
       Top = 2
       Action = aAbout
     end
@@ -103,7 +103,7 @@ object Form1: TForm1
   object Panel1: TPanel
     Left = 0
     Height = 34
-    Top = 468
+    Top = 460
     Width = 888
     Align = alBottom
     BevelOuter = bvNone
@@ -176,7 +176,7 @@ object Form1: TForm1
   object Panel2: TPanel
     Left = 0
     Height = 28
-    Top = 440
+    Top = 432
     Width = 888
     Align = alBottom
     ClientHeight = 28
@@ -184,65 +184,65 @@ object Form1: TForm1
     TabOrder = 4
     object Label1: TLabel
       Left = 16
-      Height = 16
+      Height = 15
       Top = 8
-      Width = 96
+      Width = 80
       Caption = 'Renderoptions:'
       ParentColor = False
     end
     object CheckBox1: TCheckBox
       Left = 128
-      Height = 18
+      Height = 19
       Top = 8
-      Width = 146
+      Width = 129
       Action = aEnableClippaths
       TabOrder = 0
     end
     object CheckBox2: TCheckBox
       Left = 280
-      Height = 18
+      Height = 19
       Top = 8
-      Width = 99
+      Width = 87
       Action = aEnableFilters
       TabOrder = 1
     end
     object CheckBox3: TCheckBox
       Left = 389
-      Height = 18
+      Height = 19
       Top = 8
-      Width = 61
+      Width = 54
       Action = aEnableEvents
       TabOrder = 2
     end
     object CheckBox4: TCheckBox
       Left = 456
-      Height = 18
+      Height = 19
       Top = 8
-      Width = 128
+      Width = 111
       Action = aEnablePersistentBuffers
       TabOrder = 3
     end
     object CheckBox5: TCheckBox
       Left = 592
-      Height = 18
+      Height = 19
       Top = 8
-      Width = 93
+      Width = 83
       Action = aEnableTextToPath
       TabOrder = 4
     end
     object lblRenderContext: TLabel
       Left = 705
-      Height = 16
+      Height = 15
       Top = 8
-      Width = 110
+      Width = 92
       Caption = 'lblRenderContext'
       ParentColor = False
     end
   end
   object ActionList1: TActionList
     Images = ilNormal
-    left = 640
-    top = 56
+    Left = 640
+    Top = 56
     object aOpen: TAction
       Caption = 'Open'
       Hint = 'Load an SVG from file (you can also drag-drop files...)'
@@ -638,8 +638,8 @@ object Form1: TForm1
         OuterSVGType = ostDropShadow
         StyleName = 'Style_2'
       end>
-    left = 640
-    top = 168
+    Left = 640
+    Top = 168
     Bitmap = {
       4C69420000001800000018000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -5398,8 +5398,8 @@ object Form1: TForm1
   end
   object OpenPictureDialog1: TOpenPictureDialog
     Filter = 'Scalable Vector Graphics (*.svg)|*.svg'
-    left = 640
-    top = 112
+    Left = 640
+    Top = 112
   end
   object ilNormal: TSVG2LinkedImageList
     Height = 24
@@ -5410,8 +5410,8 @@ object Form1: TForm1
     ParentStyleIndex = 0
     RenderOptions = [sroFilters, sroClippath]
     RenderQuality = bqHighQuality
-    left = 760
-    top = 168
+    Left = 760
+    Top = 168
     Bitmap = {
       4C69160000001800000018000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -8077,8 +8077,8 @@ object Form1: TForm1
     ParentStyleIndex = 1
     RenderOptions = [sroFilters, sroClippath]
     RenderQuality = bqHighQuality
-    left = 760
-    top = 224
+    Left = 760
+    Top = 224
     Bitmap = {
       4C69160000001800000018000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -10742,8 +10742,8 @@ object Form1: TForm1
     ParentStyleIndex = 2
     RenderOptions = [sroFilters, sroClippath]
     RenderQuality = bqHighQuality
-    left = 760
-    top = 280
+    Left = 760
+    Top = 280
     Bitmap = {
       4C69160000001800000018000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
