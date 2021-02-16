@@ -69,7 +69,6 @@ type
     procedure Button14Click(Sender: TObject);
     procedure Button15Click(Sender: TObject);
     procedure Button16Click(Sender: TObject);
-    procedure Button17Click(Sender: TObject);
   private
     { Private declarations }
   public
@@ -96,8 +95,7 @@ uses
   UnitLoadingFilesFromInternet,
   UnitAddSVGFragment,
   UnitAnimationControl,
-  UnitTextToPath,
-  UnitParseAndRenderInThread;
+  UnitTextToPath;
 
 {$IFnDEF FPC}
   {$R *.dfm}
@@ -138,11 +136,6 @@ end;
 procedure TForm1.Button16Click(Sender: TObject);
 begin
   ShowForm(TfrmTextToPath);
-end;
-
-procedure TForm1.Button17Click(Sender: TObject);
-begin
-  ShowForm(TfrmParseAndRenderInThread);
 end;
 
 procedure TForm1.Button1Click(Sender: TObject);
