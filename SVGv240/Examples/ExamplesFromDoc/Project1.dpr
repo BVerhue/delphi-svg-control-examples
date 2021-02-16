@@ -26,8 +26,7 @@ uses
   UnitLoadingFilesFromInternet in 'UnitLoadingFilesFromInternet.pas' {frmLoadingFilesFromInternet},
   UnitAddSVGFragment in 'UnitAddSVGFragment.pas' {frmAddSVGFragment},
   UnitAnimationControl in 'UnitAnimationControl.pas' {frmAnimationControl},
-  UnitTextToPath in 'UnitTextToPath.pas' {frmTextToPath},
-  UnitParseAndRenderInThread in 'UnitParseAndRenderInThread.pas' {frmParseAndRenderInThread};
+  UnitTextToPath in 'UnitTextToPath.pas' {frmTextToPath};
 
 {$R *.res}
 

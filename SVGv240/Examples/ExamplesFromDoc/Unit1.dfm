@@ -173,17 +173,4 @@ object Form1: TForm1
     TabOrder = 15
     OnClick = Button16Click
   end
-  object Button17: TButton
-    Left = 0
-    Top = 400
-    Width = 221
-    Height = 25
-    Align = alTop
-    Caption = 'Parse and render in thread'
-    TabOrder = 16
-    OnClick = Button17Click
-    ExplicitLeft = 40
-    ExplicitTop = 424
-    ExplicitWidth = 75
-  end
 end

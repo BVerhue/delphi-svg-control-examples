@@ -53,7 +53,6 @@ type
     Button14: TButton;
     Button15: TButton;
     Button16: TButton;
-    Button17: TButton;
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
     procedure Button3Click(Sender: TObject);
