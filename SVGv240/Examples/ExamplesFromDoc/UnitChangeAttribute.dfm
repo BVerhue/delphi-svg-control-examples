@@ -21,8 +21,6 @@ object frmChangeAttribute: TfrmChangeAttribute
     Width = 635
     Height = 299
     Align = alClient
-    BufferQuality = bqHighQuality
-    AutoViewBox = True
     OnAfterParse = SVG2Image1AfterParse
     ExplicitLeft = 112
     ExplicitTop = 88

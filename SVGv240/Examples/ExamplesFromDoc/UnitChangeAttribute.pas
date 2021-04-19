@@ -18,7 +18,8 @@ uses
   Vcl.Forms,
   Vcl.Dialogs,
   Vcl.ExtCtrls,
-  BVE.SVG2Image.VCL;
+  BVE.SVG2Image.VCL,
+  BVE.SVG2Control.VCL;
 {$ELSE}
   SysUtils,
   Variants,
@@ -28,6 +29,7 @@ uses
   Forms,
   Dialogs,
   ExtCtrls,
+  BVE.SVG2Control.FPC,
   BVE.SVG2Image.FPC;
 {$ENDIF}
 
@@ -57,7 +59,8 @@ implementation
 {$ENDIF}
 
 uses
-  BVE.SVG2Intf;
+  BVE.SVG2Intf,
+  BVE.SVG2Types;
 
 const
   svg_transform =
@@ -97,7 +100,7 @@ begin
     A2 := -A1*100/20;
 
     Element.Attributes['transform'] :=
-      Format(svg_transform, [100+80*Cos(Ar), 100+80*Sin(Ar), A2]);
+      Format(svg_transform, [100+80*Cos(Ar), 100+80*Sin(Ar), A2], USFormatSettings);
   end;
 
   Inc(t);
