@@ -13,7 +13,6 @@ object Form1: TForm1
   OldCreateOrder = False
   ShowHint = True
   OnCreate = FormCreate
-  OnDestroy = FormDestroy
   PixelsPerInch = 96
   TextHeight = 13
   object Splitter1: TSplitter
@@ -54,7 +53,6 @@ object Form1: TForm1
       MultiSelect = True
       MultiSelectStyle = [msControlSelect, msSiblingOnly]
       TabOrder = 0
-      OnChange = TreeView1Change
     end
     object ValueListEditor1: TValueListEditor
       Left = 0
@@ -64,8 +62,6 @@ object Form1: TForm1
       Align = alBottom
       KeyOptions = [keyEdit, keyAdd]
       TabOrder = 1
-      OnEditButtonClick = ValueListEditor1EditButtonClick
-      OnValidate = ValueListEditor1Validate
       ColWidths = (
         150
         83)
@@ -270,76 +266,63 @@ object Form1: TForm1
       Category = 'File'
       Caption = 'Open...'
       ShortCut = 16463
-      OnExecute = aOpenExecute
     end
     object aZoom1to1: TAction
       Category = 'View'
       Caption = 'Zoom 1:1'
-      OnExecute = aZoom1to1Execute
     end
     object aZoom1to2: TAction
       Category = 'View'
       Caption = 'Zoom 1:2'
-      OnExecute = aZoom1to2Execute
     end
     object aSaveAs: TAction
       Category = 'File'
       Caption = 'Save as...'
       ShortCut = 24659
-      OnExecute = aSaveAsExecute
     end
     object aAddRect: TAction
       Category = 'Add object'
       Caption = 'Rect'
-      OnExecute = aAddRectExecute
     end
     object aAddSVG: TAction
       Category = 'Add object'
       Caption = 'Svg'
-      OnExecute = aAddSVGExecute
     end
     object aUndo: TAction
       Category = 'Edit'
       Caption = 'Undo'
       ShortCut = 16474
-      OnExecute = aUndoExecute
     end
     object aRedo: TAction
       Category = 'Edit'
       Caption = 'Redo'
       ShortCut = 24666
-      OnExecute = aRedoExecute
     end
     object aCut: TAction
       Category = 'Edit'
       Caption = 'Cut'
       ShortCut = 16472
-      OnExecute = aCutExecute
     end
     object aCopy: TAction
       Category = 'Edit'
       Caption = 'Copy'
       ShortCut = 16451
-      OnExecute = aCopyExecute
     end
     object aPaste: TAction
       Category = 'Edit'
       Caption = 'Paste'
       ShortCut = 16470
-      OnExecute = aPasteExecute
     end
     object aDelete: TAction
       Category = 'Edit'
       Caption = 'Delete'
       ShortCut = 16430
-      OnExecute = aDeleteExecute
     end
     object aToolShape: TAction
       Category = 'Tool'
       Caption = 'Shape'
       GroupIndex = 1
       Hint = 'Shape tool'
-      OnExecute = aToolShapeExecute
     end
     object aToolTransform: TAction
       Category = 'Tool'
@@ -347,85 +330,65 @@ object Form1: TForm1
       Checked = True
       GroupIndex = 1
       Hint = 'Transform tool'
-      OnExecute = aToolTransformExecute
     end
     object aNew: TAction
       Category = 'File'
       Caption = 'New'
       ShortCut = 16462
-      OnExecute = aNewExecute
     end
     object aPrint: TAction
       Category = 'File'
       Caption = 'Print'
       ShortCut = 16464
-      OnExecute = aPrintExecute
     end
     object aExit: TAction
       Category = 'File'
       Caption = 'Exit'
-      OnExecute = aExitExecute
     end
     object aAddCircle: TAction
       Category = 'Add object'
       Caption = 'Circle'
-      OnExecute = aAddCircleExecute
     end
     object aAddEllipse: TAction
       Category = 'Add object'
       Caption = 'Ellipse'
-      OnExecute = aAddEllipseExecute
     end
     object aAddLine: TAction
       Category = 'Add object'
       Caption = 'Line'
-      OnExecute = aAddLineExecute
     end
     object aAddPolyline: TAction
       Category = 'Add object'
       Caption = 'Polyline'
-      OnExecute = aAddPolylineExecute
     end
     object aAddPolygon: TAction
       Category = 'Add object'
       Caption = 'Polygon'
-      OnExecute = aAddPolygonExecute
     end
     object aAddPath: TAction
       Category = 'Add object'
       Caption = 'Path'
-      OnExecute = aAddPathExecute
     end
     object aAddText: TAction
       Category = 'Add object'
       Caption = 'Text'
-      OnExecute = aAddTextExecute
     end
     object aAddImage: TAction
       Category = 'Add object'
       Caption = 'Image'
-      OnExecute = aAddImageExecute
     end
     object aAddGroup: TAction
       Category = 'Add object'
       Caption = 'Group'
-      OnExecute = aAddGroupExecute
     end
   end
   object OpenDialog1: TOpenDialog
-    Left = 120
-    Top = 152
-  end
-  object TimerUpdatePage: TTimer
-    Enabled = False
-    Interval = 250
-    OnTimer = TimerUpdatePageTimer
     Left = 120
     Top = 104
   end
   object SaveDialog1: TSaveDialog
     Left = 120
-    Top = 200
+    Top = 152
   end
   object SVG2ImageList1: TSVG2ImageList
     Height = 24
@@ -642,7 +605,7 @@ object Form1: TForm1
     Left = 208
     Top = 56
     Bitmap = {
-      494C010104001C00300018001800FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C010104001C00340018001800FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000600000003000000001002000000000000048
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -1252,7 +1215,7 @@ object Form1: TForm1
     Left = 208
     Top = 104
     Bitmap = {
-      494C010102000800180018001800FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C0101020008001C0018001800FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000600000001800000001002000000000000024
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -1565,7 +1528,7 @@ object Form1: TForm1
     Left = 208
     Top = 152
     Bitmap = {
-      494C010102000800180018001800FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C0101020008001C0018001800FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000600000001800000001002000000000000024
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

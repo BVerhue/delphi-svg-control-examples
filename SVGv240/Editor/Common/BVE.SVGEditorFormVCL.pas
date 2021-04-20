@@ -7,6 +7,8 @@ unit BVE.SVGEditorFormVCL;
 //
 // ------------------------------------------------------------------------------
 
+// The SVG Editor need at least version v2.40 update 9 of the SVG library
+
 {$IFDEF FPC}
   {$MODE Delphi}
 {$ENDIF}
@@ -98,15 +100,18 @@ type
 
     FEditor: TSVGEditor;
 
+    FTimerUpdatePage: TTimer;
+
     FOpenDialog: TOpenDialog;
+    FSaveDialog: TSaveDialog;
     FTreeviewXML: TTreeView;
     FValueListEditorAttribute: TValueListEditor;
-    FSaveDialog: TSaveDialog;
 
-    procedure SetOpenDialog(const Value: TOpenDialog);
-    procedure SetTreeviewXML(const Value: TTreeView);
-    procedure SetValueListEditorAttribute(const Value: TValueListEditor);
-    procedure SetSaveDialog(const Value: TSaveDialog);
+    {$IFnDEF FPC}
+    procedure WMDROPFILES(var Msg: TWMDropFiles); message WM_DROPFILES;
+    {$ELSE}
+    procedure OnDropFiles(Sender: TObject; const FileNames: array of String);
+    {$ENDIF}
   protected
     procedure SetActionAddCircle(const Value: TAction);
     procedure SetActionAddEllipse(const Value: TAction);
@@ -134,9 +139,14 @@ type
     procedure SetActionUndo(const Value: TAction);
     procedure SetActionZoom1to1(const Value: TAction);
     procedure SetActionZoom1to2(const Value: TAction);
+    procedure SetOpenDialog(const Value: TOpenDialog);
+    procedure SetTreeviewXML(const Value: TTreeView);
+    procedure SetValueListEditorAttribute(const Value: TValueListEditor);
+    procedure SetSaveDialog(const Value: TSaveDialog);
 
-    procedure FormCreate(Sender: TObject);
-    procedure FormDestroy(Sender: TObject);
+    procedure DoCreate; override;
+    procedure DoDestroy; override;
+    procedure DoShow; override;
 
     procedure TreeViewXMLChange(Sender: TObject; Node: TTreeNode);
 
@@ -189,9 +199,11 @@ type
     function TreeViewXMLNodeSelect: Boolean;
     procedure TreeViewXMLNodeRemove(const aElement: ISVGElement);
 
-
     procedure EnableActions;
   public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+
     procedure DocumentNew;
     procedure DocumentOpen(const aFilename: string);
 
@@ -221,9 +233,6 @@ type
     property ActionAddText: TAction read FActionAddText write SetActionAddText;
     property ActionAddImage: TAction read FActionAddImage write SetActionAddImage;
     property ActionAddGroup: TAction read FActionAddGroup write SetActionAddGroup;
-
-    property OpenDialog: TOpenDialog read FOpenDialog write SetOpenDialog;
-    property SaveDialog: TSaveDialog read FSaveDialog write SetSaveDialog;
 
     property TreeviewXML: TTreeView read FTreeviewXML write SetTreeviewXML;
     property ValueListEditorAttribute: TValueListEditor read FValueListEditorAttribute
@@ -261,27 +270,27 @@ end;
 
 procedure TSVGEditorForm.ActionAddImageExecute(Sender: TObject);
 begin
-
+  // TODO
 end;
 
 procedure TSVGEditorForm.ActionAddLineExecute(Sender: TObject);
 begin
-
+  // TODO
 end;
 
 procedure TSVGEditorForm.ActionAddPathExecute(Sender: TObject);
 begin
-
+  // TODO
 end;
 
 procedure TSVGEditorForm.ActionAddPolygonExecute(Sender: TObject);
 begin
-
+  // TODO
 end;
 
 procedure TSVGEditorForm.ActionAddPolylineExecute(Sender: TObject);
 begin
-
+  // TODO
 end;
 
 procedure TSVGEditorForm.ActionAddRectExecute(Sender: TObject);
@@ -298,11 +307,11 @@ begin
   if FEditor.SelectedElementList.Count <> 1 then
     Exit;
 
-  if OpenDialog.Execute then
+  if FOpenDialog.Execute then
   begin
     sl := TStringList.Create;
     try
-      sl.LoadFromFile(OpenDialog.FileName);
+      sl.LoadFromFile(FOpenDialog.FileName);
 
       FEditor.ElementAdd(sl.Text);
     finally
@@ -313,7 +322,7 @@ end;
 
 procedure TSVGEditorForm.ActionAddTextExecute(Sender: TObject);
 begin
-  //
+  // TODO
 end;
 
 procedure TSVGEditorForm.ActionCopyExecute(Sender: TObject);
@@ -358,9 +367,9 @@ end;
 
 procedure TSVGEditorForm.ActionOpenExecute(Sender: TObject);
 begin
-  if OpenDialog.Execute then
+  if FOpenDialog.Execute then
   begin
-    DocumentOpen(OpenDialog.FileName);
+    DocumentOpen(FOpenDialog.FileName);
   end;
 end;
 
@@ -376,7 +385,7 @@ end;
 
 procedure TSVGEditorForm.ActionPrintExecute(Sender: TObject);
 begin
-
+  // TODO
 end;
 
 procedure TSVGEditorForm.ActionRedoExecute(Sender: TObject);
@@ -394,9 +403,9 @@ begin
   if not assigned(FEditor.Root) then
     Exit;
 
-  if SaveDialog.Execute then
+  if FSaveDialog.Execute then
   begin
-    FEditor.SaveToFile(SaveDialog.Filename);
+    FEditor.SaveToFile(FSaveDialog.Filename);
   end;
 end;
 
@@ -458,6 +467,46 @@ begin
   end;
 end;
 
+constructor TSVGEditorForm.Create(AOwner: TComponent);
+begin
+  inherited;
+end;
+
+destructor TSVGEditorForm.Destroy;
+begin
+  inherited;
+end;
+
+procedure TSVGEditorForm.DoCreate;
+begin
+  inherited;
+
+  FEditor := TSVGEditor.Create(Self);
+  FEditor.Parent := Self;
+  FEditor.Align := alClient;
+  FEditor.OnElementAdd := ElementAdd;
+  FEditor.OnElementRemove := ElementRemove;
+  FEditor.OnElementSelect := ElementSelect;
+  FEditor.OnSetAttribute := SetAttribute;
+  FEditor.OnToolSelect := ToolSelect;
+
+  FTimerUpdatePage := TTimer.Create(Self);
+  FTimerUpdatePage.Enabled := False;
+  FTimerUpdatePage.Interval := 250;
+  FTimerUpdatePage.OnTimer := TimerUpdatePageTimer;
+
+  FOpenDialog := TOpenDialog.Create(Self);
+  FSaveDialog := TSaveDialog.Create(Self);
+
+  DocumentNew;
+
+  {$IFnDEF FPC}
+  DragAcceptFiles(Handle, True);
+  {$ELSE}
+  Application.AddOnDropFilesHandler(OnDropFiles);
+  {$ENDIF}
+end;
+
 procedure TSVGEditorForm.DocumentNew;
 var
   StringStream: TStringStream;
@@ -478,6 +527,20 @@ end;
 procedure TSVGEditorForm.DocumentOpen(const aFilename: string);
 begin
   FEditor.Filename := aFilename;
+end;
+
+procedure TSVGEditorForm.DoDestroy;
+begin
+  {$IFDEF FPC}
+  Application.RemoveOnDropFilesHandler(OnDropFiles);
+  {$ENDIF}
+
+  inherited;
+end;
+
+procedure TSVGEditorForm.DoShow;
+begin
+  inherited;
 end;
 
 procedure TSVGEditorForm.ElementAdd(Sender: TObject; const aParent: ISVGElement;
@@ -541,22 +604,13 @@ begin
   ActionAddPath.Enabled := CanAddElement;
   ActionAddText.Enabled := CanAddElement;
   ActionAddImage.Enabled := CanAddElement;
+  ActionAddGroup.Enabled := CanAddElement;
 
   ActionZoom1to1.Enabled := SVGDocLoaded;
   ActionZoom1to2.Enabled := SVGDocLoaded;
 
   ActionToolTransform.Enabled := ElementsSelected;
   ActionToolShape.Enabled := ElementsSelected;
-end;
-
-procedure TSVGEditorForm.FormCreate(Sender: TObject);
-begin
-
-end;
-
-procedure TSVGEditorForm.FormDestroy(Sender: TObject);
-begin
-
 end;
 
 procedure TSVGEditorForm.SetActionAddCircle(const Value: TAction);
@@ -839,7 +893,6 @@ begin
   end;
 end;
 
-
 procedure TSVGEditorForm.TreeViewXMLNodeAdd(const aParent: IXMLNode;
   const aIndex: Integer; const aElement: ISVGElement);
 var
@@ -1049,6 +1102,28 @@ procedure TSVGEditorForm.ValueListEditorAttributeValidate(Sender: TObject; ACol,
   ARow: Integer; const KeyName, KeyValue: string);
 begin
   FEditor.SetAttribute(KeyName, KeyValue);
+end;
+
+procedure TSVGEditorForm.WMDROPFILES(var Msg: TWMDropFiles);
+var
+  i, FileCount: integer;
+  l: integer;
+  FileName: string;
+begin
+  FileCount := DragQueryFile(Msg.Drop, $FFFFFFFF, nil, 0);
+
+  for i := 0 to FileCount - 1 do
+  begin
+    l := DragQueryFile(Msg.Drop, i, nil, 0);
+    SetLength(Filename, l);
+    DragQueryFile(Msg.Drop, i, PChar(FileName), l + 1);
+
+    DocumentOpen(FileName);
+  end;
+
+  DragFinish(Msg.Drop);
+
+  EnableActions;
 end;
 
 end.
