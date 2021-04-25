@@ -50,10 +50,11 @@ type
     FRefLeft: TSVGFLoat;
     FRefTop: TSVGFloat;
     FRefLength: TSVGFloat;
+  protected
     function GetAlignMatrix: TSVGMatrix;
     function GetViewportMatrix: TSVGMatrix;
     function GetScreenBBox: TSVGRect;
-  protected
+
     function GetRefFontSize: TSVGFloat;
     function GetRefWidth: TSVGFloat;
     function GetRefHeight: TSVGFloat;
@@ -292,16 +293,18 @@ type
     procedure CmdRedoStackClear;
 
     function PointToSVG(const aPoint: TPoint): TSVGPoint;
-
-    function GetElement(const aID: Integer): ISVGElement;
-    procedure SetSelectedElementList(const Value: TList<Integer>);
+  protected
     function GetCmdRedoCount: Integer;
     function GetCmdUndoCount: Integer;
-  protected
+    function GetElement(const aID: Integer): ISVGElement;
+    function GetSelectedElement(const aIndex: Integer): Integer;
+    function GetSelectedElementCount: Integer;
+
     procedure SetCanvasRect(const Value: TRect);
     procedure SetFilename(const Value: string);
     procedure SetPadding(const Value: TPadding);
     procedure SetScale(const Value: TSVGFloat);
+    procedure SetSelectedElementList(const Value: TList<Integer>);
     procedure SetTopLeft(const Value: TPoint);
 
     procedure RenderSVGObject(aSVGObject: ISVGObject;
@@ -354,6 +357,8 @@ type
     procedure Clear;
 
     procedure Paint; override;
+
+    property SelectedElementList: TList<Integer> read FSelectedElementList write SetSelectedElementList;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -369,6 +374,10 @@ type
     procedure ElementsDelete;
     procedure ElementAdd(const aFragment: string);
     procedure ElementsAdd(const aFragments: TStringList);
+
+    procedure ElementsUnselectAll;
+    procedure ElementsSelect(aList: TList<Integer>);
+    function ElementIsSelected(const aID: Integer): Boolean;
 
     procedure CmdUndo;
     procedure CmdRedo;
@@ -394,7 +403,8 @@ type
     property Padding: TPadding read FPadding write SetPadding;
     property Root: ISVGRoot read FRoot;
     property Scale: TSVGFloat read FScale write SetScale;
-    property SelectedElementList: TList<Integer> read FSelectedElementList write SetSelectedElementList;
+    property SelectedElementCount: Integer read GetSelectedElementCount;
+    property SelectedElement[const aIndex: Integer]: Integer read GetSelectedElement;
     property TopLeft: TPoint read FTopLeft write SetTopLeft;
 
     property OnElementAdd: TElementAddEvent read FOnElementAdd write FOnElementAdd;
@@ -403,7 +413,6 @@ type
     property OnSetAttribute: TSetAttributeEvent read FOnSetAttribute write FOnSetAttribute;
     property OnToolSelect: TToolSelectEvent read FOnToolSelect write FOnToolSelect;
   end;
-
 
 implementation
 uses
@@ -1970,6 +1979,18 @@ begin
   end;
 end;
 
+procedure TSVGEditor.ElementsUnselectAll;
+var
+  TempList: TList<Integer>;
+begin
+  TempList := TList<Integer>.Create;
+  try
+    SelectedElementList := TempList;
+  finally
+    TempList.Free;
+  end;
+end;
+
 procedure TSVGEditor.ElementAdd(const aFragment: string);
 var
   sl: TStringList;
@@ -1982,6 +2003,11 @@ begin
   finally
     sl.Free;
   end;
+end;
+
+function TSVGEditor.ElementIsSelected(const aID: Integer): Boolean;
+begin
+  Result := SelectedElementList.IndexOf(aID) <> -1;
 end;
 
 procedure TSVGEditor.ElementListInit(aNode: IXMLNode; var aID: Integer);
@@ -2208,6 +2234,11 @@ begin
   end;
 end;
 
+procedure TSVGEditor.ElementsSelect(aList: TList<Integer>);
+begin
+  SelectedElementList := aList;
+end;
+
 function TSVGEditor.GetCmdRedoCount: Integer;
 begin
   Result := FCmdRedoStack.Count;
@@ -2229,6 +2260,19 @@ var
 begin
   ID := aElement.getAttributeNS(ns_svg_editor, at_local_id);
   Result := StrToInt(ID);
+end;
+
+function TSVGEditor.GetSelectedElement(const aIndex: Integer): Integer;
+begin
+  if aIndex < SelectedElementList.Count then
+    Result := SelectedElementList[aIndex]
+  else
+    Result := -1;
+end;
+
+function TSVGEditor.GetSelectedElementCount: Integer;
+begin
+  Result := SelectedElementList.Count;
 end;
 
 function TSVGEditor.GetElementID(aElement: ISVGElement): Integer;

@@ -38,7 +38,7 @@ uses
   BVE.SVGEditorFormVCL;
 
 type
-  TForm1 = class(TSVGEditorForm)
+  TfrmEditor = class(TSVGEditorForm)
     ActionManager1: TActionManager;
     OpenDialog1: TOpenDialog;
     Panel1: TPanel;
@@ -84,13 +84,15 @@ type
   end;
 
 var
-  Form1: TForm1;
+  frmEditor: TfrmEditor;
 
 implementation
 
 {$R *.dfm}
 
-procedure TForm1.FormCreate(Sender: TObject);
+uses UnitPrintPreview;
+
+procedure TfrmEditor.FormCreate(Sender: TObject);
 begin
   ActionOpen := aOpen;
   ActionSaveAs := aSaveAs;

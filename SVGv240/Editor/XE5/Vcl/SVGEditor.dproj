@@ -86,12 +86,18 @@
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
         <DCCReference Include="UnitEditor.pas">
-            <Form>Form1</Form>
+            <Form>frmEditor</Form>
             <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="..\..\Common\BVE.SVGToolVCL.pas"/>
         <DCCReference Include="..\..\Common\BVE.SVGEditorVCL.pas"/>
         <DCCReference Include="..\..\Common\BVE.SVGEditorFormVCL.pas"/>
+        <DCCReference Include="UnitPrintPreview.pas">
+            <Form>frmPrintPreview</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="..\..\Common\BVE.SVGPrintPreviewFormVCL.pas"/>
+        <DCCReference Include="..\..\Common\BVE.SVGPrintPreviewVCL.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

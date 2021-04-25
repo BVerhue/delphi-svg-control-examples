@@ -1,7 +1,7 @@
-object Form1: TForm1
+object frmEditor: TfrmEditor
   Left = 0
   Top = 0
-  Caption = 'Form1'
+  Caption = 'SVG Editor'
   ClientHeight = 447
   ClientWidth = 695
   Color = clBtnFace
@@ -72,7 +72,6 @@ object Form1: TForm1
     Top = 0
     Width = 695
     Height = 25
-    UseSystemFont = False
     ActionManager = ActionManager1
     Caption = 'ActionMainMenuBar1'
     Color = clMenuBar
@@ -81,7 +80,7 @@ object Form1: TForm1
     ColorMap.BtnSelectedFont = clBlack
     ColorMap.UnusedColor = clWhite
     Font.Charset = DEFAULT_CHARSET
-    Font.Color = clBlack
+    Font.Color = clMenuText
     Font.Height = -12
     Font.Name = 'Segoe UI'
     Font.Style = []
@@ -148,7 +147,6 @@ object Form1: TForm1
               end
               item
                 Action = aPrint
-                Caption = '&Print'
                 ShortCut = 16464
               end
               item
@@ -338,7 +336,7 @@ object Form1: TForm1
     end
     object aPrint: TAction
       Category = 'File'
-      Caption = 'Print'
+      Caption = 'Print...'
       ShortCut = 16464
     end
     object aExit: TAction
@@ -605,7 +603,7 @@ object Form1: TForm1
     Left = 208
     Top = 56
     Bitmap = {
-      494C010104001C00340018001800FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C010104001C00380018001800FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000600000003000000001002000000000000048
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -1215,7 +1213,7 @@ object Form1: TForm1
     Left = 208
     Top = 104
     Bitmap = {
-      494C0101020008001C0018001800FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C010102000800200018001800FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000600000001800000001002000000000000024
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -1528,7 +1526,7 @@ object Form1: TForm1
     Left = 208
     Top = 152
     Bitmap = {
-      494C0101020008001C0018001800FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C010102000800200018001800FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000600000001800000001002000000000000024
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

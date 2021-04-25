@@ -66,7 +66,8 @@ uses
   BVE.SVG2Intf,
   BVE.SVG2Types,
   BVE.SVGEditorVCL,
-  BVE.SVG2ImageList.VCL;
+  BVE.SVG2ImageList.VCL,
+  BVE.SVGPrintPreviewFormVCL;
 
 type
   TSVGEditorForm = class(TForm)
@@ -99,6 +100,8 @@ type
     FActionPaste: TAction;
 
     FEditor: TSVGEditor;
+
+    FFormPrintPreview: TSVGPrintPreviewForm;
 
     FTimerUpdatePage: TTimer;
 
@@ -234,6 +237,8 @@ type
     property ActionAddImage: TAction read FActionAddImage write SetActionAddImage;
     property ActionAddGroup: TAction read FActionAddGroup write SetActionAddGroup;
 
+    property FormPrintPreview: TSVGPrintPreviewForm read FFormPrintPreview write FFormPrintPreview;
+
     property TreeviewXML: TTreeView read FTreeviewXML write SetTreeviewXML;
     property ValueListEditorAttribute: TValueListEditor read FValueListEditorAttribute
       write SetValueListEditorAttribute;
@@ -304,7 +309,7 @@ procedure TSVGEditorForm.ActionAddSVGExecute(Sender: TObject);
 var
   sl: TStringList;
 begin
-  if FEditor.SelectedElementList.Count <> 1 then
+  if FEditor.SelectedElementCount <> 1 then
     Exit;
 
   if FOpenDialog.Execute then
@@ -385,7 +390,13 @@ end;
 
 procedure TSVGEditorForm.ActionPrintExecute(Sender: TObject);
 begin
-  // TODO
+  if assigned(FFormPrintPreview) then
+  begin
+    FEditor.ElementsUnselectAll;
+
+    FFormPrintPreview.Root := FEditor.Root;
+    FFormPrintPreview.Show;
+  end;
 end;
 
 procedure TSVGEditorForm.ActionRedoExecute(Sender: TObject);
@@ -446,7 +457,7 @@ var
 begin
   Result := True;
 
-  if FEditor.SelectedElementList.Count <> 1 then
+  if FEditor.SelectedElementCount <> 1 then
   begin
     Result := False;
     if aExceptions then
@@ -455,7 +466,7 @@ begin
       Exit;
   end;
 
-  Element := FEditor.Element[FEditor.SelectedElementList[0]];
+  Element := FEditor.Element[FEditor.SelectedElement[0]];
 
   if not Supports(Element, ISVGGroup) then
   begin
@@ -541,6 +552,8 @@ end;
 procedure TSVGEditorForm.DoShow;
 begin
   inherited;
+
+  EnableActions;
 end;
 
 procedure TSVGEditorForm.ElementAdd(Sender: TObject; const aParent: ISVGElement;
@@ -573,8 +586,8 @@ var
   SVGDocLoaded: Boolean;
   ElementsSelected: Boolean;
 begin
-  ElementsSelected := FEditor.SelectedElementList.Count > 0;
-  OuterSVGSelected := FEditor.SelectedElementList.IndexOf(0) <> -1;
+  ElementsSelected := FEditor.SelectedElementCount > 0;
+  OuterSVGSelected := FEditor.ElementIsSelected(0);
 
   CanAddElement := CheckSelectionIsGroup(False);
   CanDeleteElement := ElementsSelected and (not OuterSVGSelected);
@@ -881,7 +894,7 @@ begin
     try
       TreeViewXML.OnChange := nil;
 
-      FEditor.SelectedElementList := TempList;
+      FEditor.ElementsSelect(TempList);
     finally
       TreeViewXML.OnChange := Handler;
     end;
@@ -1013,7 +1026,7 @@ begin
     begin
       ID := Integer(TreeViewXML.Selections[i].Data);
 
-      if FEditor.SelectedElementList.IndexOf(ID) = -1 then
+      if not FEditor.ElementIsSelected(ID) then
       begin
         TreeViewXML.Selections[i].Selected := False;
         Result := True;
@@ -1022,9 +1035,9 @@ begin
     end;
 
     i := 0;
-    while i < FEditor.SelectedElementList.Count do
+    while i < FEditor.SelectedElementCount do
     begin
-      ID := FEditor.SelectedElementList[i];
+      ID := FEditor.SelectedElement[i];
 
       j := 0;
       while j < Integer(TreeViewXML.SelectionCount) do
@@ -1037,7 +1050,7 @@ begin
 
       if j = Integer(TreeViewXML.SelectionCount) then
       begin
-        Element := FEditor.Element[FEditor.SelectedElementList[i]];
+        Element := FEditor.Element[FEditor.SelectedElement[i]];
         TTreeNode(Element.Data).Selected := True;
         Result := True;
       end;
@@ -1076,10 +1089,10 @@ begin
 
   ValueListEditorAttribute.Strings.Clear;
 
-  if FEditor.SelectedElementList.Count <> 1 then
+  if FEditor.SelectedElementCount <> 1 then
     Exit;
 
-  ID := FEditor.SelectedElementList[0];
+  ID := FEditor.SelectedElement[0];
 
   Element := FEditor.Element[ID];
 
