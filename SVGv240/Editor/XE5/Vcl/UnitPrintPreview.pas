@@ -55,7 +55,6 @@ type
     Label3: TLabel;
     ePagesHorizontal: TEdit;
     ePagesVertical: TEdit;
-    eMarginLeft: TEdit;
     eMarginTop: TEdit;
     eMarginRight: TEdit;
     eMarginBottom: TEdit;
@@ -73,6 +72,7 @@ type
     cbMeetOrSlice: TComboBox;
     Label10: TLabel;
     Label11: TLabel;
+    eMarginLeft: TEdit;
     procedure FormCreate(Sender: TObject);
   private
     { Private declarations }

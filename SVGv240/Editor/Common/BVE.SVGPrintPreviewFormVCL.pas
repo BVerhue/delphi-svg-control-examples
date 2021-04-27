@@ -128,6 +128,9 @@ type
     procedure SetEditMarginRight(const Value: TEdit);
     procedure SetEditMarginTop(const Value: TEdit);
 
+    procedure EditNumberKeyPress(Sender: TObject; var Key: Char);
+    procedure EditIntegerKeyPress(Sender: TObject; var Key: Char);
+
     procedure ActionOrientationLandscapeExecute(Sender: TObject);
     procedure ActionOrientationPortaitExecute(Sender: TObject);
     procedure ActionPrintExecute(Sender: TObject);
@@ -179,6 +182,7 @@ implementation
 procedure TSVGPrintPreviewForm.ActionCancelExecute(Sender: TObject);
 begin
   ModalResult := mrOk;
+  Close;
 end;
 
 procedure TSVGPrintPreviewForm.ActionOrientationLandscapeExecute(
@@ -243,6 +247,33 @@ begin
   inherited;
 
   EnableActions;
+end;
+
+procedure TSVGPrintPreviewForm.EditIntegerKeyPress(Sender: TObject;
+  var Key: Char);
+begin
+  case Key of
+    '0'..'9':;
+    #8, #9:;
+    else
+      Key := #0;
+  end;
+end;
+
+procedure TSVGPrintPreviewForm.EditNumberKeyPress(Sender: TObject;
+  var Key: Char);
+begin
+  case Key of
+    '0'..'9':;
+    #8, #9:;
+    '.':
+      begin
+        if Pos('.', TEdit(Sender).Text) > 0 then
+          Key := #0;
+      end
+    else
+      Key := #0;
+  end;
 end;
 
 procedure TSVGPrintPreviewForm.EnableActions;
@@ -417,35 +448,50 @@ procedure TSVGPrintPreviewForm.SetEditGlueEdge(const Value: TEdit);
 begin
   FEditGlueEdge := Value;
   if assigned(FEditGlueEdge) then
+  begin
+    FEditGlueEdge.OnKeyPress := EditNumberKeyPress;
     FEditGlueEdge.OnChange := PageSettingsChange;
+  end;
 end;
 
 procedure TSVGPrintPreviewForm.SetEditMarginBottom(const Value: TEdit);
 begin
   FEditMarginBottom := Value;
   if assigned(FEditMarginBottom) then
+  begin
+    FEditMarginBottom.OnKeyPress := EditNumberKeyPress;
     FEditMarginBottom.OnChange := PageSettingsChange;
+  end;
 end;
 
 procedure TSVGPrintPreviewForm.SetEditMarginLeft(const Value: TEdit);
 begin
   FEditMarginLeft := Value;
   if assigned(FEditMarginLeft) then
+  begin
+    FEditMarginLeft.OnKeyPress := EditNumberKeyPress;
     FEditMarginLeft.OnChange := PageSettingsChange;
+  end;
 end;
 
 procedure TSVGPrintPreviewForm.SetEditMarginRight(const Value: TEdit);
 begin
   FEditMarginRight := Value;
   if assigned(FEditMarginRight) then
+  begin
+    FEditMarginRight.OnKeyPress := EditNumberKeyPress;
     FEditMarginRight.OnChange := PageSettingsChange;
+  end;
 end;
 
 procedure TSVGPrintPreviewForm.SetEditMarginTop(const Value: TEdit);
 begin
   FEditMarginTop := Value;
   if assigned(FEditMarginTop) then
+  begin
+    FEditMarginTop.OnKeyPress := EditNumberKeyPress;
     FEditMarginTop.OnChange := PageSettingsChange;
+  end;
 end;
 
 procedure TSVGPrintPreviewForm.SetEditOutputDevice(const Value: TEdit);
@@ -461,14 +507,20 @@ procedure TSVGPrintPreviewForm.SetEditPagesHorizontal(const Value: TEdit);
 begin
   FEditPagesHorizontal := Value;
   if assigned(FEditPagesHorizontal) then
+  begin
+    FEditPagesHorizontal.OnKeyPress := EditIntegerKeyPress;
     FEditPagesHorizontal.OnChange := PageSettingsChange;
+  end;
 end;
 
 procedure TSVGPrintPreviewForm.SetEditPagesVertical(const Value: TEdit);
 begin
   FEditPagesVertical := Value;
   if assigned(FEditPagesVertical) then
+  begin
+    FEditPagesVertical.OnKeyPress := EditIntegerKeyPress;
     FEditPagesVertical.OnChange := PageSettingsChange;
+  end;
 end;
 
 procedure TSVGPrintPreviewForm.SetRoot(const Value: ISVGRoot);

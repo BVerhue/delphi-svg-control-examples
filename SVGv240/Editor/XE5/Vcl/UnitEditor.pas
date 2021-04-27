@@ -7,6 +7,10 @@ unit UnitEditor;
 //
 // ------------------------------------------------------------------------------
 
+// This editor is not meant to be a finished product, although it might some day
+// be one. It's use is primarily to show some practical solutions for
+// programming with the SVG library
+
 // The SVG Editor need at least version v2.40 update 9 of the SVG library
 
 interface

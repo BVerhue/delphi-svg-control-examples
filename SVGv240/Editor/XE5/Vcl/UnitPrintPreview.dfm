@@ -30,7 +30,6 @@ object frmPrintPreview: TfrmPrintPreview
     Align = alLeft
     BevelOuter = bvNone
     TabOrder = 0
-    ExplicitHeight = 550
     object Label1: TLabel
       Left = 16
       Top = 13
@@ -62,8 +61,6 @@ object frmPrintPreview: TfrmPrintPreview
       Align = alBottom
       BevelOuter = bvNone
       TabOrder = 2
-      ExplicitTop = 484
-      ExplicitWidth = 209
       object Button2: TButton
         AlignWithMargins = True
         Left = 90
@@ -73,7 +70,6 @@ object frmPrintPreview: TfrmPrintPreview
         Action = aPrint
         Align = alRight
         TabOrder = 0
-        ExplicitLeft = 50
       end
       object Button3: TButton
         AlignWithMargins = True
@@ -84,7 +80,6 @@ object frmPrintPreview: TfrmPrintPreview
         Action = aCancel
         Align = alRight
         TabOrder = 1
-        ExplicitLeft = 131
       end
     end
     object RadioGroup1: TRadioGroup
@@ -161,24 +156,13 @@ object frmPrintPreview: TfrmPrintPreview
         Height = 13
         Caption = 'Units'
       end
-      object eMarginLeft: TEdit
-        Left = 61
-        Top = 53
-        Width = 32
-        Height = 21
-        Alignment = taRightJustify
-        NumbersOnly = True
-        TabOrder = 0
-        Text = '0'
-      end
       object eMarginTop: TEdit
         Left = 153
         Top = 53
         Width = 32
         Height = 21
         Alignment = taRightJustify
-        NumbersOnly = True
-        TabOrder = 1
+        TabOrder = 2
         Text = '0'
       end
       object eMarginRight: TEdit
@@ -187,8 +171,7 @@ object frmPrintPreview: TfrmPrintPreview
         Width = 32
         Height = 21
         Alignment = taRightJustify
-        NumbersOnly = True
-        TabOrder = 2
+        TabOrder = 3
         Text = '0'
       end
       object eMarginBottom: TEdit
@@ -197,8 +180,7 @@ object frmPrintPreview: TfrmPrintPreview
         Width = 32
         Height = 21
         Alignment = taRightJustify
-        NumbersOnly = True
-        TabOrder = 3
+        TabOrder = 4
         Text = '0'
       end
       object eGlueEdge: TEdit
@@ -207,8 +189,7 @@ object frmPrintPreview: TfrmPrintPreview
         Width = 32
         Height = 21
         Alignment = taRightJustify
-        NumbersOnly = True
-        TabOrder = 4
+        TabOrder = 5
         Text = '0'
       end
       object cbUnits: TComboBox
@@ -216,8 +197,17 @@ object frmPrintPreview: TfrmPrintPreview
         Top = 21
         Width = 55
         Height = 21
-        TabOrder = 5
+        TabOrder = 0
         Text = 'mm'
+      end
+      object eMarginLeft: TEdit
+        Left = 61
+        Top = 53
+        Width = 32
+        Height = 21
+        Alignment = taRightJustify
+        TabOrder = 1
+        Text = '0'
       end
     end
     object GroupBox2: TGroupBox
@@ -247,7 +237,6 @@ object frmPrintPreview: TfrmPrintPreview
         Width = 32
         Height = 21
         Alignment = taRightJustify
-        NumbersOnly = True
         TabOrder = 0
         Text = '1'
       end
@@ -257,7 +246,6 @@ object frmPrintPreview: TfrmPrintPreview
         Width = 32
         Height = 21
         Alignment = taRightJustify
-        NumbersOnly = True
         TabOrder = 1
         Text = '1'
       end

@@ -43,6 +43,7 @@ type
     FDPIX, FDPIY: Integer;
     FPrinterPageWidth: TSVGFLoat;
     FPrinterPageHeight: TSVGFLoat;
+    FPxToPt: TSVGPoint;
 
     FPagesVertical: Integer;
     FPagesHorizontal: Integer;
@@ -72,17 +73,18 @@ type
 
     FPagePreviewList: TList<TBitmap>;
 
-    function CalcDIP(const aValue, aDPI: TSVGFloat): TSVGFloat;
+    function CalcRCUnits(const aValue, aDPI: TSVGFloat): TSVGFloat;
     procedure CalcPrinterDimensions;
+    function CalcViewport: TSVGRect;
     function CalcViewportMatrix: TSVGMatrix;
-    procedure SetAspectRatioAlign(const Value: TSVGAspectRatioAlign);
-    procedure SetAspectRatioMeetOrSlice(
-      const Value: TSVGAspectRatioMeetOrSlice);
   protected
     function GetPageCount: Integer;
     function GetPageViewBox(const aIndex: Integer): TSVGRect;
 
     procedure SetAutoViewbox(const Value: Boolean);
+    procedure SetAspectRatioAlign(const Value: TSVGAspectRatioAlign);
+    procedure SetAspectRatioMeetOrSlice(
+      const Value: TSVGAspectRatioMeetOrSlice);
     procedure SetGlueEdge(const Value: TSVGFloat);
     procedure SetMarginBottom(const Value: TSVGFloat);
     procedure SetMarginLeft(const Value: TSVGFloat);
@@ -109,7 +111,7 @@ type
     procedure Print(const aPrintJobName: string);
 
     procedure Paint; override;
-    procedure RePaint; override;
+    procedure Repaint; override;
     procedure Resize; override;
 
     property AutoViewbox: Boolean read FAutoViewbox write SetAutoViewbox;
@@ -134,27 +136,56 @@ uses
 
 { TSVGPrintPreview }
 
-function TSVGPrintPreview.CalcDIP(const aValue, aDPI: TSVGFloat): TSVGFloat;
+function TSVGPrintPreview.CalcRCUnits(const aValue, aDPI: TSVGFloat): TSVGFloat;
 begin
-  case FPrintUnits of
-    puPixel:
-      begin
-        Result := 96 / aDPI * aValue;
-      end;
-    puMm:
-      begin
-        Result := 96 / 25.4 * aValue;
-      end;
-    puCm:
-      begin
-        Result := 96 / 2.54 * aValue;
-      end;
-    puInch:
-      begin
-         Result := 96 * aValue;
-      end;
-    else
-      Result := aValue;
+  if TSVGRenderContextManager.RenderContextType = rcDirect2D then
+  begin
+    // Direct2D coords are in device independent pixels
+
+    case FPrintUnits of
+      puPixel:
+        begin
+          Result := 96 / aDPI * aValue;
+        end;
+      puMm:
+        begin
+          Result := 96 / 25.4 * aValue;
+        end;
+      puCm:
+        begin
+          Result := 96 / 2.54 * aValue;
+        end;
+      puInch:
+        begin
+           Result := 96 * aValue;
+        end;
+      else
+        Result := aValue;
+    end;
+
+  end else begin
+    // GDI+ coords are in pixels
+
+    case FPrintUnits of
+      puPixel:
+        begin
+          Result := aDPI / aDPI * aValue;
+        end;
+      puMm:
+        begin
+          Result := aDPI / 25.4 * aValue;
+        end;
+      puCm:
+        begin
+          Result := aDPI / 2.54 * aValue;
+        end;
+      puInch:
+        begin
+           Result := aValue * aDPI;
+        end;
+      else
+        Result := aValue;
+    end;
   end;
 end;
 
@@ -163,51 +194,70 @@ begin
   FPrinterPageWidth := Printer.PageWidth;
   FPrinterPageHeight := Printer.PageHeight;
 
-  // Printer.PageWidth and Printer.PageHeight are in pixels, we need to
-  // convert them to points
-
   FDPIX := GetDeviceCaps(Printer.Handle, LOGPIXELSX);
   FDPIY := GetDeviceCaps(Printer.Handle, LOGPIXELSY);
 
-  if FDPIX <> 0 then
-    FPrinterPageWidth := FPrinterPageWidth * 96 / FDPIX;
+  if FDPIX = 0 then
+    FDPIX := 96;
 
-  if FDPIY <> 0 then
-    FPrinterPageHeight := FPrinterPageHeight * 96 / FDPIY;
+  if FDPIY = 0 then
+    FDPIY := 96;
+
+  FPxToPt := SVGPoint(FDPIX / 96, FDPIY / 96);
+
+  if TSVGRenderContextManager.RenderContextType = rcDirect2D then
+  begin
+    // Printer.PageWidth and Printer.PageHeight are in pixels, we need to
+    // convert them to points
+
+    FPrinterPageWidth := FPrinterPageWidth / FPxToPt.X;
+    FPrinterPageHeight := FPrinterPageHeight / FPxToPt.Y;
+
+    FPxToPt := SVGPoint(1.0, 1.0);
+  end;
+end;
+
+function TSVGPrintPreview.CalcViewport: TSVGRect;
+begin
+  Result := SVGRect(
+    CalcRCUnits(FMarginLeft, FDPIX),
+    CalcRCUnits(FMarginTop, FDPIY),
+    PagesHorizontal * FPrinterPageWidth - CalcRCUnits(FMarginRight, FDPIX) - CalcRCUnits(FGlueEdge, FDPIX) * (PagesHorizontal - 1),
+    PagesVertical * FPrinterPageHeight - CalcRCUnits(FMarginBottom, FDPIX) - CalcRCUnits(FGlueEdge, FDPIY) * (PagesVertical - 1));
 end;
 
 function TSVGPrintPreview.CalcViewportMatrix: TSVGMatrix;
 var
   Viewport, Viewbox: TSVGRect;
 begin
-  // The size of the SVG
-
-  ViewBox := SVGRect(0, 0, FCmdListWidth, FCmdListHeight);
-
   if FAutoViewbox then
   begin
 
-  // The available area for the SVG
+    // The size of the SVG
 
-  ViewPort := SVGRect(
-    CalcDIP(FMarginLeft, FDPIX),
-    CalcDIP(FMarginTop, FDPIY),
-    PagesHorizontal * FPrinterPageWidth - CalcDIP(FMarginRight, FDPIX) - CalcDIP(FGlueEdge, FDPIX) * (PagesHorizontal - 1),
-    PagesVertical * FPrinterPageHeight - CalcDIP(FMarginBottom, FDPIX) - CalcDIP(FGlueEdge, FDPIY) * (PagesVertical - 1));
+    ViewBox := SVGRect(0, 0, FCmdListWidth, FCmdListHeight);
 
-  Result := CreateViewBoxMatrix(
-    Viewport,
-    ViewBox,
-    FAspectRatioAlign,
-    FAspectRatioMeetOrSlice);
+    // The available area for the SVG
+
+    ViewPort := CalcViewport;
+
+    Result := CreateViewBoxMatrix(
+      Viewport,
+      ViewBox,
+      FAspectRatioAlign,
+      FAspectRatioMeetOrSlice);
 
   end else begin
 
     Result := TSVGMatrix.CreateTranslation(
-      CalcDIP(FMarginLeft, FDPIX),
-      CalcDIP(FMarginTop, FDPIY));
+      CalcRCUnits(FMarginLeft, FDPIX),
+      CalcRCUnits(FMarginTop, FDPIY));
 
+    Result := TSVGMatrix.Multiply(
+      Result,
+      TSVGMatrix.CreateScaling(FPxToPt.X, FPxToPt.Y));
   end;
+
 end;
 
 constructor TSVGPrintPreview.Create(AOwner: TComponent);
@@ -267,14 +317,14 @@ begin
     W := FPrinterPageWidth;
     H := FPrinterPageHeight;
 
-    L := C * (W - CalcDIP(FGlueEdge, FDPIX));
-    T := R * (H - CalcDIP(FGlueEdge, FDPIY));
+    L := C * (W - CalcRCUnits(FGlueEdge, FDPIX));
+    T := R * (H - CalcRCUnits(FGlueEdge, FDPIY));
 
     if C < PagesHorizontal - 1 then
-      W := W - CalcDIP(FGlueEdge, FDPIX);
+      W := W - CalcRCUnits(FGlueEdge, FDPIX);
 
     if R < PagesVertical - 1 then
-      H := H - CalcDIP(FGlueEdge, FDPIY);
+      H := H - CalcRCUnits(FGlueEdge, FDPIY);
 
     Result := SVGRect(L, T, L + W, T + H);
   end;
@@ -340,9 +390,10 @@ procedure TSVGPrintPreview.PagePreviewListCreate;
 var
   i, Count: Integer;
   R: TSVGRect;
+  Viewport: TSVGRect;
   Bitmap: TBitmap;
   RC: ISVGRenderContext;
-  M: TSVGMatrix;
+  M, MV: TSVGMatrix;
 begin
   FNeedRecreatePreview := False;
 
@@ -359,9 +410,15 @@ begin
 
   M := CalcViewportMatrix;
 
+  ViewPort := CalcViewport;
+
   for i := 0 to Count - 1 do
   begin
     R := PageViewbox[i];
+
+    MV := TSVGMatrix.Multiply(
+      TSVGMatrix.CreateTranslation(-R.Left, -R.Top),
+      TSVGMatrix.CreateScaling(FViewportScale, FViewportScale));
 
     Bitmap := TSVGRenderContextManager.CreateCompatibleBitmap(FPreviewPageWidth, FPreviewPageHeight);
     FPagePreviewList.Add(Bitmap);
@@ -372,11 +429,15 @@ begin
     try
       RC.Clear(SVGColorWhite);
 
-      RC.PushClipRect(SVGRect(0, 0, R.Width * FViewportScale, R.Height * FViewportScale));
+      RC.PushClipRect(
+        TSVGRect.Intersect(
+          TransformRect(Viewport, MV),
+          TransformRect(R, MV)
+          )
+        );
       try
         RC.Matrix := TSVGMatrix.Multiply(RC.Matrix, M);
-        RC.Matrix := TSVGMatrix.Multiply(RC.Matrix, TSVGMatrix.CreateTranslation(-R.Left, -R.Top));
-        RC.Matrix := TSVGMatrix.Multiply(RC.Matrix, TSVGMatrix.CreateScaling(FViewportScale, FViewportScale));
+        RC.Matrix := TSVGMatrix.Multiply(RC.Matrix, MV);
 
         RC.DrawCmdList(FCmdList, SVGRect(0, 0, FCmdListWidth, FCmdListHeight));
       finally
@@ -416,9 +477,10 @@ procedure TSVGPrintPreview.Print(const aPrintJobName: string);
 var
   i, Count: Integer;
   R: TSVGRect;
+  Viewport: TSVGRect;
   PrintJob: ISVGPrintJob;
   RC: ISVGRenderContext;
-  M: TSVGMatrix;
+  M, MV: TSVGMatrix;
 begin
   CalcPrinterDimensions;
 
@@ -429,11 +491,15 @@ begin
 
   M := CalcViewportMatrix;
 
+  ViewPort := CalcViewport;
+
   PrintJob := TSVGRenderContextManager.CreatePrintJob(aPrintJobName);
 
   for i := 0 to Count - 1 do
   begin
     R := PageViewbox[i];
+
+    MV := TSVGMatrix.CreateTranslation(-R.Left, -R.Top);
 
     RC := PrintJob.BeginPage(FPrinterPageWidth, FPrinterPageHeight);
     try
@@ -441,10 +507,15 @@ begin
       try
         RC.Clear(SVGColorNone);
 
-        RC.PushClipRect(SVGRect(0, 0, R.Width, R.Height));
+        RC.PushClipRect(
+          TSVGRect.Intersect(
+            TransformRect(Viewport, MV),
+            TransformRect(R, MV)
+            )
+          );
         try
           RC.Matrix := TSVGMatrix.Multiply(RC.Matrix, M);
-          RC.Matrix := TSVGMatrix.Multiply(RC.Matrix, TSVGMatrix.CreateTranslation(-R.Left, -R.Top));
+          RC.Matrix := TSVGMatrix.Multiply(RC.Matrix, MV);
 
           RC.DrawCmdList(FCmdList, SVGRect(0, 0, FCmdListWidth, FCmdListHeight));
         finally
@@ -472,7 +543,7 @@ begin
 
   FCmdList := TSVGRenderContextManager.CreateCmdList;
 
-  // We render the SVG to a commandlist with the intrisic size of the SVG
+  // We render the SVG to a commandlist with the intrinsic size of the SVG
   // and will later scale the commandlist over the page(s)
 
   R := FRoot.CalcIntrinsicSize(SVGRect(0, 0, FPrinterPageWidth, FPrinterPageHeight));
@@ -498,7 +569,7 @@ begin
   end;
 end;
 
-procedure TSVGPrintPreview.RePaint;
+procedure TSVGPrintPreview.Repaint;
 begin
   FNeedRecreatePreview := True;
 
