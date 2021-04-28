@@ -9,6 +9,17 @@ unit BVE.SVGPrintPreviewVCL;
 
 // The SVG Editor need at least version v2.40 update 9 of the SVG library
 
+{$Include ContextSettingsVCL.inc}
+
+{$IFDEF SVGDirect2d3D11}
+  {$DEFINE SVGSupportsCmdList}
+{$ENDIF}
+
+{$IFDEF SVGGDIP}
+  {$DEFINE SVGSupportsCmdList}
+{$ENDIF}
+
+
 interface
 
 uses
@@ -54,7 +65,9 @@ type
 
     FNeedRecreatePreview: Boolean;
 
+    {$IFDEF SVGSupportsCmdList}
     FCmdList: ISVGRenderContextCmdList;
+    {$ENDIF}
     FCmdListWidth: Integer;
     FCmdListHeight: Integer;
 
@@ -101,7 +114,9 @@ type
     procedure PagePreviewListClear;
     procedure PagePreviewListCreate;
 
+    {$IFDEF SVGSupportsCmdList}
     procedure RenderToCmdList;
+    {$ENDIF}
 
     property PageViewbox[const aIndex: Integer]: TSVGRect read GetPageViewBox;
   public
@@ -401,8 +416,10 @@ begin
 
   PagePreviewListClear;
 
+  {$IFDEF SVGSupportsCmdList}
   if not assigned(FCmdList) then
     Exit;
+  {$ENDIF}
 
   PagePreviewCalcSize;
 
@@ -439,7 +456,18 @@ begin
         RC.Matrix := TSVGMatrix.Multiply(RC.Matrix, M);
         RC.Matrix := TSVGMatrix.Multiply(RC.Matrix, MV);
 
+        {$IFDEF SVGSupportsCmdList}
         RC.DrawCmdList(FCmdList, SVGRect(0, 0, FCmdListWidth, FCmdListHeight));
+        {$ELSE}
+        SVGRenderToRenderContext(
+          FRoot,
+          RC,
+          FCmdListWidth,
+          FCmdListHeight,
+          [sroFilters, sroClippath],
+          False);
+        {$ENDIF}
+
       finally
         RC.PopClipRect;
       end;
@@ -484,8 +512,10 @@ var
 begin
   CalcPrinterDimensions;
 
+  {$IFDEF SVGSupportsCmdList}
   if not assigned(FCmdList) then
     Exit;
+  {$ENDIF}
 
   Count := PageCount;
 
@@ -517,7 +547,17 @@ begin
           RC.Matrix := TSVGMatrix.Multiply(RC.Matrix, M);
           RC.Matrix := TSVGMatrix.Multiply(RC.Matrix, MV);
 
+          {$IFDEF SVGSupportsCmdList}
           RC.DrawCmdList(FCmdList, SVGRect(0, 0, FCmdListWidth, FCmdListHeight));
+          {$ELSE}
+          SVGRenderToRenderContext(
+            FRoot,
+            RC,
+            FCmdListWidth,
+            FCmdListHeight,
+            [sroFilters, sroClippath],
+            False);
+          {$ENDIF}
         finally
           RC.PopClipRect;
         end;
@@ -531,10 +571,10 @@ begin
   end;
 end;
 
+{$IFDEF SVGSupportsCmdList}
 procedure TSVGPrintPreview.RenderToCmdList;
 var
   RC: ISVGRenderContext;
-  R: TSVGRect;
 begin
   if not assigned(FRoot) then
     Exit;
@@ -542,14 +582,6 @@ begin
   CalcPrinterDimensions;
 
   FCmdList := TSVGRenderContextManager.CreateCmdList;
-
-  // We render the SVG to a commandlist with the intrinsic size of the SVG
-  // and will later scale the commandlist over the page(s)
-
-  R := FRoot.CalcIntrinsicSize(SVGRect(0, 0, FPrinterPageWidth, FPrinterPageHeight));
-
-  FCmdListWidth := Round(R.Width);
-  FCmdListHeight := Round(R.Height);
 
   RC := TSVGRenderContextManager.CreateRenderContextCmdList(
     FCmdList, FCmdListWidth, FCmdListHeight);
@@ -568,6 +600,7 @@ begin
     RC.EndScene;
   end;
 end;
+{$ENDIF}
 
 procedure TSVGPrintPreview.Repaint;
 begin
@@ -705,10 +738,26 @@ begin
 end;
 
 procedure TSVGPrintPreview.SetRoot(const Value: ISVGRoot);
+var
+  R: TSVGRect;
 begin
   FRoot := Value;
 
-  RenderToCmdList;
+  if assigned(FRoot) then
+  begin
+    R := FRoot.CalcIntrinsicSize(SVGRect(0, 0, FPrinterPageWidth, FPrinterPageHeight));
+
+    FCmdListWidth := Round(R.Width);
+    FCmdListHeight := Round(R.Height);
+
+    {$IFDEF SVGSupportsCmdList}
+
+    // We render the SVG to a commandlist with the intrinsic size of the SVG
+    // and will later scale the commandlist over the page(s)
+
+    RenderToCmdList;
+    {$ENDIF}
+  end;
 
   FNeedRecreatePreview := True;
   Invalidate;

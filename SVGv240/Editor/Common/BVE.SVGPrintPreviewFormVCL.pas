@@ -303,42 +303,43 @@ end;
 
 procedure TSVGPrintPreviewForm.PreviewSetProperties;
 var
-  Value: Integer;
+  ValueInt: Integer;
+  ValueFloat: TSVGFloat;
 begin
-  if not TryStrToInt(EditPagesHorizontal.Text, Value) then
-    Value := 1;
+  if not TryStrToInt(EditPagesHorizontal.Text, ValueInt) then
+    ValueInt := 1;
 
-  FPrintPreview.PagesHorizontal := Value;;
+  FPrintPreview.PagesHorizontal := ValueInt;;
 
-  if not TryStrToInt(EditPagesVertical.Text, Value) then
-    Value := 1;
+  if not TryStrToInt(EditPagesVertical.Text, ValueInt) then
+    ValueInt := 1;
 
-  FPrintPreview.PagesVertical := Value;;
+  FPrintPreview.PagesVertical := ValueInt;
 
-  if not TryStrToInt(EditMarginLeft.Text, Value) then
-    Value := 0;
+  if not TryStrToFloat(EditMarginLeft.Text, ValueFloat, USFormatSettings) then
+    ValueFloat := 0;
 
-  FPrintPreview.MarginLeft := Value;
+  FPrintPreview.MarginLeft := ValueFloat;
 
-  if not TryStrToInt(EditMarginRight.Text, Value) then
-    Value := 0;
+  if not TryStrToFloat(EditMarginRight.Text, ValueFloat, USFormatSettings) then
+    ValueFloat := 0;
 
-  FPrintPreview.MarginRight := Value;
+  FPrintPreview.MarginRight := ValueFloat;
 
-  if not TryStrToInt(EditMarginTop.Text, Value) then
-    Value := 0;
+  if not TryStrToFloat(EditMarginTop.Text, ValueFloat, USFormatSettings) then
+    ValueFloat := 0;
 
-  FPrintPreview.MarginTop := Value;
+  FPrintPreview.MarginTop := ValueFloat;
 
-  if not TryStrToInt(EditMarginBottom.Text, Value) then
-    Value := 0;
+  if not TryStrToFloat(EditMarginBottom.Text, ValueFloat, USFormatSettings) then
+    ValueFloat := 0;
 
-  FPrintPreview.MarginBottom := Value;
+  FPrintPreview.MarginBottom := ValueFloat;
 
-  if not TryStrToInt(EditGlueEdge.Text, Value) then
-    Value := 0;
+  if not TryStrToFloat(EditGlueEdge.Text, ValueFloat, USFormatSettings) then
+    ValueFloat := 0;
 
-  FPrintPreview.GlueEdge := Value;
+  FPrintPreview.GlueEdge := ValueFloat;
 
   FPrintPreview.Units := TSVGPrintUnits(ComboboxUnits.ItemIndex);
 
