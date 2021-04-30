@@ -290,7 +290,9 @@ end;
 
 procedure TSVGEditorForm.ActionAddPolygonExecute(Sender: TObject);
 begin
-  // TODO
+  CheckSelectionIsGroup(True);
+
+  FEditor.ElementAdd('<polygon points="100,100 200,100, 200,200" />');
 end;
 
 procedure TSVGEditorForm.ActionAddPolylineExecute(Sender: TObject);

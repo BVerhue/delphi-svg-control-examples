@@ -908,9 +908,12 @@ procedure TSVGEditorToolTransform.SetBounds(ALeft, ATop, AWidth,
 begin
   inherited;
 
-  CalcTransform(True);
-  UpdateBitmap;
-  Repaint;
+  if IsChanged then
+  begin
+    CalcTransform(True);
+    UpdateBitmap;
+    Repaint;
+  end;
 end;
 
 // -----------------------------------------------------------------------------
@@ -1087,6 +1090,7 @@ var
   Rect: ISVGRect;
   Circle: ISVGCircle;
   Ellipse: ISVGEllipse;
+  Polygon: ISVGPolygon;
 begin
   P := SVGPoint(0.0, 0.0);
 
@@ -1113,6 +1117,11 @@ begin
       else
          P := SVGPoint(CalcX(Ellipse.CX), CalcY(Ellipse.CY) + CalcY(Ellipse.RY));
     end;
+  end else
+
+  if Supports(FSVGObject, ISVGPolygon, Polygon) then
+  begin
+    //
   end;
 
   Result := SVGToTool(P).Round;
@@ -2646,7 +2655,8 @@ procedure TSVGEditor.ToolDestroy(var aTool: TSVGEditorTool);
 begin
   if assigned(aTool) then
   begin
-    aTool.Apply;
+    if aTool.IsChanged then
+      aTool.Apply;
 
     UpdatePage([rsCalcCache]);
 

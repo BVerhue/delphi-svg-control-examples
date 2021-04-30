@@ -74,6 +74,7 @@ type
     FMouseDown: TPoint;
     FSelected: Boolean;
     FMoveable: Boolean;
+    FIsChanged: Boolean;
 
     procedure MoveDelta(const aDx, aDy: Integer);
     procedure SetSize(const aValue: TRect);
@@ -117,6 +118,7 @@ type
     property HandleList: TList<TSVGHandle> read FHandleList;
     property HandlesVisible: Boolean read GetHandlesVisible write SetHandlesVisible;
     property AbsoluteContentRect: TRect read GetAbsoluteContentRect write SetAbsoluteContentRect;
+    property IsChanged: Boolean read FIsChanged;
     property ContentRect: TRect read GetContentRect;
     property Margin: Integer read FMargin write SetMargin;
     property Selected: Boolean read FSelected;
@@ -240,6 +242,7 @@ begin
   FMargin := 10;
   FSelected := False;
   FMoveable := True;
+  FIsChanged := False;
 
   inherited;
 end;
@@ -280,7 +283,10 @@ procedure TSVGTool.DoSetHandlePoint(const aIndex: integer; const Value: TPoint);
 var
   R: TRect;
 begin
+  FIsChanged := True;
+
   R := ContentRect;
+
   case aIndex of
     0 : SetSize(
           TRect.Create(Value.X, Value.Y, R.Right, R.Bottom));
@@ -295,6 +301,8 @@ end;
 
 procedure TSVGTool.DoMovePosition(const aDx, aDy: Integer);
 begin
+  FIsChanged := True;
+
   SetBounds(Left + aDx, Top + aDy, Width, Height);
 end;
 
