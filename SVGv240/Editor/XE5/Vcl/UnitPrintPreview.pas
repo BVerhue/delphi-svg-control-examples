@@ -46,7 +46,6 @@ type
     Panel2: TPanel;
     Button2: TButton;
     Button3: TButton;
-    RadioGroup1: TRadioGroup;
     RadioButton1: TRadioButton;
     RadioButton2: TRadioButton;
     GroupBox1: TGroupBox;
@@ -73,6 +72,9 @@ type
     Label10: TLabel;
     Label11: TLabel;
     eMarginLeft: TEdit;
+    GroupBox4: TGroupBox;
+    cbIdenticalMargins: TCheckBox;
+    aIdenticalMargins: TAction;
     procedure FormCreate(Sender: TObject);
   private
     { Private declarations }
@@ -96,6 +98,7 @@ begin
   ActionPrint := aPrint;
   ActionCancel := aCancel;
   ActionPrinterSelect := aPrinterSelect;
+  ActionIdenticalMargins := aIdenticalMargins;
 
   ComboBoxUnits := cbUnits;
   CheckBoxAutoViewbox := cbAutoViewBox;

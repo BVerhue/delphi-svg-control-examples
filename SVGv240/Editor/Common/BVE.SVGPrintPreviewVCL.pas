@@ -147,6 +147,7 @@ type
 implementation
 uses
   BVE.SVG2GeomUtility,
+  BVE.SVG2Context,
   BVE.SVG2Elements.VCL;
 
 { TSVGPrintPreview }
@@ -453,8 +454,15 @@ begin
           )
         );
       try
+        // Draw margins
+
+        RC.ApplyStroke(TSVGSolidBrush.Create(SVGColorGray), 1);
+        RC.DrawRect(TransformRect(ViewPort, MV));
+
         RC.Matrix := TSVGMatrix.Multiply(RC.Matrix, M);
         RC.Matrix := TSVGMatrix.Multiply(RC.Matrix, MV);
+
+        // Draw SVG
 
         {$IFDEF SVGSupportsCmdList}
         RC.DrawCmdList(FCmdList, SVGRect(0, 0, FCmdListWidth, FCmdListHeight));

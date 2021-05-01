@@ -284,6 +284,9 @@ type
 
     procedure ChildListBeforeCreate(aParent: IXMLNode);
 
+    function ControlSize(const aScrollbarKind: ShortInt;
+      const aControlSB, aAssumeSB: Boolean): Integer;
+
     procedure ToolsCreate;
     procedure ToolsClear;
 
@@ -1348,6 +1351,7 @@ var
   SVGWidth, SVGHeight: TSVGDimension;
   W, H: Integer;
   R: TSVGRect;
+  CWidth, CHeight: Integer;
 begin
   // Calculate the size of the canvas
 
@@ -1358,8 +1362,11 @@ begin
     FPadding.Right := 100;
     FPadding.Bottom := 100;
 
-    W := ClientWidth - FPadding.Right - FPadding.Left;
-    H := ClientHeight - FPadding.Bottom - FPadding.Top;
+    CWidth := ControlSize(SB_HORZ, False, False);
+    CHeight := ControlSize(SB_VERT, False, False);
+
+    W := CWidth - FPadding.Right - FPadding.Left - 1;
+    H := CHeight - FPadding.Bottom - FPadding.Top - 1;
 
     R := SVGRect(0, 0, W, H);
 
@@ -1390,16 +1397,18 @@ begin
       R.Width := R.Width * FScale;
       R.Height := R.Height * FScale;
 
+      // Increase padding to fill the available area
+
       if R.Width < W then
       begin
-        FPadding.Right := Round((ClientWidth - R.Width) / 2);
-        FPadding.Left := FPadding.Right;
+        FPadding.Left := (CWidth - Ceil(R.Width)) div 2;
+        FPadding.Right := FPadding.Left - 1;
       end;
 
       if R.Height < H then
       begin
-        FPadding.Top := Round((ClientHeight - R.Height) / 2);
-        FPadding.Bottom := FPadding.Top;
+        FPadding.Top := (CHeight - Ceil(R.Height)) div 2;
+        FPadding.Bottom := FPadding.Top - 1;
       end;
     end;
 
@@ -1860,6 +1869,44 @@ begin
   end;
 end;
 
+function TSVGEditor.ControlSize(const aScrollbarKind: ShortInt;
+  const aControlSB, aAssumeSB: Boolean): Integer;
+var
+  BorderAdjust: Integer;
+
+  // From TControlScrollBar
+
+  function ScrollBarVisible(Code: Word): Boolean;
+  var
+    Style: Longint;
+  begin
+    Style := WS_HSCROLL;
+    if Code = SB_VERT then Style := WS_VSCROLL;
+    Result := GetWindowLong(Handle, GWL_STYLE) and Style <> 0;
+  end;
+
+  function Adjustment(Code, Metric: Word): Integer;
+  begin
+    Result := 0;
+    if not aControlSB then
+    begin
+      if aAssumeSB and not ScrollBarVisible(Code) then
+        Result := -(GetSystemMetrics(Metric) - BorderAdjust)
+      else
+        if not aAssumeSB and ScrollBarVisible(Code) then
+          Result := GetSystemMetrics(Metric) - BorderAdjust;
+    end;
+  end;
+
+begin
+  BorderAdjust := Integer(GetWindowLong(Handle, GWL_STYLE) and
+    (WS_BORDER or WS_THICKFRAME) <> 0);
+  if aScrollbarKind = SB_VERT then
+    Result := ClientHeight + Adjustment(SB_HORZ, SM_CXHSCROLL)
+  else
+    Result := ClientWidth + Adjustment(SB_VERT, SM_CYVSCROLL);
+end;
+
 constructor TSVGEditor.Create(AOwner: TComponent);
 begin
   inherited;
@@ -2299,7 +2346,7 @@ var
   ScrollInfo: TScrollInfo;
 begin
   aMsg.result := 0;
-  ScrollInfo.cbSize := Sizeof(TscrollInfo);
+  ScrollInfo.cbSize := Sizeof(TScrollInfo);
   ScrollInfo.fMask := SIF_ALL;
   GetScrollInfo(Handle, aBar, ScrollInfo);
   ScrollInfo.fMask := SIF_POS;
@@ -2512,6 +2559,8 @@ end;
 procedure TSVGEditor.Resize;
 begin
   inherited;
+
+  UpdateScrollbars;
 
   FTimerUpdatePage.Enabled := False;
   FTimerUpdatePage.Enabled := True;
@@ -2833,18 +2882,18 @@ var
   ScrollInfo: TScrollInfo;
 begin
   ScrollInfo.cbSize := Sizeof(TScrollInfo);
-  ScrollInfo.fMask := SIF_ALL or SIF_DISABLENOSCROLL;
+  ScrollInfo.fMask := SIF_PAGE or SIF_POS or SIF_RANGE;
   ScrollInfo.nMin := 0;
   ScrollInfo.nMax := FCanvasRect.Height;
 
-  ScrollInfo.nPage := ClientHeight;
+  ScrollInfo.nPage := ControlSize(SB_VERT, False, False);
   ScrollInfo.nPos := 0;
-  SetScrollInfo(Handle, SB_VERT, ScrollInfo, true);
+  SetScrollInfo(Handle, SB_VERT, ScrollInfo, True);
 
   ScrollInfo.nMax := FCanvasRect.Width;
-  ScrollInfo.nPage := ClientWidth;
+  ScrollInfo.nPage := ControlSize(SB_HORZ, False, False);
 
-  SetScrollInfo(Handle, SB_HORZ, ScrollInfo, true);
+  SetScrollInfo(Handle, SB_HORZ, ScrollInfo, True);
 end;
 
 procedure TSVGEditor.WMGetDlgCode(var msg: TWMGetDlgCode);

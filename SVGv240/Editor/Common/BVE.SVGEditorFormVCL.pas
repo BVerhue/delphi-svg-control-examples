@@ -510,6 +510,8 @@ begin
 
   FOpenDialog := TOpenDialog.Create(Self);
   FSaveDialog := TSaveDialog.Create(Self);
+  FSaveDialog.Filter := 'SVG Files (*.svg)|*.svg';
+  FSaveDialog.DefaultExt := 'svg';
 
   DocumentNew;
 
