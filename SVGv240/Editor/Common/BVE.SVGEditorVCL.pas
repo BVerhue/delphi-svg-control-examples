@@ -42,7 +42,7 @@ type
     FCache: ISVGObjectCache;
     FParentCache: ISVGObjectCache;
     FBitmap: TBitmap;
-    FOriginalBounds: TRect;
+    FOrigBounds: TRect;
     FMatrix: TSVGMatrix;
 
     FRefFontSize: TSVGFloat;
@@ -77,18 +77,19 @@ type
 
     procedure UpdateBitmap;
   public
-    constructor Create(aEditor: TSVGEditor; aRoot: ISVGRoot; aObject: ISVGObject); reintroduce; virtual;
+    constructor Create(aEditor: TSVGEditor; aRoot: ISVGRoot;
+      aObject: ISVGObject; aParentCache: ISVGObjectCache); reintroduce; virtual;
     destructor Destroy; override;
 
     procedure SetBounds(ALeft, ATop, AWidth, AHeight: Integer); override;
 
-    procedure Apply; virtual; abstract;
+    procedure Apply; virtual;
 
     procedure CalcTransform(const aLocal: Boolean);
 
     procedure Paint; override;
 
-    property OriginalBounds: TRect read FOriginalBounds;
+    property OrigBounds: TRect read FOrigBounds;
     property SVGObject: ISVGObject read FSVGObject;
     property AlignMatrix: TSVGMatrix read GetAlignMatrix;
     property ViewportMatrix: TSVGMatrix read GetViewportMatrix;
@@ -101,13 +102,14 @@ type
     FOrigTransform: TSVGUnicodeString;
   protected
     procedure DoCreateHandles; override;
+
+    procedure UpdateTransform;
   public
-    constructor Create(aEditor: TSVGEditor; aRoot: ISVGRoot; aObject: ISVGObject); override;
+    constructor Create(aEditor: TSVGEditor; aRoot: ISVGRoot;
+      aObject: ISVGObject; aParentCache: ISVGObjectCache); override;
     destructor Destroy; override;
 
     procedure SetBounds(ALeft, ATop, AWidth, AHeight: Integer); override;
-
-    procedure Apply; override;
   end;
 
   /// <summary>Shape tool, modifies the shape of an element.</summary>
@@ -122,10 +124,9 @@ type
     procedure DoSetHandlePoint(const aIndex: Integer; const Value: TPoint); override;
     procedure DoMovePosition(const aDx, aDy: Integer); override;
   public
-    constructor Create(aEditor: TSVGEditor; aRoot: ISVGRoot; aObject: ISVGObject); reintroduce;
+    constructor Create(aEditor: TSVGEditor; aRoot: ISVGRoot;
+      aObject: ISVGObject; aParentCache: ISVGObjectCache); override;
     destructor Destroy; override;
-
-    procedure Apply; override;
   end;
 
   TSVGEditorCmdType = (ctGroup, ctSelectElement, ctAddElement, ctRemoveElement,
@@ -473,6 +474,11 @@ const
 //
 // -----------------------------------------------------------------------------
 
+procedure TSVGEditorTool.Apply;
+begin
+  //
+end;
+
 procedure TSVGEditorTool.CalcBounds;
 var
   R: TSVGRect;
@@ -481,15 +487,15 @@ begin
   R := ScreenBBox;
 
   R := TransformRect(R, FEditor.Matrix);
-  R.Offset(-FEditor.Padding.Left, -FEditor.Padding.Top);
+  //R.Offset(-FEditor.Padding.Left, -FEditor.Padding.Top);
   RR := R.Round;
 
   AbsoluteContentRect :=
     Rect(
-      RR.Left - FEditor.TopLeft.X + FEditor.Padding.Left,
-      RR.Top - FEditor.TopLeft.Y + FEditor.Padding.Top,
-      RR.Right - FEditor.TopLeft.X + FEditor.Padding.Left,
-      RR.Bottom - FEditor.TopLeft.Y + FEditor.Padding.Top);
+      RR.Left - FEditor.TopLeft.X{ + FEditor.Padding.Left},
+      RR.Top - FEditor.TopLeft.Y{ + FEditor.Padding.Top},
+      RR.Right - FEditor.TopLeft.X{ + FEditor.Padding.Left},
+      RR.Bottom - FEditor.TopLeft.Y{ + FEditor.Padding.Top});
 end;
 
 procedure TSVGEditorTool.CalcDimReferences;
@@ -549,14 +555,14 @@ begin
 
   if aLocal then
   begin
-    R1 := TSVGRect.Create(OriginalBounds);
+    R1 := TSVGRect.Create(OrigBounds);
 
     R2 := TSVGRect.Create(ContentRect);
     R2.Offset(
-      OriginalBounds.Left - Margin,
-      OriginalBounds.Top - Margin);
+      OrigBounds.Left - Margin,
+      OrigBounds.Top - Margin);
   end else begin
-    R1 := TSVGRect.Create(OriginalBounds);
+    R1 := TSVGRect.Create(OrigBounds);
 
     R2 := TSVGRect.Create(AbsoluteContentRect);
     R2.Offset(
@@ -622,31 +628,30 @@ begin
 end;
 
 constructor TSVGEditorTool.Create(aEditor: TSVGEditor;
-  aRoot: ISVGRoot; aObject: ISVGObject);
+  aRoot: ISVGRoot; aObject: ISVGObject; aParentCache: ISVGObjectCache);
 var
   i: Integer;
-  Parent: ISVGObject;
 begin
   FEditor := aEditor;
   FMatrix := TSVGMatrix.CreateIdentity;
 
   FRoot := aRoot;
   FSVGObject := aObject;
+  FParentCache := aParentCache;
 
-  if Supports(FSVGObject.ParentNode, ISVGObject, Parent) then
-    FParentCache := Parent.CacheList[0]
-  else
-    FParentCache := nil;
+  if FSVGObject.CacheList.Count > 0 then
+  begin
+    i := 0;
+    while (i < FSVGObject.CacheList.Count)
+    and (FSVGObject.CacheList[i].ParentCache as IInterface <> FParentCache as IInterface) do
+      Inc(i);
 
-  i := 0;
-  while (i < FSVGObject.CacheList.Count)
-  and (FSVGObject.CacheList[i].ParentCache as IInterface <> FParentCache as IInterface) do
-    Inc(i);
-
-  if i < FSVGObject.CacheList.Count then
-    FCache := FSVGObject.CacheList[i]
-  else
-    FCache := FSVGObject.CacheList[0];
+    if i < FSVGObject.CacheList.Count then
+      FCache := FSVGObject.CacheList[i]
+    else
+      FCache := FSVGObject.CacheList[0];
+  end else
+    FCache := nil;
 
   CalcDimReferences;
 
@@ -656,9 +661,9 @@ begin
 
   if (AbsoluteContentRect.Right < AbsoluteContentRect.Left)
   or (AbsoluteContentRect.Bottom < AbsoluteContentRect.Top) then
-    FOriginalBounds := AbsoluteContentRect
+    FOrigBounds := AbsoluteContentRect
   else
-    FOriginalBounds := Rect(
+    FOrigBounds := Rect(
       AbsoluteContentRect.Left + FEditor.TopLeft.X - FEditor.Padding.Left,
       AbsoluteContentRect.Top + FEditor.TopLeft.Y - FEditor.Padding.Top,
       AbsoluteContentRect.Right + FEditor.TopLeft.X - FEditor.Padding.Left,
@@ -676,21 +681,12 @@ begin
 end;
 
 function TSVGEditorTool.GetAlignMatrix: TSVGMatrix;
-var
-  R: TSVGRect;
 begin
   // Alignment of the SVG in the tool client rectangle
 
-  R := ScreenBBox;
-
   Result := TSVGMatrix.Multiply(
     FEditor.Matrix,
-    TSVGMatrix.CreateTranslation(-FEditor.Padding.Left, -FEditor.Padding.Top)
-  );
-
-  Result := TSVGMatrix.Multiply(
-    TSVGMatrix.CreateTranslation(-R.Left,  -R.Top),
-    Result);
+    TSVGMatrix.CreateTranslation(-AbsoluteContentRect.Left, -AbsoluteContentRect.Top));
 end;
 
 function TSVGEditorTool.GetRefFontSize: TSVGFloat;
@@ -846,15 +842,18 @@ begin
     end;
   end;}
 
-  if assigned(FParentCache) then
-  begin
+  //if assigned(FParentCache) then
+  //begin
     SaveMatrix := FRoot.CTMSave;
     SaveStyle := FRoot.CSASave;
     SaveViewport := FRoot.CVP;
     try
-      FRoot.CTMRestore(FParentCache.CTM);
-      FRoot.CSARestore(FParentCache.CSA);
-      FRoot.CVPSet(FParentCache.CVP);
+      if assigned(FParentCache) then
+      begin
+        FRoot.CTMRestore(FParentCache.CTM);
+        FRoot.CSARestore(FParentCache.CSA);
+        FRoot.CVPSet(FParentCache.CVP);
+      end;
 
       FRoot.PushBuffer(TSVGRenderBuffer.Create(RC));
       try
@@ -881,9 +880,7 @@ begin
       FRoot.CSARestore(SaveStyle);
       FRoot.CTMRestore(SaveMatrix);
     end;
-  end;
-
-
+  //end;
 end;
 
 // -----------------------------------------------------------------------------
@@ -892,7 +889,7 @@ end;
 //
 // -----------------------------------------------------------------------------
 
-procedure TSVGEditorToolTransform.Apply;
+{procedure TSVGEditorToolTransform.Apply;
 var
   Transform: TSVGUnicodeString;
   Parser: TSVGCssParser;
@@ -900,14 +897,12 @@ var
   M: TSVGMatrix;
   Count: Integer;
 begin
-  //CalcTransform(False);
-  CalcTransform(True);
+  CalcTransform(False);
 
   if FMatrix.IsIdentity then
     Exit;
 
-  //Transform := FSVGObject.Attributes['transform'];
-  Transform := FOrigTransform;
+  Transform := FSVGObject.Attributes['transform'];
 
   Parser := TSVGCssParser.Create(Transform);
   try
@@ -928,17 +923,16 @@ begin
 
     Transform := ConvertTransform(TransformList);
 
-    //FEditor.SetAttribute('transform', Transform);
-    FSVGObject.SetAttribute('transform', Transform);
+    FEditor.SetAttribute('transform', Transform);
   finally
     Parser.Free;
   end;
-end;
+end;}
 
 constructor TSVGEditorToolTransform.Create(aEditor: TSVGEditor; aRoot: ISVGRoot;
-  aObject: ISVGObject);
+  aObject: ISVGObject; aParentCache: ISVGObjectCache);
 begin
-  inherited Create(aEditor, aRoot, aObject);
+  inherited Create(aEditor, aRoot, aObject, aParentCache);
 
   FOrigTransform := FSVGObject.Attributes['transform'];
 end;
@@ -976,9 +970,50 @@ begin
   if IsChanged then
   begin
     //CalcTransform(True);
-    Apply;
+    UpdateTransform;
     UpdateBitmap;
     Repaint;
+  end;
+end;
+
+procedure TSVGEditorToolTransform.UpdateTransform;
+var
+  Transform: TSVGUnicodeString;
+  Parser: TSVGCssParser;
+  TransformList: TSVGTransformList;
+  M: TSVGMatrix;
+  Count: Integer;
+begin
+  CalcTransform(False);
+  //CalcTransform(True);
+
+  if FMatrix.IsIdentity then
+    Exit;
+
+  Transform := FOrigTransform;
+
+  Parser := TSVGCssParser.Create(Transform);
+  try
+    Parser.ReadTransformList(TransformList);
+
+    // If the last transform is a matrix, we multiply else we add
+
+    Count := Length(TransformList);
+    if (Count > 0) and (TransformList[Count-1].TransformType = ttMatrix) then
+    begin
+      M := TransformList[Count-1].CalcMatrix(FRoot as ISVGRefDimensions);
+      M := TSVGMatrix.Multiply(FMatrix, M);
+      TransformList[Count-1].SetMatrix(M);
+    end else begin
+      SetLength(TransformList, Count + 1);
+      TransformList[Count].SetMatrix(FMatrix);
+    end;
+
+    Transform := ConvertTransform(TransformList);
+
+    FSVGObject.SetAttribute('transform', Transform);
+  finally
+    Parser.Free;
   end;
 end;
 
@@ -988,15 +1023,10 @@ end;
 //
 // -----------------------------------------------------------------------------
 
-procedure TSVGEditorToolShape.Apply;
-begin
-  // TODO
-end;
-
 constructor TSVGEditorToolShape.Create(aEditor: TSVGEditor; aRoot: ISVGRoot;
-  aObject: ISVGObject);
+  aObject: ISVGObject; aParentCache: ISVGObjectCache);
 begin
-  inherited Create(aEditor, aRoot, aObject);
+  inherited Create(aEditor, aRoot, aObject, aParentCache);
 end;
 
 destructor TSVGEditorToolShape.Destroy;
@@ -2758,8 +2788,16 @@ begin
 end;
 
 function TSVGEditor.ToolCreate(aSVGObject: ISVGObject): TSVGEditorTool;
+var
+  ParentObject: ISVGObject;
+  ParentCache: ISVGObjectCache;
 begin
-  Result := FCurTool.Create(Self, FRoot, aSVGObject);
+  if Supports(aSVGObject.ParentNode, ISVGObject, ParentObject) then
+    ParentCache := ParentObject.CacheList[0]
+  else
+    ParentCache := nil;
+
+  Result := FCurTool.Create(Self, FRoot, aSVGObject, ParentCache);
   Result.Parent := Self;
 end;
 
