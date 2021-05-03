@@ -40,6 +40,7 @@ type
     FRoot: ISVGRoot;
     FSVGObject: ISVGObject;
     FCache: ISVGObjectCache;
+    FParentCache: ISVGObjectCache;
     FBitmap: TBitmap;
     FOriginalBounds: TRect;
     FMatrix: TSVGMatrix;
@@ -76,7 +77,7 @@ type
 
     procedure UpdateBitmap;
   public
-    constructor Create(aEditor: TSVGEditor; aRoot: ISVGRoot; aObject: ISVGObject); reintroduce;
+    constructor Create(aEditor: TSVGEditor; aRoot: ISVGRoot; aObject: ISVGObject); reintroduce; virtual;
     destructor Destroy; override;
 
     procedure SetBounds(ALeft, ATop, AWidth, AHeight: Integer); override;
@@ -96,10 +97,12 @@ type
 
   /// <summary>Transform tool, modifies the transform attribute of an element.</summary>
   TSVGEditorToolTransform = class(TSVGEditorTool)
+  private
+    FOrigTransform: TSVGUnicodeString;
   protected
     procedure DoCreateHandles; override;
   public
-    constructor Create(aEditor: TSVGEditor; aRoot: ISVGRoot; aObject: ISVGObject); reintroduce;
+    constructor Create(aEditor: TSVGEditor; aRoot: ISVGRoot; aObject: ISVGObject); override;
     destructor Destroy; override;
 
     procedure SetBounds(ALeft, ATop, AWidth, AHeight: Integer); override;
@@ -620,6 +623,9 @@ end;
 
 constructor TSVGEditorTool.Create(aEditor: TSVGEditor;
   aRoot: ISVGRoot; aObject: ISVGObject);
+var
+  i: Integer;
+  Parent: ISVGObject;
 begin
   FEditor := aEditor;
   FMatrix := TSVGMatrix.CreateIdentity;
@@ -627,7 +633,19 @@ begin
   FRoot := aRoot;
   FSVGObject := aObject;
 
-  if FSVGObject.CacheList.Count > 0 then
+  if Supports(FSVGObject.ParentNode, ISVGObject, Parent) then
+    FParentCache := Parent.CacheList[0]
+  else
+    FParentCache := nil;
+
+  i := 0;
+  while (i < FSVGObject.CacheList.Count)
+  and (FSVGObject.CacheList[i].ParentCache as IInterface <> FParentCache as IInterface) do
+    Inc(i);
+
+  if i < FSVGObject.CacheList.Count then
+    FCache := FSVGObject.CacheList[i]
+  else
     FCache := FSVGObject.CacheList[0];
 
   CalcDimReferences;
@@ -671,7 +689,7 @@ begin
   );
 
   Result := TSVGMatrix.Multiply(
-    TSVGMatrix.CreateTranslation(- R.Left,  - R.Top),
+    TSVGMatrix.CreateTranslation(-R.Left,  -R.Top),
     Result);
 end;
 
@@ -792,7 +810,7 @@ begin
 
   FEditor.FRenderingSelection := rsSelection;
 
-  if assigned(FCache) then
+  {if assigned(FCache) then
   begin
     SaveMatrix := FRoot.CTMSave;
     SaveStyle := FRoot.CSASave;
@@ -826,7 +844,46 @@ begin
       FRoot.CSARestore(SaveStyle);
       FRoot.CTMRestore(SaveMatrix);
     end;
+  end;}
+
+  if assigned(FParentCache) then
+  begin
+    SaveMatrix := FRoot.CTMSave;
+    SaveStyle := FRoot.CSASave;
+    SaveViewport := FRoot.CVP;
+    try
+      FRoot.CTMRestore(FParentCache.CTM);
+      FRoot.CSARestore(FParentCache.CSA);
+      FRoot.CVPSet(FParentCache.CVP);
+
+      FRoot.PushBuffer(TSVGRenderBuffer.Create(RC));
+      try
+        RC.BeginScene;
+        try
+          RC.Clear(SVGColorNone);
+
+          RC.Matrix := AlignMatrix;
+
+          //FRoot.CTMMultiply(FCache.UserMatrix);
+
+          //FRoot.CTMMultiply(FMatrix);
+
+          FSVGObject.PaintIndirect(FRoot, False, FParentCache);
+        finally
+          RC.EndScene;
+        end;
+      finally
+        FRoot.PopBuffer;
+      end;
+
+    finally
+      FRoot.CVPSet(SaveViewport);
+      FRoot.CSARestore(SaveStyle);
+      FRoot.CTMRestore(SaveMatrix);
+    end;
   end;
+
+
 end;
 
 // -----------------------------------------------------------------------------
@@ -837,18 +894,20 @@ end;
 
 procedure TSVGEditorToolTransform.Apply;
 var
-  Transform: string;
+  Transform: TSVGUnicodeString;
   Parser: TSVGCssParser;
   TransformList: TSVGTransformList;
   M: TSVGMatrix;
   Count: Integer;
 begin
-  CalcTransform(False);
+  //CalcTransform(False);
+  CalcTransform(True);
 
   if FMatrix.IsIdentity then
     Exit;
 
-  Transform := FSVGObject.Attributes['transform'];
+  //Transform := FSVGObject.Attributes['transform'];
+  Transform := FOrigTransform;
 
   Parser := TSVGCssParser.Create(Transform);
   try
@@ -869,7 +928,8 @@ begin
 
     Transform := ConvertTransform(TransformList);
 
-    FEditor.SetAttribute('transform', Transform);
+    //FEditor.SetAttribute('transform', Transform);
+    FSVGObject.SetAttribute('transform', Transform);
   finally
     Parser.Free;
   end;
@@ -879,6 +939,8 @@ constructor TSVGEditorToolTransform.Create(aEditor: TSVGEditor; aRoot: ISVGRoot;
   aObject: ISVGObject);
 begin
   inherited Create(aEditor, aRoot, aObject);
+
+  FOrigTransform := FSVGObject.Attributes['transform'];
 end;
 
 destructor TSVGEditorToolTransform.Destroy;
@@ -913,7 +975,8 @@ begin
 
   if IsChanged then
   begin
-    CalcTransform(True);
+    //CalcTransform(True);
+    Apply;
     UpdateBitmap;
     Repaint;
   end;
@@ -1661,7 +1724,7 @@ begin
 
   Element.Attributes[aCmd.Name] := Value;
 
-  UpdatePage([rsCalcCache]);
+  ///UpdatePage([rsCalcCache]);
 
   DoSetAttribute(Element, aCmd.Name, Value);
 end;
@@ -1996,7 +2059,7 @@ begin
     FOnElementRemove(Self, aElement);
 end;
 
-procedure TSVGEditor.DoElementSelect;
+procedure TSVGEditor.DoElementSelect(const aElement: ISVGElement);
 begin
   if assigned(FOnElementSelect) then
     FOnElementSelect(Self);
