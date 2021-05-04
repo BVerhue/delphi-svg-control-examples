@@ -33,102 +33,6 @@ type
   TSVGEditor = class;
   TSVGToolClass = class of TSVGEditorTool;
 
-  /// <summary>Bass class for Editor tools.</summary>
-  TSVGEditorTool = class(TSVGTool, ISVGRefDimensions)
-  private
-    FEditor: TSVGEditor;
-    FRoot: ISVGRoot;
-    FSVGObject: ISVGObject;
-    FCache: ISVGObjectCache;
-    FParentCache: ISVGObjectCache;
-    FBitmap: TBitmap;
-    FOrigBounds: TRect;
-    FMatrix: TSVGMatrix;
-
-    FRefFontSize: TSVGFloat;
-    FRefWidth: TSVGFloat;
-    FRefHeight: TSVGFloat;
-    FRefLeft: TSVGFLoat;
-    FRefTop: TSVGFloat;
-    FRefLength: TSVGFloat;
-  protected
-    function GetAlignMatrix: TSVGMatrix;
-    function GetViewportMatrix: TSVGMatrix;
-    function GetScreenBBox: TSVGRect;
-
-    function GetRefFontSize: TSVGFloat;
-    function GetRefWidth: TSVGFloat;
-    function GetRefHeight: TSVGFloat;
-    function GetRefLeft: TSVGFloat;
-    function GetRefTop: TSVGFloat;
-    function GetRefLength: TSVGFloat;
-
-    function SVGToTool(const aPoint: TSVGPoint): TSVGPoint;
-    function ToolToSVG(const aPoint: TSVGPoint): TSVGPoint;
-
-    procedure CalcDimReferences;
-    procedure CalcBounds;
-
-    function CalcX(aValue: TSVGDimension): TSVGFloat; overload;
-    function CalcY(aValue: TSVGDimension): TSVGFloat; overload;
-
-    function CalcX(const aValue: TSVGFloat; aDimType: TSVGDimensionType): TSVGDimension; overload;
-    function CalcY(const aValue: TSVGFloat; aDimType: TSVGDimensionType): TSVGDimension; overload;
-
-    procedure UpdateBitmap;
-  public
-    constructor Create(aEditor: TSVGEditor; aRoot: ISVGRoot;
-      aObject: ISVGObject; aParentCache: ISVGObjectCache); reintroduce; virtual;
-    destructor Destroy; override;
-
-    procedure SetBounds(ALeft, ATop, AWidth, AHeight: Integer); override;
-
-    procedure Apply; virtual;
-
-    procedure CalcTransform(const aLocal: Boolean);
-
-    procedure Paint; override;
-
-    property OrigBounds: TRect read FOrigBounds;
-    property SVGObject: ISVGObject read FSVGObject;
-    property AlignMatrix: TSVGMatrix read GetAlignMatrix;
-    property ViewportMatrix: TSVGMatrix read GetViewportMatrix;
-    property ScreenBBox: TSVGRect read GetScreenBBox;
-  end;
-
-  /// <summary>Transform tool, modifies the transform attribute of an element.</summary>
-  TSVGEditorToolTransform = class(TSVGEditorTool)
-  private
-    FOrigTransform: TSVGUnicodeString;
-  protected
-    procedure DoCreateHandles; override;
-
-    procedure UpdateTransform;
-  public
-    constructor Create(aEditor: TSVGEditor; aRoot: ISVGRoot;
-      aObject: ISVGObject; aParentCache: ISVGObjectCache); override;
-    destructor Destroy; override;
-
-    procedure SetBounds(ALeft, ATop, AWidth, AHeight: Integer); override;
-  end;
-
-  /// <summary>Shape tool, modifies the shape of an element.</summary>
-  TSVGEditorToolShape = class(TSVGEditorTool)
-  private
-    function GetObjectBounds: TSVGRect;
-    procedure SetObjectBounds(aRect: TSVGRect);
-  protected
-    function GetHandlePoint(const aIndex: Integer): TPoint; override;
-
-    procedure DoCreateHandles; override;
-    procedure DoSetHandlePoint(const aIndex: Integer; const Value: TPoint); override;
-    procedure DoMovePosition(const aDx, aDy: Integer); override;
-  public
-    constructor Create(aEditor: TSVGEditor; aRoot: ISVGRoot;
-      aObject: ISVGObject; aParentCache: ISVGObjectCache); override;
-    destructor Destroy; override;
-  end;
-
   TSVGEditorCmdType = (ctGroup, ctSelectElement, ctAddElement, ctRemoveElement,
     ctSetAttribute, ctSelectTool);
 
@@ -220,6 +124,106 @@ type
 
     property ToolOld: TSVGToolClass read FToolOld;
     property ToolNew: TSVGToolClass read FToolNew;
+  end;
+
+  /// <summary>Bass class for Editor tools.</summary>
+  TSVGEditorTool = class(TSVGTool, ISVGRefDimensions)
+  private
+    FEditor: TSVGEditor;
+    FRoot: ISVGRoot;
+    FSVGObject: ISVGObject;
+    FCache: ISVGObjectCache;
+    FParentCache: ISVGObjectCache;
+    FBitmap: TBitmap;
+    FOrigBounds: TRect;
+    FMatrix: TSVGMatrix;
+
+    FRefFontSize: TSVGFloat;
+    FRefWidth: TSVGFloat;
+    FRefHeight: TSVGFloat;
+    FRefLeft: TSVGFLoat;
+    FRefTop: TSVGFloat;
+    FRefLength: TSVGFloat;
+
+    FCmdList: TDictionary<TSVGUnicodeString, TSVGEditorCmdSetAttribute>;
+  protected
+    function GetAlignMatrix: TSVGMatrix;
+    function GetViewportMatrix: TSVGMatrix;
+    function GetScreenBBox: TSVGRect;
+
+    function GetRefFontSize: TSVGFloat;
+    function GetRefWidth: TSVGFloat;
+    function GetRefHeight: TSVGFloat;
+    function GetRefLeft: TSVGFloat;
+    function GetRefTop: TSVGFloat;
+    function GetRefLength: TSVGFloat;
+
+    function SVGToTool(const aPoint: TSVGPoint): TSVGPoint;
+    function ToolToSVG(const aPoint: TSVGPoint): TSVGPoint;
+
+    procedure CalcDimReferences;
+    procedure CalcBounds;
+
+    function CalcX(aValue: TSVGDimension): TSVGFloat; overload;
+    function CalcY(aValue: TSVGDimension): TSVGFloat; overload;
+
+    function CalcX(const aValue: TSVGFloat; aDimType: TSVGDimensionType): TSVGDimension; overload;
+    function CalcY(const aValue: TSVGFloat; aDimType: TSVGDimensionType): TSVGDimension; overload;
+
+    procedure UpdateBitmap;
+  public
+    constructor Create(aEditor: TSVGEditor; aRoot: ISVGRoot;
+      aObject: ISVGObject; aParentCache: ISVGObjectCache); reintroduce; virtual;
+    destructor Destroy; override;
+
+    procedure SetBounds(ALeft, ATop, AWidth, AHeight: Integer); override;
+
+    procedure Apply; virtual;
+
+    procedure CalcTransform(const aLocal: Boolean);
+
+    procedure Paint; override;
+
+    property OrigBounds: TRect read FOrigBounds;
+    property SVGObject: ISVGObject read FSVGObject;
+    property AlignMatrix: TSVGMatrix read GetAlignMatrix;
+    property ViewportMatrix: TSVGMatrix read GetViewportMatrix;
+    property ScreenBBox: TSVGRect read GetScreenBBox;
+  end;
+
+  /// <summary>Transform tool, modifies the transform attribute of an element.</summary>
+  TSVGEditorToolTransform = class(TSVGEditorTool)
+  private
+    FOrigTransform: TSVGUnicodeString;
+  protected
+    procedure DoCreateHandles; override;
+
+    procedure UpdateTransform;
+  public
+    constructor Create(aEditor: TSVGEditor; aRoot: ISVGRoot;
+      aObject: ISVGObject; aParentCache: ISVGObjectCache); override;
+    destructor Destroy; override;
+
+    procedure SetBounds(ALeft, ATop, AWidth, AHeight: Integer); override;
+  end;
+
+  /// <summary>Shape tool, modifies the shape of an element.</summary>
+  TSVGEditorToolShape = class(TSVGEditorTool)
+  private
+    function GetObjectBounds: TSVGRect;
+    procedure SetObjectBounds(aRect: TSVGRect);
+  protected
+    function GetHandlePoint(const aIndex: Integer): TPoint; override;
+
+    procedure DoCreateHandles; override;
+    procedure DoSetHandlePoint(const aIndex: Integer; const Value: TPoint); override;
+    procedure DoMovePosition(const aDx, aDy: Integer); override;
+  public
+    constructor Create(aEditor: TSVGEditor; aRoot: ISVGRoot;
+      aObject: ISVGObject; aParentCache: ISVGObjectCache); override;
+    destructor Destroy; override;
+
+    procedure Apply; override;
   end;
 
   TElementSelectEvent = procedure(Sender: TObject) of object;
@@ -632,6 +636,8 @@ constructor TSVGEditorTool.Create(aEditor: TSVGEditor;
 var
   i: Integer;
 begin
+  FCmdList := TDictionary<TSVGUnicodeString, TSVGEditorCmdSetAttribute>.Create;
+
   FEditor := aEditor;
   FMatrix := TSVGMatrix.CreateIdentity;
 
@@ -673,9 +679,16 @@ begin
 end;
 
 destructor TSVGEditorTool.Destroy;
+var
+  Pair: TPair<TSVGUnicodeString, TSVGEditorCmdSetAttribute>;
 begin
   if assigned(FBitmap) then
     FBitmap.Free;
+
+  for Pair in FCmdList do
+    Pair.Value.Free;
+
+  FCmdList.Free;
 
   inherited;
 end;
@@ -931,10 +944,20 @@ end;}
 
 constructor TSVGEditorToolTransform.Create(aEditor: TSVGEditor; aRoot: ISVGRoot;
   aObject: ISVGObject; aParentCache: ISVGObjectCache);
+var
+  Cmd: TSVGEditorCmdSetAttribute;
 begin
   inherited Create(aEditor, aRoot, aObject, aParentCache);
 
   FOrigTransform := FSVGObject.Attributes['transform'];
+
+  Cmd := TSVGEditorCmdSetAttribute.Create(
+    FEditor.GetElementID(aObject),
+    'transform',
+    FOrigTransform,
+    FOrigTransform);
+
+  FCmdList.Add('transform', Cmd);
 end;
 
 destructor TSVGEditorToolTransform.Destroy;
@@ -1022,6 +1045,11 @@ end;
 //                         TSVGEditorToolShape
 //
 // -----------------------------------------------------------------------------
+
+procedure TSVGEditorToolShape.Apply;
+begin
+//
+end;
 
 constructor TSVGEditorToolShape.Create(aEditor: TSVGEditor; aRoot: ISVGRoot;
   aObject: ISVGObject; aParentCache: ISVGObjectCache);
