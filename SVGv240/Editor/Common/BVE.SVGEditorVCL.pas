@@ -112,7 +112,7 @@ type
 
     property Name: TSVGUnicodeString read FName;
     property ValueOld: TSVGUnicodeString read FValueOld;
-    property ValueNew: TSVGUnicodeString read FValueNew;
+    property ValueNew: TSVGUnicodeString read FValueNew write FValueNew;
   end;
 
   TSVGEditorCmdToolSelect = class(TSVGEditorCmd)
@@ -126,12 +126,16 @@ type
     property ToolNew: TSVGToolClass read FToolNew;
   end;
 
+  TSVGToolAttributeChangeEvent = procedure(Sender: TObject; const aAttrName,
+    aAttrValue: TSVGUnicodeString) of object;
+
   /// <summary>Bass class for Editor tools.</summary>
   TSVGEditorTool = class(TSVGTool, ISVGRefDimensions)
   private
     FEditor: TSVGEditor;
     FRoot: ISVGRoot;
     FSVGObject: ISVGObject;
+    FObjectID: Integer;
     FCache: ISVGObjectCache;
     FParentCache: ISVGObjectCache;
     FBitmap: TBitmap;
@@ -146,6 +150,8 @@ type
     FRefLength: TSVGFloat;
 
     FCmdList: TDictionary<TSVGUnicodeString, TSVGEditorCmdSetAttribute>;
+
+    FOnAttributeChange: TSVGToolAttributeChangeEvent;
   protected
     function GetAlignMatrix: TSVGMatrix;
     function GetViewportMatrix: TSVGMatrix;
@@ -170,6 +176,10 @@ type
     function CalcX(const aValue: TSVGFloat; aDimType: TSVGDimensionType): TSVGDimension; overload;
     function CalcY(const aValue: TSVGFloat; aDimType: TSVGDimensionType): TSVGDimension; overload;
 
+    procedure CmdListAddAttribute(const aAttrName: TSVGUnicodeString);
+    procedure CmdListSetAttribute(const aAttrName, aAttrValue: TSVGUnicodeString); overload;
+    procedure CmdListSetAttribute(const aAttrName: TSVGUnicodeString; aDimValue: TSVGDimension); overload;
+
     procedure UpdateBitmap;
   public
     constructor Create(aEditor: TSVGEditor; aRoot: ISVGRoot;
@@ -180,7 +190,7 @@ type
 
     procedure Apply; virtual;
 
-    procedure CalcTransform(const aLocal: Boolean);
+    procedure CalcTransform;
 
     procedure Paint; override;
 
@@ -189,12 +199,13 @@ type
     property AlignMatrix: TSVGMatrix read GetAlignMatrix;
     property ViewportMatrix: TSVGMatrix read GetViewportMatrix;
     property ScreenBBox: TSVGRect read GetScreenBBox;
+
+    property OnAttributeChange: TSVGToolAttributeChangeEvent
+      read FOnAttributeChange write FOnAttributeChange;
   end;
 
   /// <summary>Transform tool, modifies the transform attribute of an element.</summary>
   TSVGEditorToolTransform = class(TSVGEditorTool)
-  private
-    FOrigTransform: TSVGUnicodeString;
   protected
     procedure DoCreateHandles; override;
 
@@ -222,8 +233,6 @@ type
     constructor Create(aEditor: TSVGEditor; aRoot: ISVGRoot;
       aObject: ISVGObject; aParentCache: ISVGObjectCache); override;
     destructor Destroy; override;
-
-    procedure Apply; override;
   end;
 
   TElementSelectEvent = procedure(Sender: TObject) of object;
@@ -359,6 +368,8 @@ type
 
     function ToolCreate(aSVGObject: ISVGObject): TSVGEditorTool;
     procedure ToolDestroy(var aTool: TSVGEditorTool);
+    procedure ToolAttributeChangeEvent(Sender: TObject; const aAttrName,
+      aAttrValue: TSVGUnicodeString);
 
     procedure CalcCanvasRect;
 
@@ -479,8 +490,25 @@ const
 // -----------------------------------------------------------------------------
 
 procedure TSVGEditorTool.Apply;
+var
+  CmdGroup: TSVGEditorCmdGroup;
+  Pair: TPair<TSVGUnicodeString, TSVGEditorCmdSetAttribute>;
 begin
-  //
+  if FCmdList.Count = 0 then
+    Exit;
+
+  CmdGroup := TSVGEditorCmdGroup.Create;
+  try
+    for Pair in FCmdList do
+      CmdGroup.CmdList.Add(Pair.Value);
+    FCmdList.Clear;
+
+    FEditor.CmdExec(CmdGroup, False);
+    FEditor.FCmdUndoStack.Push(CmdGroup);
+
+    except on E:Exception do
+      CmdGroup.Free;
+  end;
 end;
 
 procedure TSVGEditorTool.CalcBounds;
@@ -491,15 +519,14 @@ begin
   R := ScreenBBox;
 
   R := TransformRect(R, FEditor.Matrix);
-  //R.Offset(-FEditor.Padding.Left, -FEditor.Padding.Top);
   RR := R.Round;
 
   AbsoluteContentRect :=
     Rect(
-      RR.Left - FEditor.TopLeft.X{ + FEditor.Padding.Left},
-      RR.Top - FEditor.TopLeft.Y{ + FEditor.Padding.Top},
-      RR.Right - FEditor.TopLeft.X{ + FEditor.Padding.Left},
-      RR.Bottom - FEditor.TopLeft.Y{ + FEditor.Padding.Top});
+      RR.Left - FEditor.TopLeft.X,
+      RR.Top - FEditor.TopLeft.Y,
+      RR.Right - FEditor.TopLeft.X,
+      RR.Bottom - FEditor.TopLeft.Y);
 end;
 
 procedure TSVGEditorTool.CalcDimReferences;
@@ -543,7 +570,7 @@ begin
   end;
 end;
 
-procedure TSVGEditorTool.CalcTransform(const aLocal: Boolean);
+procedure TSVGEditorTool.CalcTransform;
 var
   CTM: TSVGMatrix;
   R1, R2: TSVGRect;
@@ -557,22 +584,12 @@ begin
 
   CTM := FCache.CTM;
 
-  if aLocal then
-  begin
-    R1 := TSVGRect.Create(OrigBounds);
+  R1 := TSVGRect.Create(OrigBounds);
 
-    R2 := TSVGRect.Create(ContentRect);
-    R2.Offset(
-      OrigBounds.Left - Margin,
-      OrigBounds.Top - Margin);
-  end else begin
-    R1 := TSVGRect.Create(OrigBounds);
-
-    R2 := TSVGRect.Create(AbsoluteContentRect);
-    R2.Offset(
-      -FEditor.Padding.Left + FEditor.TopLeft.X,
-      -FEditor.Padding.Top + FEditor.TopLeft.Y);
-  end;
+  R2 := TSVGRect.Create(AbsoluteContentRect);
+  R2.Offset(
+    -FEditor.Padding.Left + FEditor.TopLeft.X,
+    -FEditor.Padding.Top + FEditor.TopLeft.Y);
 
   R1 := TSVGRect.Scale(R1, 1/FEditor.ContentScale.X);
   R2 := TSVGRect.Scale(R2, 1/FEditor.ContentScale.Y);
@@ -631,6 +648,42 @@ begin
   Result := TSVGDimension.CalcAsY(aValue, aDimType, Self);
 end;
 
+procedure TSVGEditorTool.CmdListAddAttribute(
+  const aAttrName: TSVGUnicodeString);
+var
+  Cmd: TSVGEditorCmdSetAttribute;
+begin
+  Cmd := TSVGEditorCmdSetAttribute.Create(
+    FObjectID,
+    aAttrName,
+    FSVGObject.Attributes[aAttrName],
+    FSVGObject.Attributes[aAttrName]);
+
+  FCmdList.Add(aAttrName, Cmd);
+end;
+
+procedure TSVGEditorTool.CmdListSetAttribute(const aAttrName: TSVGUnicodeString;
+  aDimValue: TSVGDimension);
+begin
+  CmdListSetAttribute(aAttrName, aDimValue.AsString);
+end;
+
+procedure TSVGEditorTool.CmdListSetAttribute(const aAttrName,
+  aAttrValue: TSVGUnicodeString);
+var
+  Cmd: TSVGEditorCmdSetAttribute;
+begin
+  if FCmdList.TryGetValue(aAttrName, Cmd) then
+  begin
+    Cmd.ValueNew := aAttrValue;
+
+    FSVGObject.Attributes[aAttrName] := aAttrValue;
+
+    if assigned(FOnAttributeChange) then
+      FOnAttributeChange(Self, aAttrName, aAttrValue);
+  end;
+end;
+
 constructor TSVGEditorTool.Create(aEditor: TSVGEditor;
   aRoot: ISVGRoot; aObject: ISVGObject; aParentCache: ISVGObjectCache);
 var
@@ -644,6 +697,8 @@ begin
   FRoot := aRoot;
   FSVGObject := aObject;
   FParentCache := aParentCache;
+
+  FObjectID := FEditor.GetElementID(FSVGObject);
 
   if FSVGObject.CacheList.Count > 0 then
   begin
@@ -819,81 +874,38 @@ begin
 
   FEditor.FRenderingSelection := rsSelection;
 
-  {if assigned(FCache) then
-  begin
-    SaveMatrix := FRoot.CTMSave;
-    SaveStyle := FRoot.CSASave;
-    SaveViewport := FRoot.CVP;
-    try
-      FRoot.CTMRestore(FCache.CTM);
-      FRoot.CSARestore(FCache.CSA);
-      FRoot.CVPSet(FCache.CVP);
-
-      FRoot.PushBuffer(TSVGRenderBuffer.Create(RC));
-      try
-        RC.BeginScene;
-        try
-          RC.Clear(SVGColorNone);
-
-          RC.Matrix := AlignMatrix;
-
-          FRoot.CTMMultiply(FMatrix);
-
-          FSVGObject.PaintContent(FRoot, False);
-          FSVGObject.PaintChildren(FRoot, False);
-        finally
-          RC.EndScene;
-        end;
-      finally
-        FRoot.PopBuffer;
-      end;
-
-    finally
-      FRoot.CVPSet(SaveViewport);
-      FRoot.CSARestore(SaveStyle);
-      FRoot.CTMRestore(SaveMatrix);
+  SaveMatrix := FRoot.CTMSave;
+  SaveStyle := FRoot.CSASave;
+  SaveViewport := FRoot.CVP;
+  try
+    if assigned(FParentCache) then
+    begin
+      FRoot.CTMRestore(FParentCache.CTM);
+      FRoot.CSARestore(FParentCache.CSA);
+      FRoot.CVPSet(FParentCache.CVP);
     end;
-  end;}
 
-  //if assigned(FParentCache) then
-  //begin
-    SaveMatrix := FRoot.CTMSave;
-    SaveStyle := FRoot.CSASave;
-    SaveViewport := FRoot.CVP;
+    FRoot.PushBuffer(TSVGRenderBuffer.Create(RC));
     try
-      if assigned(FParentCache) then
-      begin
-        FRoot.CTMRestore(FParentCache.CTM);
-        FRoot.CSARestore(FParentCache.CSA);
-        FRoot.CVPSet(FParentCache.CVP);
-      end;
-
-      FRoot.PushBuffer(TSVGRenderBuffer.Create(RC));
+      RC.BeginScene;
       try
-        RC.BeginScene;
-        try
-          RC.Clear(SVGColorNone);
+        RC.Clear(SVGColorNone);
 
-          RC.Matrix := AlignMatrix;
+        RC.Matrix := AlignMatrix;
 
-          //FRoot.CTMMultiply(FCache.UserMatrix);
-
-          //FRoot.CTMMultiply(FMatrix);
-
-          FSVGObject.PaintIndirect(FRoot, False, FParentCache);
-        finally
-          RC.EndScene;
-        end;
+        FSVGObject.PaintIndirect(FRoot, False, FParentCache);
       finally
-        FRoot.PopBuffer;
+        RC.EndScene;
       end;
-
     finally
-      FRoot.CVPSet(SaveViewport);
-      FRoot.CSARestore(SaveStyle);
-      FRoot.CTMRestore(SaveMatrix);
+      FRoot.PopBuffer;
     end;
-  //end;
+
+  finally
+    FRoot.CVPSet(SaveViewport);
+    FRoot.CSARestore(SaveStyle);
+    FRoot.CTMRestore(SaveMatrix);
+  end;
 end;
 
 // -----------------------------------------------------------------------------
@@ -902,62 +914,12 @@ end;
 //
 // -----------------------------------------------------------------------------
 
-{procedure TSVGEditorToolTransform.Apply;
-var
-  Transform: TSVGUnicodeString;
-  Parser: TSVGCssParser;
-  TransformList: TSVGTransformList;
-  M: TSVGMatrix;
-  Count: Integer;
-begin
-  CalcTransform(False);
-
-  if FMatrix.IsIdentity then
-    Exit;
-
-  Transform := FSVGObject.Attributes['transform'];
-
-  Parser := TSVGCssParser.Create(Transform);
-  try
-    Parser.ReadTransformList(TransformList);
-
-    // If the last transform is a matrix, we multiply else we add
-
-    Count := Length(TransformList);
-    if (Count > 0) and (TransformList[Count-1].TransformType = ttMatrix) then
-    begin
-      M := TransformList[Count-1].CalcMatrix(FRoot as ISVGRefDimensions);
-      M := TSVGMatrix.Multiply(FMatrix, M);
-      TransformList[Count-1].SetMatrix(M);
-    end else begin
-      SetLength(TransformList, Count + 1);
-      TransformList[Count].SetMatrix(FMatrix);
-    end;
-
-    Transform := ConvertTransform(TransformList);
-
-    FEditor.SetAttribute('transform', Transform);
-  finally
-    Parser.Free;
-  end;
-end;}
-
 constructor TSVGEditorToolTransform.Create(aEditor: TSVGEditor; aRoot: ISVGRoot;
   aObject: ISVGObject; aParentCache: ISVGObjectCache);
-var
-  Cmd: TSVGEditorCmdSetAttribute;
 begin
   inherited Create(aEditor, aRoot, aObject, aParentCache);
 
-  FOrigTransform := FSVGObject.Attributes['transform'];
-
-  Cmd := TSVGEditorCmdSetAttribute.Create(
-    FEditor.GetElementID(aObject),
-    'transform',
-    FOrigTransform,
-    FOrigTransform);
-
-  FCmdList.Add('transform', Cmd);
+  CmdListAddAttribute('transform');
 end;
 
 destructor TSVGEditorToolTransform.Destroy;
@@ -992,7 +954,6 @@ begin
 
   if IsChanged then
   begin
-    //CalcTransform(True);
     UpdateTransform;
     UpdateBitmap;
     Repaint;
@@ -1006,14 +967,17 @@ var
   TransformList: TSVGTransformList;
   M: TSVGMatrix;
   Count: Integer;
+  Cmd: TSVGEditorCmdSetAttribute;
 begin
-  CalcTransform(False);
-  //CalcTransform(True);
+  CalcTransform;
 
   if FMatrix.IsIdentity then
     Exit;
 
-  Transform := FOrigTransform;
+  if FCmdList.TryGetValue('transform', Cmd) then
+    Transform := Cmd.ValueOld
+  else
+    Transform := '';
 
   Parser := TSVGCssParser.Create(Transform);
   try
@@ -1034,7 +998,7 @@ begin
 
     Transform := ConvertTransform(TransformList);
 
-    FSVGObject.SetAttribute('transform', Transform);
+    CmdListSetAttribute('transform', Transform);
   finally
     Parser.Free;
   end;
@@ -1046,15 +1010,37 @@ end;
 //
 // -----------------------------------------------------------------------------
 
-procedure TSVGEditorToolShape.Apply;
-begin
-//
-end;
-
 constructor TSVGEditorToolShape.Create(aEditor: TSVGEditor; aRoot: ISVGRoot;
   aObject: ISVGObject; aParentCache: ISVGObjectCache);
+var
+  Rect: ISVGRect;
+  Circle: ISVGCircle;
+  Ellipse: ISVGEllipse;
 begin
   inherited Create(aEditor, aRoot, aObject, aParentCache);
+
+  if Supports(FSVGObject, ISVGRect, Rect) then
+  begin
+    CmdListAddAttribute('x');
+    CmdListAddAttribute('y');
+    CmdListAddAttribute('width');
+    CmdListAddAttribute('height');
+  end else
+
+  if Supports(FSVGObject, ISVGCircle, Circle) then
+  begin
+    CmdListAddAttribute('cx');
+    CmdListAddAttribute('cy');
+    CmdListAddAttribute('r');
+  end else
+
+  if Supports(FSVGObject, ISVGEllipse, Ellipse) then
+  begin
+    CmdListAddAttribute('cx');
+    CmdListAddAttribute('cy');
+    CmdListAddAttribute('rx');
+    CmdListAddAttribute('ry');
+  end;
 end;
 
 destructor TSVGEditorToolShape.Destroy;
@@ -1190,6 +1176,8 @@ begin
     end;
   end;
 
+  IsChanged := True;
+
   SetObjectBounds(R);
 
   if assigned(FCache) then
@@ -1297,27 +1285,25 @@ var
 begin
   if Supports(FSVGObject, ISVGRect, Rect) then
   begin
-
-    Rect.X := CalcX(aRect.Left, Rect.X.DimType);
-    Rect.Y := CalcY(aRect.Top, Rect.X.DimType);
-    Rect.Width := CalcX(aRect.Right - aRect.Left, Rect.Width.DimType);
-    Rect.Height := CalcX(aRect.Bottom - aRect.Top, Rect.Height.DimType);
-
+    CmdListSetAttribute('x', CalcX(aRect.Left, Rect.X.DimType));
+    CmdListSetAttribute('y', CalcY(aRect.Top, Rect.X.DimType));
+    CmdListSetAttribute('width', CalcX(aRect.Right - aRect.Left, Rect.Width.DimType));
+    CmdListSetAttribute('height', CalcX(aRect.Bottom - aRect.Top, Rect.Height.DimType));
   end else
 
   if Supports(FSVGObject, ISVGCircle, Circle) then
   begin
-    Circle.CX := CalcX((aRect.Left + aRect.Right) / 2, Circle.CX.DimType);
-    Circle.CY := CalcY((aRect.Top + aRect.Bottom) / 2, Circle.CY.DimType);
-    Circle.R := CalcX(aRect.Width / 2, Circle.R.DimType);
+    CmdListSetAttribute('cx', CalcX((aRect.Left + aRect.Right) / 2, Circle.CX.DimType));
+    CmdListSetAttribute('cy', CalcY((aRect.Top + aRect.Bottom) / 2, Circle.CY.DimType));
+    CmdListSetAttribute('r', CalcX(aRect.Width / 2, Circle.R.DimType));
   end else
 
   if Supports(FSVGObject, ISVGEllipse, Ellipse) then
   begin
-    Ellipse.CX := CalcX((aRect.Left + aRect.Right) / 2, Ellipse.CX.DimType);
-    Ellipse.CY := CalcY((aRect.Top + aRect.Bottom) / 2, Ellipse.CY.DimType);
-    Ellipse.RX := CalcX(aRect.Width / 2, Ellipse.RX.DimType);
-    Ellipse.RY := CalcY(aRect.Height / 2, Ellipse.RX.DimType);
+    CmdListSetAttribute('cx', CalcX((aRect.Left + aRect.Right) / 2, Ellipse.CX.DimType));
+    CmdListSetAttribute('cy', CalcY((aRect.Top + aRect.Bottom) / 2, Ellipse.CY.DimType));
+    CmdListSetAttribute('rx', CalcX(aRect.Width / 2, Ellipse.RX.DimType));
+    CmdListSetAttribute('ry', CalcY(aRect.Height / 2, Ellipse.RX.DimType));
   end;
 end;
 
@@ -1782,7 +1768,7 @@ begin
 
   Element.Attributes[aCmd.Name] := Value;
 
-  ///UpdatePage([rsCalcCache]);
+  UpdatePage([rsCalcCache]);
 
   DoSetAttribute(Element, aCmd.Name, Value);
 end;
@@ -2815,6 +2801,19 @@ begin
   end;
 end;
 
+procedure TSVGEditor.ToolAttributeChangeEvent(Sender: TObject; const aAttrName,
+  aAttrValue: TSVGUnicodeString);
+var
+  Tool: TSVGEditorTool;
+begin
+  if Sender is TSVGEditorTool then
+  begin
+    Tool := Sender as TSVGEditorTool;
+
+    DoSetAttribute(Tool.SVGObject, aAttrName, aAttrValue);
+  end;
+end;
+
 function TSVGEditor.ToolCreate(aSVGObject: ISVGObject): TSVGEditorTool;
 var
   ParentObject: ISVGObject;
@@ -2827,6 +2826,7 @@ begin
 
   Result := FCurTool.Create(Self, FRoot, aSVGObject, ParentCache);
   Result.Parent := Self;
+  Result.OnAttributeChange := ToolAttributeChangeEvent;
 end;
 
 procedure TSVGEditor.ToolDestroy(var aTool: TSVGEditorTool);

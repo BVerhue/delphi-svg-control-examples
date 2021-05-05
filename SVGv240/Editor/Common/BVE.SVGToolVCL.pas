@@ -118,7 +118,7 @@ type
     property HandleList: TList<TSVGHandle> read FHandleList;
     property HandlesVisible: Boolean read GetHandlesVisible write SetHandlesVisible;
     property AbsoluteContentRect: TRect read GetAbsoluteContentRect write SetAbsoluteContentRect;
-    property IsChanged: Boolean read FIsChanged;
+    property IsChanged: Boolean read FIsChanged write FISChanged;
     property ContentRect: TRect read GetContentRect;
     property Margin: Integer read FMargin write SetMargin;
     property Selected: Boolean read FSelected;
