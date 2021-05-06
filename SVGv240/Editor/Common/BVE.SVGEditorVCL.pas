@@ -27,6 +27,7 @@ uses
   BVE.SVG2Types,
   BVE.SVG2Intf,
   BVE.SVG2Elements,
+  BVE.SVG2PathData,
   BVE.SVGToolVCL;
 
 type
@@ -140,6 +141,7 @@ type
     FParentCache: ISVGObjectCache;
     FBitmap: TBitmap;
     FOrigBounds: TRect;
+    FOrigCTM: TSVGMatrix;
     FMatrix: TSVGMatrix;
 
     FRefFontSize: TSVGFloat;
@@ -194,7 +196,6 @@ type
 
     procedure Paint; override;
 
-    property OrigBounds: TRect read FOrigBounds;
     property SVGObject: ISVGObject read FSVGObject;
     property AlignMatrix: TSVGMatrix read GetAlignMatrix;
     property ViewportMatrix: TSVGMatrix read GetViewportMatrix;
@@ -221,6 +222,8 @@ type
   /// <summary>Shape tool, modifies the shape of an element.</summary>
   TSVGEditorToolShape = class(TSVGEditorTool)
   private
+    FPathPointList: TSVGPathPointList;
+
     function GetObjectBounds: TSVGRect;
     procedure SetObjectBounds(aRect: TSVGRect);
   protected
@@ -579,12 +582,9 @@ begin
   if not assigned(FSVGObject) then
     Exit;
 
-  if not assigned(FCache) then
-    Exit;
+  CTM := FOrigCTM;
 
-  CTM := FCache.CTM;
-
-  R1 := TSVGRect.Create(OrigBounds);
+  R1 := TSVGRect.Create(FOrigBounds);
 
   R2 := TSVGRect.Create(AbsoluteContentRect);
   R2.Offset(
@@ -698,6 +698,8 @@ begin
   FSVGObject := aObject;
   FParentCache := aParentCache;
 
+  FOrigCTM := TSVGMatrix.CreateIdentity;
+
   FObjectID := FEditor.GetElementID(FSVGObject);
 
   if FSVGObject.CacheList.Count > 0 then
@@ -711,6 +713,9 @@ begin
       FCache := FSVGObject.CacheList[i]
     else
       FCache := FSVGObject.CacheList[0];
+
+    FOrigCTM := FCache.CTM;
+
   end else
     FCache := nil;
 
@@ -1012,39 +1017,47 @@ end;
 
 constructor TSVGEditorToolShape.Create(aEditor: TSVGEditor; aRoot: ISVGRoot;
   aObject: ISVGObject; aParentCache: ISVGObjectCache);
-var
-  Rect: ISVGRect;
-  Circle: ISVGCircle;
-  Ellipse: ISVGEllipse;
 begin
   inherited Create(aEditor, aRoot, aObject, aParentCache);
 
-  if Supports(FSVGObject, ISVGRect, Rect) then
-  begin
-    CmdListAddAttribute('x');
-    CmdListAddAttribute('y');
-    CmdListAddAttribute('width');
-    CmdListAddAttribute('height');
-  end else
+  FPathPointList := TSVGPathPointList.Create;
 
-  if Supports(FSVGObject, ISVGCircle, Circle) then
-  begin
-    CmdListAddAttribute('cx');
-    CmdListAddAttribute('cy');
-    CmdListAddAttribute('r');
-  end else
+  case FSVGObject.ElementType of
+    elRect:
+      begin
+        CmdListAddAttribute('x');
+        CmdListAddAttribute('y');
+        CmdListAddAttribute('width');
+        CmdListAddAttribute('height');
+      end;
 
-  if Supports(FSVGObject, ISVGEllipse, Ellipse) then
-  begin
-    CmdListAddAttribute('cx');
-    CmdListAddAttribute('cy');
-    CmdListAddAttribute('rx');
-    CmdListAddAttribute('ry');
+    elCircle:
+      begin
+        CmdListAddAttribute('cx');
+        CmdListAddAttribute('cy');
+        CmdListAddAttribute('r');
+      end;
+
+    elEllipse:
+      begin
+        CmdListAddAttribute('cx');
+        CmdListAddAttribute('cy');
+        CmdListAddAttribute('rx');
+        CmdListAddAttribute('ry');
+      end;
+
+    elPolygon:
+      begin
+        CmdListAddAttribute('points');
+      end;
   end;
+
 end;
 
 destructor TSVGEditorToolShape.Destroy;
 begin
+  FPathPointList.Free;
+
   inherited;
 end;
 
@@ -1052,38 +1065,42 @@ procedure TSVGEditorToolShape.DoCreateHandles;
 var
   i: integer;
   Handle: TSVGHandle;
-  Rect: ISVGRect;
-  Circle: ISVGCircle;
-  Ellipse: ISVGEllipse;
 begin
-  if Supports(FSVGObject, ISVGRect, Rect) then
-  begin
-    for i := 0 to 3 do
-    begin
-      Handle := TSVGHandle.Create(Self, i, 4, svg_handle_shape_1);
-      Handle.Parent := Parent;
-      HandleList.Add(Handle);
-    end;
-  end else
+  case FSVGObject.ElementType of
+    elRect:
+      begin
+        for i := 0 to 3 do
+        begin
+          Handle := TSVGHandle.Create(Self, i, 4, svg_handle_shape_1);
+          Handle.Parent := Parent;
+          HandleList.Add(Handle);
+        end;
+      end;
 
-  if Supports(FSVGObject, ISVGCircle, Circle) then
-  begin
-    for i := 0 to 0 do
-    begin
-      Handle := TSVGHandle.Create(Self, i, 4, svg_handle_shape_1);
-      Handle.Parent := Parent;
-      HandleList.Add(Handle);
-    end;
-  end else
+    elCircle:
+      begin
+        for i := 0 to 0 do
+        begin
+          Handle := TSVGHandle.Create(Self, i, 4, svg_handle_shape_1);
+          Handle.Parent := Parent;
+          HandleList.Add(Handle);
+        end;
+      end;
 
-  if Supports(FSVGObject, ISVGEllipse, Ellipse) then
-  begin
-    for i := 0 to 1 do
-    begin
-      Handle := TSVGHandle.Create(Self, i, 4, svg_handle_shape_1);
-      Handle.Parent := Parent;
-      HandleList.Add(Handle);
-    end;
+    elEllipse:
+      begin
+        for i := 0 to 1 do
+        begin
+          Handle := TSVGHandle.Create(Self, i, 4, svg_handle_shape_1);
+          Handle.Parent := Parent;
+          HandleList.Add(Handle);
+        end;
+      end;
+
+    elPolygon:
+      begin
+        CmdListAddAttribute('points');
+      end;
   end;
 end;
 
@@ -1101,20 +1118,7 @@ begin
   if R.IsUndefined then
     Exit;
 
-  if Supports(FSVGObject, ISVGRect, Rect) then
-  begin
-    R.Offset(aDx, aDy);
-  end else
-
-  if Supports(FSVGObject, ISVGCircle, Circle) then
-  begin
-    R.Offset(aDx, aDy);
-  end else
-
-  if Supports(FSVGObject, ISVGEllipse, Ellipse) then
-  begin
-    R.Offset(aDx, aDy);
-  end;
+  R.Offset(aDx, aDy);
 
   SetObjectBounds(R);
 
@@ -1140,9 +1144,6 @@ var
   P: TSVGPoint;
   R: TSVGRect;
   SaveCTM: TSVGMatrix;
-  Rect: ISVGRect;
-  Circle: ISVGCircle;
-  Ellipse: ISVGEllipse;
 begin
   P := SVGPoint(Value.X, Value.Y);
   P := ToolToSVG(P);
@@ -1151,29 +1152,31 @@ begin
   if R.IsUndefined then
     Exit;
 
-  if Supports(FSVGObject, ISVGRect, Rect) then
-  begin
-    case aIndex of
-      0: R := SVGRect(P.X, P.Y, R.Right, R.Bottom);
-      1: R := SVGRect(R.Left, P.Y, P.X, R.Bottom);
-      2: R := SVGRect(R.Left, R.Top, P.X, P.Y);
-      else
-         R := SVGRect(P.X, R.Top, R.Right, P.Y);
-    end;
-  end else
+  case FSVGObject.ElementType of
+    elRect:
+      begin
+        case aIndex of
+          0: R := SVGRect(P.X, P.Y, R.Right, R.Bottom);
+          1: R := SVGRect(R.Left, P.Y, P.X, R.Bottom);
+          2: R := SVGRect(R.Left, R.Top, P.X, P.Y);
+          else
+             R := SVGRect(P.X, R.Top, R.Right, P.Y);
+        end;
+      end;
 
-  if Supports(FSVGObject, ISVGCircle, Circle) then
-  begin
-    R := SVGRect(R.Left - P.X + R.Right, R.Top, P.X, R.Bottom);
-  end else
+    elCircle:
+      begin
+        R := SVGRect(R.Left - P.X + R.Right, R.Top, P.X, R.Bottom);
+      end;
 
-  if Supports(FSVGObject, ISVGEllipse, Ellipse) then
-  begin
-    case aIndex of
-      0: R := SVGRect(R.Left - P.X + R.Right, R.Top, P.X, R.Bottom);
-      else
-         R := SVGRect(R.Left, R.Top - P.Y + R.Bottom, R.Right, P.Y);
-    end;
+    elEllipse:
+      begin
+        case aIndex of
+          0: R := SVGRect(R.Left - P.X + R.Right, R.Top, P.X, R.Bottom);
+          else
+             R := SVGRect(R.Left, R.Top - P.Y + R.Bottom, R.Right, P.Y);
+        end;
+      end;
   end;
 
   IsChanged := True;

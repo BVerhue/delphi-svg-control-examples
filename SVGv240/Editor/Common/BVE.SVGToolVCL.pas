@@ -178,10 +178,13 @@ begin
     Dx := X - FMouseDown.X;
     Dy := Y - FMouseDown.Y;
 
-    P := Point;
-    P.X := P.X + Dx;
-    P.Y := P.Y + Dy;
-    Point := P;
+    if (Dx <> 0) or (Dy <> 0) then
+    begin
+      P := Point;
+      P.X := P.X + Dx;
+      P.Y := P.Y + Dy;
+      Point := P;
+    end;
   end;
 
   inherited;
