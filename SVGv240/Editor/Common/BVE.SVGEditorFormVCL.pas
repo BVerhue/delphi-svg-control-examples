@@ -285,7 +285,10 @@ end;
 
 procedure TSVGEditorForm.ActionAddPathExecute(Sender: TObject);
 begin
-  // TODO
+  CheckSelectionIsGroup(True);
+
+  //FEditor.ElementAdd('<path d="M100,100 L200,100, L200,200 L100,200 Z" />');
+  FEditor.ElementAdd('<path d="M100,100 L200,100, C250,100 250,200, 200,200 L100,200 Z" />');
 end;
 
 procedure TSVGEditorForm.ActionAddPolygonExecute(Sender: TObject);

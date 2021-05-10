@@ -8,7 +8,8 @@ uses
   BVE.SVGEditorFormVCL in '..\..\Common\BVE.SVGEditorFormVCL.pas',
   UnitPrintPreview in 'UnitPrintPreview.pas' {frmPrintPreview},
   BVE.SVGPrintPreviewFormVCL in '..\..\Common\BVE.SVGPrintPreviewFormVCL.pas',
-  BVE.SVGPrintPreviewVCL in '..\..\Common\BVE.SVGPrintPreviewVCL.pas';
+  BVE.SVGPrintPreviewVCL in '..\..\Common\BVE.SVGPrintPreviewVCL.pas',
+  BVE.SVG2PathGeometry in '..\..\Common\BVE.SVG2PathGeometry.pas';
 
 {$R *.res}
 

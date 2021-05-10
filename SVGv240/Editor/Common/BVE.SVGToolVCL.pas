@@ -91,7 +91,6 @@ type
     procedure SetMoveable(const Value: Boolean);
     procedure SetParent(aValue: TWinControl); override;
 
-
     procedure DoCreateHandles; virtual;
     procedure DoSetHandlePoint(const aIndex: integer; const Value: TPoint); virtual;
     procedure DoMovePosition(const aDx, aDy: Integer); virtual;
@@ -180,6 +179,8 @@ begin
 
     if (Dx <> 0) or (Dy <> 0) then
     begin
+      SetBounds(Left + Dx, Top + Dy, FSize * 2, FSize * 2);
+
       P := Point;
       P.X := P.X + Dx;
       P.Y := P.Y + Dy;
@@ -286,8 +287,6 @@ procedure TSVGTool.DoSetHandlePoint(const aIndex: integer; const Value: TPoint);
 var
   R: TRect;
 begin
-  FIsChanged := True;
-
   R := ContentRect;
 
   case aIndex of
@@ -429,6 +428,9 @@ end;
 procedure TSVGTool.SetHandlePoint(const aIndex: integer;
   const Value: TPoint);
 begin
+  FIsChanged := True;
+  FHandleMoving := True;
+
   DoSetHandlePoint(aIndex, Value);
 end;
 

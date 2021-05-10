@@ -98,6 +98,7 @@
         </DCCReference>
         <DCCReference Include="..\..\Common\BVE.SVGPrintPreviewFormVCL.pas"/>
         <DCCReference Include="..\..\Common\BVE.SVGPrintPreviewVCL.pas"/>
+        <DCCReference Include="..\..\Common\BVE.SVG2PathGeometry.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
