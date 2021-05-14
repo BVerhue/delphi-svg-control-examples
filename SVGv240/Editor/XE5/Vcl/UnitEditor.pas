@@ -11,7 +11,7 @@ unit UnitEditor;
 // be one. It's use is primarily to show some practical solutions for
 // programming with the SVG library
 
-// The SVG Editor need at least version v2.40 update 9 of the SVG library
+// The SVG Editor needs at least version v2.40 update 9 of the SVG library
 
 interface
 uses

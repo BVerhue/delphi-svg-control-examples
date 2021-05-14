@@ -26,10 +26,13 @@ uses
 type
   ISVGPathSegment = interface
     ['{CE946139-3E3E-42A7-A577-7E89D3218F54}']
+    function GetEndPoint: TSVGPoint;
     function GetIsRelative: Boolean;
+    procedure SetEndPoint(const Value: TSVGPoint);
     procedure SetIsRelative(const Value: Boolean);
 
     property IsRelative: Boolean read GetIsRelative write SetIsRelative;
+    property EndPoint: TSVGPoint read GetEndPoint write SetEndPoint;
   end;
 
   ISVGLineSegment = interface(ISVGPathSegment)
@@ -123,20 +126,25 @@ type
   private
     FIsRelative: Boolean;
   protected
+    function GetEndPoint: TSVGPoint; virtual; abstract;
     function GetIsRelative: Boolean;
+    procedure SetEndPoint(const Value: TSVGPoint); virtual; abstract;
     procedure SetIsRelative(const Value: Boolean);
   public
     constructor Create;
     destructor Destroy; override;
 
     property IsRelative: Boolean read GetIsRelative write SetIsRelative;
+    property EndPoint: TSVGPoint read GetEndPoint write SetEndPoint;
   end;
 
   TSVGLineSegment = class(TSVGPathSegment, ISVGLineSegment)
   private
     FPoint: TSVGPoint;
   protected
+    function GetEndPoint: TSVGPoint; override;
     function GetPoint: TSVGPoint;
+    procedure SetEndPoint(const Value: TSVGPoint); override;
     procedure SetPoint(const Value: TSVGPoint);
   public
     constructor Create;
@@ -151,9 +159,11 @@ type
     FPoint2: TSVGPoint;
     FPoint3: TSVGPoint;
   protected
+    function GetEndPoint: TSVGPoint; override;
     function GetPoint1: TSVGPoint;
     function GetPoint2: TSVGPoint;
     function GetPoint3: TSVGPoint;
+    procedure SetEndPoint(const Value: TSVGPoint); override;
     procedure SetPoint1(const Value: TSVGPoint);
     procedure SetPoint2(const Value: TSVGPoint);
     procedure SetPoint3(const Value: TSVGPoint);
@@ -171,8 +181,10 @@ type
     FPoint1: TSVGPoint;
     FPoint2: TSVGPoint;
   protected
+    function GetEndPoint: TSVGPoint; override;
     function GetPoint1: TSVGPoint;
     function GetPoint2: TSVGPoint;
+    procedure SetEndPoint(const Value: TSVGPoint); override;
     procedure SetPoint1(const Value: TSVGPoint);
     procedure SetPoint2(const Value: TSVGPoint);
   public
@@ -191,11 +203,13 @@ type
     FRadius: TSVGPoint;
     FSweepDirection: Boolean;
   protected
+    function GetEndPoint: TSVGPoint; override;
     function GetIsLargeArc: Boolean;
     function GetPoint: TSVGPoint;
     function GetRotationAngle: TSVGFloat;
     function GetRadius: TSVGPoint;
     function GetSweepDirection: Boolean;
+    procedure SetEndPoint(const Value: TSVGPoint); override;
     procedure SetIsLargeArc(const Value: Boolean);
     procedure SetPoint(const Value: TSVGPoint);
     procedure SetRotationAngle(const Value: TSVGFloat);
@@ -312,9 +326,19 @@ begin
   inherited;
 end;
 
+function TSVGLineSegment.GetEndPoint: TSVGPoint;
+begin
+  Result := Point;
+end;
+
 function TSVGLineSegment.GetPoint: TSVGPoint;
 begin
   Result := FPoint;
+end;
+
+procedure TSVGLineSegment.SetEndPoint(const Value: TSVGPoint);
+begin
+  Point := Value;
 end;
 
 procedure TSVGLineSegment.SetPoint(const Value: TSVGPoint);
@@ -341,6 +365,11 @@ begin
   inherited;
 end;
 
+function TSVGBezierSegment.GetEndPoint: TSVGPoint;
+begin
+  Result := Point3;
+end;
+
 function TSVGBezierSegment.GetPoint1: TSVGPoint;
 begin
   Result := FPoint1;
@@ -354,6 +383,11 @@ end;
 function TSVGBezierSegment.GetPoint3: TSVGPoint;
 begin
   Result := FPoint3;
+end;
+
+procedure TSVGBezierSegment.SetEndPoint(const Value: TSVGPoint);
+begin
+  Point3 := Value;
 end;
 
 procedure TSVGBezierSegment.SetPoint1(const Value: TSVGPoint);
@@ -395,6 +429,11 @@ begin
   inherited;
 end;
 
+function TSVGQuadSegment.GetEndPoint: TSVGPoint;
+begin
+  Result := Point2;
+end;
+
 function TSVGQuadSegment.GetPoint1: TSVGPoint;
 begin
   Result := FPoint1;
@@ -403,6 +442,11 @@ end;
 function TSVGQuadSegment.GetPoint2: TSVGPoint;
 begin
   Result := FPoint2;
+end;
+
+procedure TSVGQuadSegment.SetEndPoint(const Value: TSVGPoint);
+begin
+  Point2 := Value;
 end;
 
 procedure TSVGQuadSegment.SetPoint1(const Value: TSVGPoint);
@@ -439,6 +483,11 @@ begin
   inherited;
 end;
 
+function TSVGArcSegment.GetEndPoint: TSVGPoint;
+begin
+  Result := Point;
+end;
+
 function TSVGArcSegment.GetIsLargeArc: Boolean;
 begin
   Result := FIsLargeArc;
@@ -462,6 +511,11 @@ end;
 function TSVGArcSegment.GetSweepDirection: Boolean;
 begin
   Result := FSweepDirection;
+end;
+
+procedure TSVGArcSegment.SetEndPoint(const Value: TSVGPoint);
+begin
+  Point := Value;
 end;
 
 procedure TSVGArcSegment.SetIsLargeArc(const Value: Boolean);

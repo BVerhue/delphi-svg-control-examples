@@ -7,7 +7,7 @@ unit BVE.SVGToolVCL;
 //
 // ------------------------------------------------------------------------------
 
-// The SVG Editor need at least version v2.40 update 9 of the SVG library
+// The SVG Editor needs at least version v2.40 update 9 of the SVG library
 
 interface
 uses
@@ -16,6 +16,7 @@ uses
   System.Classes,
   System.UITypes,
   System.Generics.Collections,
+  System.Math,
   Vcl.Controls,
   BVE.SVG2Elements,
   BVE.SVG2Context,
@@ -30,16 +31,22 @@ const
     + '<rect x="%4.2f" y="%4.2f" width="%4.2f" height="%4.2f" fill="none" stroke="blue" stroke-width="1" />'
     + '</svg>';
 
-  svg_handle =
+  svg_tool_handle =
     '<?xml version="1.0" standalone="no"?>'
     + '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" version="1.1">'
     + '<rect x="0" y="0" width="100" height="100" fill="red" stroke="none" stroke-width="1" />'
     + '</svg>';
 
-type
+  svg_tool_line =
+    '<?xml version="1.0" standalone="no"?>'
+    + '<svg width="%4.2f" height="%4.2f" xmlns="http://www.w3.org/2000/svg" version="1.1">'
+    + '<line x1="%4.2f" y1="%4.2f" x2="%4.2f" y2="%4.2f" fill="none" stroke="blue" stroke-width="1" />'
+    + '</svg>';
+
+type
   TSVGTool = class;
 
-  TSVGHandle = class(TSVG2Control)
+  TSVGToolHandle = class(TSVG2Control)
   private
     FSize: Integer;
     FMouseDown: TPoint;
@@ -47,61 +54,97 @@ type
     FTool: TSVGTool;
     FSVG: string;
   protected
+    function GetIsFocused: Boolean;
     function GetPoint: TPoint; virtual;
     procedure SetPoint(const Value: TPoint); virtual;
   public
     constructor Create(aTool: TSVGTool; const aIndex: Integer; const aSize: Integer = 4;
-      const aSVG: string = svg_handle); reintroduce; virtual;
+      const aSVG: string = svg_tool_handle); reintroduce; virtual;
     destructor Destroy; override;
 
     procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
     procedure MouseMove(Shift: TShiftState; X, Y: Integer); override;
     procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
 
+    procedure SetFocus;
+
     procedure Resize; override;
 
     procedure UpdateBounds;
 
+    property IsFocused: Boolean read GetIsFocused;
     property Point: TPoint read GetPoint write SetPoint;
+  end;
+
+  TSVGToolLine = class(TSVG2Control)
+  private
+    FMargin: Integer;
+    FIndex1: integer;
+    FIndex2: integer;
+    FTool: TSVGTool;
+    FP1, FP2: TPoint;
+    FSVG: string;
+  protected
+    function GetPoint2: TPoint;
+    function GetPoint1: TPoint; virtual;
+  public
+    constructor Create(aTool: TSVGTool; const aIndex1, aIndex2: Integer;
+      const aSVG: string = svg_tool_line); reintroduce; virtual;
+    destructor Destroy; override;
+
+    procedure Resize; override;
+
+    procedure UpdateBounds;
+
+    property Point1: TPoint read GetPoint1;
+    property Point2: TPoint read GetPoint2;
   end;
 
   TSVGTool = class(TSVG2Control)
   private
     FMargin: Integer;
     FHandleMoving: Boolean;
-    FHandleList: TList<TSVGHandle>;
+    FHandleList: TList<TSVGToolHandle>;
     FHandlesVisible: Boolean;
+    FLineList: TList<TSVGToolLine>;
     FMouseDown: TPoint;
     FSelected: Boolean;
     FMoveable: Boolean;
     FIsChanged: Boolean;
-
+    FFocusedHandle: TSVGToolHandle;
+  protected
     procedure MoveDelta(const aDx, aDy: Integer);
     procedure SetSize(const aValue: TRect);
-  protected
+
     function GetAbsoluteContentRect: TRect;
     function GetContentRect: TRect;
+    function GetFocusedHandle: TSVGToolHandle;
     function GetHandlePoint(const aIndex: Integer): TPoint; virtual;
     function GetHandlesVisible: Boolean;
 
     procedure SetAbsoluteContentRect(const Value: TRect);
+    procedure SetFocusedHandle(const Value: TSVGToolHandle);
     procedure SetHandlesVisible(const Value: Boolean);
     procedure SetHandlePoint(const aIndex: integer; const Value: TPoint); virtual;
     procedure SetMargin(const Value: Integer);
     procedure SetMoveable(const Value: Boolean);
     procedure SetParent(aValue: TWinControl); override;
 
-    procedure DoCreateHandles; virtual;
+    procedure DoCreateToolParts; virtual;
     procedure DoSetHandlePoint(const aIndex: integer; const Value: TPoint); virtual;
+    procedure DoSetFocusedHandle(const aHandle: TSVGToolHandle); virtual;
     procedure DoMovePosition(const aDx, aDy: Integer); virtual;
+
+    procedure UpdateToolHandles;
+    procedure UpdateToolLines;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
 
-    procedure CreateHandles;
-    procedure ClearHandles;
+    procedure CreateToolParts;
+    procedure ClearToolParts;
 
-    procedure UpdateHandles;
+    procedure UpdateToolParts;
 
     procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
     procedure MouseMove(Shift: TShiftState; X, Y: Integer); override;
@@ -112,28 +155,32 @@ type
     procedure Select;
     procedure Deselect;
 
+    procedure SetFocus; virtual;
+
     property HandlePoint[const aIndex : integer]: TPoint read GetHandlePoint write SetHandlePoint;
 
-    property HandleList: TList<TSVGHandle> read FHandleList;
-    property HandlesVisible: Boolean read GetHandlesVisible write SetHandlesVisible;
     property AbsoluteContentRect: TRect read GetAbsoluteContentRect write SetAbsoluteContentRect;
-    property IsChanged: Boolean read FIsChanged write FISChanged;
     property ContentRect: TRect read GetContentRect;
+    property FocusedHandle: TSVGToolHandle read GetFocusedHandle write SetFocusedHandle;
+    property HandleList: TList<TSVGToolHandle> read FHandleList;
+    property HandlesVisible: Boolean read GetHandlesVisible write SetHandlesVisible;
+    property IsChanged: Boolean read FIsChanged write FISChanged;
+    property LineList: TList<TSVGToolLine> read FLineList;
     property Margin: Integer read FMargin write SetMargin;
-    property Selected: Boolean read FSelected;
     property Moveable: Boolean read FMoveable write SetMoveable;
+    property Selected: Boolean read FSelected;
   end;
 
 implementation
 
 // -----------------------------------------------------------------------------
 //
-//                           TSVGHandle
+//                           TSVGToolHandle
 //
 // -----------------------------------------------------------------------------
 
-constructor TSVGHandle.Create(aTool: TSVGTool; const aIndex: Integer;
-  const aSize: Integer = 4; const aSVG: string = svg_handle);
+constructor TSVGToolHandle.Create(aTool: TSVGTool; const aIndex: Integer;
+  const aSize: Integer = 4; const aSVG: string = svg_tool_handle);
 begin
   inherited Create(aTool);
 
@@ -144,12 +191,17 @@ begin
   FSVG := aSVG;
 end;
 
-destructor TSVGHandle.Destroy;
+destructor TSVGToolHandle.Destroy;
 begin
   inherited;
 end;
 
-function TSVGHandle.GetPoint: TPoint;
+function TSVGToolHandle.GetIsFocused: Boolean;
+begin
+  Result := FTool.FocusedHandle = Self;
+end;
+
+function TSVGToolHandle.GetPoint: TPoint;
 begin
   if assigned(FTool) then
   begin
@@ -158,16 +210,18 @@ begin
     Result := TPoint.Create(0,0);
 end;
 
-procedure TSVGHandle.MouseDown(Button: TMouseButton; Shift: TShiftState; X,
+procedure TSVGToolHandle.MouseDown(Button: TMouseButton; Shift: TShiftState; X,
   Y: Integer);
 begin
   if ssLeft in Shift then
   begin
     FMouseDown := TPoint.Create(X, Y);
+
+    SetFocus;
   end;
 end;
 
-procedure TSVGHandle.MouseMove(Shift: TShiftState; X, Y: Integer);
+procedure TSVGToolHandle.MouseMove(Shift: TShiftState; X, Y: Integer);
 var
   Dx, Dy: Integer;
   P: TPoint;
@@ -191,20 +245,25 @@ begin
   inherited;
 end;
 
-procedure TSVGHandle.MouseUp(Button: TMouseButton; Shift: TShiftState; X,
+procedure TSVGToolHandle.MouseUp(Button: TMouseButton; Shift: TShiftState; X,
   Y: Integer);
 begin
   inherited;
 end;
 
-procedure TSVGHandle.Resize;
+procedure TSVGToolHandle.Resize;
 begin
   inherited;
 
   SVG.Text := FSVG;
 end;
 
-procedure TSVGHandle.SetPoint(const Value: TPoint);
+procedure TSVGToolHandle.SetFocus;
+begin
+  FTool.FocusedHandle := Self;
+end;
+
+procedure TSVGToolHandle.SetPoint(const Value: TPoint);
 begin
   if assigned(FTool) then
   begin
@@ -212,7 +271,7 @@ begin
   end;
 end;
 
-procedure TSVGHandle.UpdateBounds;
+procedure TSVGToolHandle.UpdateBounds;
 var
   P: TPoint;
 begin
@@ -224,14 +283,96 @@ end;
 
 // -----------------------------------------------------------------------------
 //
+//                             TSVGToolLine
+//
+// -----------------------------------------------------------------------------
+
+constructor TSVGToolLine.Create(aTool: TSVGTool; const aIndex1,
+  aIndex2: Integer; const aSVG: string = svg_tool_line);
+begin
+  inherited Create(aTool);
+
+  FMargin := 10;
+
+  FTool := aTool;
+  FIndex1 := aIndex1;
+  FIndex2 := aIndex2;
+
+  FSVG := aSVG;
+end;
+
+destructor TSVGToolLine.Destroy;
+begin
+  inherited;
+end;
+
+function TSVGToolLine.GetPoint1: TPoint;
+begin
+  if assigned(FTool) then
+    Result := FTool.HandlePoint[FIndex1]
+  else
+    Result := TPoint.Create(0,0);
+end;
+
+function TSVGToolLine.GetPoint2: TPoint;
+begin
+  if assigned(FTool) then
+    Result := FTool.HandlePoint[FIndex2]
+  else
+    Result := TPoint.Create(0,0);
+end;
+
+procedure TSVGToolLine.Resize;
+begin
+  inherited;
+
+  SVG.Text := FSVG;
+
+  SVG.Text := Format(svg_tool_line,
+    [1.0 * Width,
+     1.0 * Height,
+     1.0 * FP1.X,
+     1.0 * FP1.Y,
+     1.0 * FP2.X,
+     1.0 * FP2.Y],
+     USFormatSettings);
+end;
+
+procedure TSVGToolLine.UpdateBounds;
+var
+  R: TRect;
+begin
+  FP1 := GetPoint1;
+  FP2 := GetPoint2;
+
+  R.Left := Min(FP1.X, FP2.X) + FTool.Left - FMargin;
+  R.Top := Min(FP1.Y, FP2.Y) + FTool.Top - FMargin;
+  R.Right := Max(FP1.X, FP2.X) + FTool.Left + FMargin;
+  R.Bottom := Max(FP1.Y, FP2.Y) + FTool.Top + FMargin;
+
+  FP1.X := FP1.X + FTool.Left - R.Left;
+  FP1.Y := FP1.Y + FTool.Top - R.Top;
+  FP2.X := FP2.X + FTool.Left - R.Left;
+  FP2.Y := FP2.Y + FTool.Top - R.Top;
+
+  SetBounds(R.Left, R.Top, R.Width, R.Height);
+end;
+
+// -----------------------------------------------------------------------------
+//
 //                               TSVGTool
 //
 // -----------------------------------------------------------------------------
 
-procedure TSVGTool.ClearHandles;
+procedure TSVGTool.ClearToolParts;
 var
-  Handle: TSVGHandle;
+  Handle: TSVGToolHandle;
+  Line: TSVGToolLine;
 begin
+  for Line in FLineList do
+    Line.Free;
+  FLineList.Clear;
+
   for Handle in FHandleList do
     Handle.Free;
   FHandleList.Clear;
@@ -239,7 +380,8 @@ end;
 
 constructor TSVGTool.Create(AOwner: TComponent);
 begin
-  FHandleList := TList<TSVGHandle>.Create;
+  FHandleList := TList<TSVGToolHandle>.Create;
+  FLineList := TList<TSVGToolLine>.Create;
 
   FHandlesVisible := True;
   FHandleMoving := False;
@@ -247,15 +389,16 @@ begin
   FSelected := False;
   FMoveable := True;
   FIsChanged := False;
+  FFocusedHandle := nil;
 
   inherited;
 end;
 
-procedure TSVGTool.CreateHandles;
+procedure TSVGTool.CreateToolParts;
 begin
-  ClearHandles;
-  DoCreateHandles;
-  UpdateHandles;
+  ClearToolParts;
+  DoCreateToolParts;
+  UpdateToolParts;
 end;
 
 procedure TSVGTool.Deselect;
@@ -265,22 +408,30 @@ end;
 
 destructor TSVGTool.Destroy;
 begin
+  ClearToolParts;
+
+  FLineList.Free;
   FHandleList.Free;
 
   inherited;
 end;
 
-procedure TSVGTool.DoCreateHandles;
+procedure TSVGTool.DoCreateToolParts;
 var
   i: integer;
-  Handle: TSVGHandle;
+  Handle: TSVGToolHandle;
 begin
   for i := 0 to 3 do
   begin
-    Handle := TSVGHandle.Create(Self, i);
+    Handle := TSVGToolHandle.Create(Self, i);
     Handle.Parent := Parent;
     FHandleList.Add(Handle);
   end;
+end;
+
+procedure TSVGTool.DoSetFocusedHandle(const aHandle: TSVGToolHandle);
+begin
+  SetFocus;
 end;
 
 procedure TSVGTool.DoSetHandlePoint(const aIndex: integer; const Value: TPoint);
@@ -324,6 +475,11 @@ begin
   Result.Height := Height - FMargin * 2;
 end;
 
+function TSVGTool.GetFocusedHandle: TSVGToolHandle;
+begin
+  Result := FFocusedHandle;
+end;
+
 function TSVGTool.GetHandlePoint(const aIndex: Integer): TPoint;
 var
   R: TRect;
@@ -350,6 +506,8 @@ begin
   begin
     FMouseDown := TPoint.Create(X, Y);
   end;
+
+  SetFocus;
 
   Select;
 
@@ -385,7 +543,7 @@ begin
 
   DoMovePosition(aDx, aDy);
 
-  UpdateHandles;
+  UpdateToolParts;
 end;
 
 procedure TSVGTool.Resize;
@@ -397,9 +555,9 @@ begin
     // If the resize is not initiated by a handle, then we update the handles
 
     if FHandleList.Count = 0 then
-      CreateHandles
+      CreateToolParts
     else
-      UpdateHandles;
+      UpdateToolParts;
   end;
 
   SVG.Text := Format(svg_tool,
@@ -425,6 +583,21 @@ begin
     Value.Height + Margin * 2);
 end;
 
+procedure TSVGTool.SetFocus;
+begin
+  //
+end;
+
+procedure TSVGTool.SetFocusedHandle(const Value: TSVGToolHandle);
+begin
+  if Value <> FFocusedHandle then
+  begin
+    FFocusedHandle := Value;
+
+    DoSetFocusedHandle(FFocusedHandle);
+  end;
+end;
+
 procedure TSVGTool.SetHandlePoint(const aIndex: integer;
   const Value: TPoint);
 begin
@@ -432,6 +605,8 @@ begin
   FHandleMoving := True;
 
   DoSetHandlePoint(aIndex, Value);
+
+  UpdateToolLines;
 end;
 
 procedure TSVGTool.SetHandlesVisible(const Value: Boolean);
@@ -454,7 +629,7 @@ end;
 
 procedure TSVGTool.SetParent(aValue: TWinControl);
 var
-  Handle: TSVGHandle;
+  Handle: TSVGToolHandle;
 begin
   inherited;
 
@@ -476,15 +651,29 @@ begin
 
   SetBounds(Left + Dx, Top + Dy, Width + Dw, Height + Dh);
 
-  UpdateHandles;
+  UpdateToolParts;
 end;
 
-procedure TSVGTool.UpdateHandles;
+procedure TSVGTool.UpdateToolHandles;
 var
-  Handle: TSVGHandle;
+  Handle: TSVGToolHandle;
 begin
   for Handle in FHandleList do
     Handle.UpdateBounds;
+end;
+
+procedure TSVGTool.UpdateToolLines;
+var
+  Line: TSVGToolLine;
+begin
+  for Line in FLineList do
+    Line.UpdateBounds;
+end;
+
+procedure TSVGTool.UpdateToolParts;
+begin
+  UpdateToolLines;
+  UpdateToolHandles;
 end;
 
 end.

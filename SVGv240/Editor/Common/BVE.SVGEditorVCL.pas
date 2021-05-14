@@ -7,7 +7,7 @@ unit BVE.SVGEditorVCL;
 //
 // ------------------------------------------------------------------------------
 
-// The SVG Editor need at least version v2.40 update 9 of the SVG library
+// The SVG Editor needs at least version v2.40 update 9 of the SVG library
 
 interface
 
@@ -199,6 +199,8 @@ type
 
     procedure KeyDown(var Key: Word; Shift: TShiftState); virtual;
 
+    procedure SetFocus; override;
+
     property SVGObject: ISVGObject read FSVGObject;
     property AlignMatrix: TSVGMatrix read GetAlignMatrix;
     property ViewportMatrix: TSVGMatrix read GetViewportMatrix;
@@ -211,7 +213,7 @@ type
   /// <summary>Transform tool, modifies the transform attribute of an element.</summary>
   TSVGEditorToolTransform = class(TSVGEditorTool)
   protected
-    procedure DoCreateHandles; override;
+    procedure DoCreateToolParts; override;
 
     procedure UpdateTransform;
   public
@@ -237,7 +239,7 @@ type
   protected
     function GetHandlePoint(const aIndex: Integer): TPoint; override;
 
-    procedure DoCreateHandles; override;
+    procedure DoCreateToolParts; override;
     procedure DoSetHandlePoint(const aIndex: Integer; const Value: TPoint); override;
     procedure DoMovePosition(const aDx, aDy: Integer); override;
   public
@@ -291,6 +293,7 @@ type
     FUpdateRectList: TList<TSVGRect>;
 
     FToolList: TList<TSVGEditorTool>;
+    FFocusedTool: TSVGEditorTool;
     FCurTool: TSVGToolClass;
 
     FChildListBefore: TList<ISVGElement>;
@@ -326,6 +329,7 @@ type
     procedure CmdRedoStackClear;
 
     function PointToSVG(const aPoint: TPoint): TSVGPoint;
+    procedure SetFocusedTool(const Value: TSVGEditorTool);
   protected
     function GetCmdRedoCount: Integer;
     function GetCmdUndoCount: Integer;
@@ -434,6 +438,7 @@ type
     property CurTool: TSVGToolClass read FCurTool;
     property Element[const aID: Integer]: ISVGElement read GetElement;
     property Filename: string read FFilename write SetFilename;
+    property FocusedTool: TSVGEditorTool read FFocusedTool write SetFocusedTool;
     property Matrix: TSVGMatrix read FMatrix;
     property Padding: TPadding read FPadding write SetPadding;
     property Root: ISVGRoot read FRoot;
@@ -855,6 +860,14 @@ begin
   inherited;
 end;
 
+procedure TSVGEditorTool.SetFocus;
+begin
+  inherited;
+
+  FEditor.SetFocus;
+  FEditor.FocusedTool := Self;
+end;
+
 function TSVGEditorTool.SVGToTool(const aPoint: TSVGPoint): TSVGPoint;
 var
   M: TSVGMatrix;
@@ -957,19 +970,19 @@ begin
   inherited;
 end;
 
-procedure TSVGEditorToolTransform.DoCreateHandles;
+procedure TSVGEditorToolTransform.DoCreateToolParts;
 var
   i: integer;
-  Handle: TSVGHandle;
+  Handle: TSVGToolHandle;
 begin
   for i := 0 to 3 do
   begin
     case i of
-      0: Handle := TSVGHandle.Create(Self, i, 6, svg_handle_transform_0);
-      1: Handle := TSVGHandle.Create(Self, i, 6, svg_handle_transform_1);
-      2: Handle := TSVGHandle.Create(Self, i, 6, svg_handle_transform_2);
+      0: Handle := TSVGToolHandle.Create(Self, i, 6, svg_handle_transform_0);
+      1: Handle := TSVGToolHandle.Create(Self, i, 6, svg_handle_transform_1);
+      2: Handle := TSVGToolHandle.Create(Self, i, 6, svg_handle_transform_2);
       else
-        Handle := TSVGHandle.Create(Self, i, 6, svg_handle_transform_3);
+        Handle := TSVGToolHandle.Create(Self, i, 6, svg_handle_transform_3);
     end;
 
     Handle.Parent := Parent;
@@ -1120,10 +1133,11 @@ begin
   inherited;
 end;
 
-procedure TSVGEditorToolShape.DoCreateHandles;
+procedure TSVGEditorToolShape.DoCreateToolParts;
 var
   i: integer;
-  Handle: TSVGHandle;
+  ToolHandle: TSVGToolHandle;
+  ToolLine: TSVGToolLine;
   Points: TSVGPathPointList;
   Figure: ISVGPathFigure;
   Segment: ISVGPathSegment;
@@ -1136,9 +1150,9 @@ begin
       begin
         for i := 0 to 3 do
         begin
-          Handle := TSVGHandle.Create(Self, i, 4, svg_handle_shape_1);
-          Handle.Parent := Parent;
-          HandleList.Add(Handle);
+          ToolHandle := TSVGToolHandle.Create(Self, i, 4, svg_handle_shape_1);
+          ToolHandle.Parent := Parent;
+          HandleList.Add(ToolHandle);
         end;
       end;
 
@@ -1146,9 +1160,9 @@ begin
       begin
         for i := 0 to 0 do
         begin
-          Handle := TSVGHandle.Create(Self, i, 4, svg_handle_shape_1);
-          Handle.Parent := Parent;
-          HandleList.Add(Handle);
+          ToolHandle := TSVGToolHandle.Create(Self, i, 4, svg_handle_shape_1);
+          ToolHandle.Parent := Parent;
+          HandleList.Add(ToolHandle);
         end;
       end;
 
@@ -1156,9 +1170,9 @@ begin
       begin
         for i := 0 to 1 do
         begin
-          Handle := TSVGHandle.Create(Self, i, 4, svg_handle_shape_1);
-          Handle.Parent := Parent;
-          HandleList.Add(Handle);
+          ToolHandle := TSVGToolHandle.Create(Self, i, 4, svg_handle_shape_1);
+          ToolHandle.Parent := Parent;
+          HandleList.Add(ToolHandle);
         end;
       end;
 
@@ -1169,9 +1183,9 @@ begin
 
         for i := 0 to Points.Count - 1 do
         begin
-          Handle := TSVGHandle.Create(Self, i, 4, svg_handle_shape_1);
-          Handle.Parent := Parent;
-          HandleList.Add(Handle);
+          ToolHandle := TSVGToolHandle.Create(Self, i, 4, svg_handle_shape_1);
+          ToolHandle.Parent := Parent;
+          HandleList.Add(ToolHandle);
         end;
       end;
 
@@ -1187,36 +1201,56 @@ begin
 
             if Supports(Segment, ISVGLineSegment, LineSegment) then
             begin
-              Handle := TSVGHandle.Create(Self, 0, 4, svg_handle_shape_1);
-              Handle.Parent := Parent;
-              HandleList.Add(Handle);
+              ToolHandle := TSVGToolHandle.Create(Self, 0, 4, svg_handle_shape_1);
+              ToolHandle.Parent := Parent;
+              HandleList.Add(ToolHandle);
+
+              ToolHandle := TSVGToolHandle.Create(Self, 1, 4, svg_handle_shape_1);
+              ToolHandle.Parent := Parent;
+              HandleList.Add(ToolHandle);
             end else
 
             if Supports(Segment, ISVGBezierSegment, BezierSegment) then
             begin
-              Handle := TSVGHandle.Create(Self, 0, 4, svg_handle_shape_2);
-              Handle.Parent := Parent;
-              HandleList.Add(Handle);
+              ToolLine := TSVGToolLine.Create(Self, 0, 1, svg_tool_line);
+              ToolLine.Parent := Parent;
+              LineList.Add(ToolLine);
 
-              Handle := TSVGHandle.Create(Self, 1, 4, svg_handle_shape_2);
-              Handle.Parent := Parent;
-              HandleList.Add(Handle);
+              ToolLine := TSVGToolLine.Create(Self, 3, 2, svg_tool_line);
+              ToolLine.Parent := Parent;
+              LineList.Add(ToolLine);
 
-              Handle := TSVGHandle.Create(Self, 2, 4, svg_handle_shape_1);
-              Handle.Parent := Parent;
-              HandleList.Add(Handle);
+              ToolHandle := TSVGToolHandle.Create(Self, 0, 4, svg_handle_shape_1);
+              ToolHandle.Parent := Parent;
+              HandleList.Add(ToolHandle);
+
+              ToolHandle := TSVGToolHandle.Create(Self, 1, 4, svg_handle_shape_2);
+              ToolHandle.Parent := Parent;
+              HandleList.Add(ToolHandle);
+
+              ToolHandle := TSVGToolHandle.Create(Self, 2, 4, svg_handle_shape_2);
+              ToolHandle.Parent := Parent;
+              HandleList.Add(ToolHandle);
+
+              ToolHandle := TSVGToolHandle.Create(Self, 3, 4, svg_handle_shape_1);
+              ToolHandle.Parent := Parent;
+              HandleList.Add(ToolHandle);
 
             end else
 
             if Supports(Segment, ISVGQuadSegment, QuadSegment) then
             begin
-              Handle := TSVGHandle.Create(Self, 0, 4, svg_handle_shape_2);
-              Handle.Parent := Parent;
-              HandleList.Add(Handle);
+              ToolHandle := TSVGToolHandle.Create(Self, 0, 4, svg_handle_shape_1);
+              ToolHandle.Parent := Parent;
+              HandleList.Add(ToolHandle);
 
-              Handle := TSVGHandle.Create(Self, 1, 4, svg_handle_shape_1);
-              Handle.Parent := Parent;
-              HandleList.Add(Handle);
+              ToolHandle := TSVGToolHandle.Create(Self, 1, 4, svg_handle_shape_2);
+              ToolHandle.Parent := Parent;
+              HandleList.Add(ToolHandle);
+
+              ToolHandle := TSVGToolHandle.Create(Self, 2, 4, svg_handle_shape_1);
+              ToolHandle.Parent := Parent;
+              HandleList.Add(ToolHandle);
             end else
               // TODO
               ;
@@ -1302,6 +1336,14 @@ var
     end;
   end;
 
+  procedure PathSetPrevPoint(const aP: TSVGPoint);
+  begin
+    if FSegmentIndex > 0 then
+      Figure.Segments[FSegmentIndex - 1].EndPoint := aP
+    else
+      Figure.StartPoint := aP;
+  end;
+
 begin
   P := SVGPoint(Value.X, Value.Y);
   P := ToolToSVG(P);
@@ -1372,24 +1414,28 @@ begin
 
             if Supports(Segment, ISVGLineSegment, LineSegment) then
             begin
-              if aIndex = 0 then
-                LineSegment.Point := P;
+              case aIndex of
+                0: PathSetPrevPoint(P);
+                1: LineSegment.Point := P;
+              end;
             end else
 
             if Supports(Segment, ISVGBezierSegment, BezierSegment) then
             begin
               case aIndex of
-                0: BezierSegment.Point1 := p;
-                1: BezierSegment.Point2 := p;
-                2: BezierSegment.Point3 := p;
+                0: PathSetPrevPoint(P);
+                1: BezierSegment.Point1 := p;
+                2: BezierSegment.Point2 := p;
+                3: BezierSegment.Point3 := p;
               end;
             end else
 
             if Supports(Segment, ISVGQuadSegment, QuadSegment) then
             begin
               case aIndex of
-                0: QuadSegment.Point1 := p;
-                1: QuadSegment.Point2 := p;
+                0: PathSetPrevPoint(P);
+                1: QuadSegment.Point1 := p;
+                2: QuadSegment.Point2 := p;
               end;
 
 
@@ -1431,7 +1477,7 @@ end;
 
 function TSVGEditorToolShape.GetHandlePoint(const aIndex: Integer): TPoint;
 var
-  P: TSVGPoint;
+  P, PrevPoint: TSVGPoint;
   Rect: ISVGRect;
   Circle: ISVGCircle;
   Ellipse: ISVGEllipse;
@@ -1488,26 +1534,36 @@ begin
           begin
             Segment := Figure.Segments[FSegmentIndex];
 
+            if FSegmentIndex > 0 then
+              PrevPoint := Figure.Segments[FSegmentIndex - 1].EndPoint
+            else
+              PrevPoint := Figure.StartPoint;
+
             if Supports(Segment, ISVGLineSegment, LineSegment) then
             begin
-              if aIndex = 0 then
-                P := LineSegment.Point;
+              case aIndex of
+                0: P := PrevPoint;
+                1: P := LineSegment.Point;
+              end;
+
             end else
 
             if Supports(Segment, ISVGBezierSegment, BezierSegment) then
             begin
               case aIndex of
-                0: P := BezierSegment.Point1;
-                1: P := BezierSegment.Point2;
-                2: P := BezierSegment.Point3;
+                0: P := PrevPoint;
+                1: P := BezierSegment.Point1;
+                2: P := BezierSegment.Point2;
+                3: P := BezierSegment.Point3;
               end;
             end else
 
             if Supports(Segment, ISVGQuadSegment, QuadSegment) then
             begin
               case aIndex of
-                0: P := QuadSegment.Point1;
-                1: P := QuadSegment.Point2;
+                0: P := PrevPoint;
+                1: P := QuadSegment.Point1;
+                2: P := QuadSegment.Point2;
               end;
             end else
               // TODO
@@ -1570,7 +1626,7 @@ begin
       begin
         if Key = 78 then // n
         begin
-          ClearHandles;
+          ClearToolParts;
           try
             Figure := FPathGeometry.Figures[FFigureIndex];
 
@@ -1583,13 +1639,13 @@ begin
                 FFigureIndex := 0;
             end;
           finally
-            CreateHandles;
+            CreateToolParts;
           end;
         end else
 
         if Key = 80 then // p
         begin
-          ClearHandles;
+          ClearToolParts;
           try
             Dec(FSegmentIndex);
             if FSegmentIndex < 0 then
@@ -1607,7 +1663,7 @@ begin
                 FFigureIndex := 0;
             end;
           finally
-            CreateHandles;
+            CreateToolParts;
           end;
         end;
 
@@ -2384,6 +2440,7 @@ begin
   FScale := 1.0;
 
   FToolList := TList<TSVGEditorTool>.Create;
+  FFocusedTool := nil;
   FUpdateRectList := TList<TSVGRect>.Create;
 
   FChildListBefore := nil;
@@ -2395,7 +2452,7 @@ begin
 
   DoubleBuffered := True;
 
-  FCurTool := TSVGEditorToolTransform;
+  FCurTool := TSVGEditorToolShape;
 end;
 
 procedure TSVGEditor.CreateParams(var params: TCreateParams);
@@ -3078,6 +3135,14 @@ begin
   LoadFromFile(FFilename);
 end;
 
+procedure TSVGEditor.SetFocusedTool(const Value: TSVGEditorTool);
+begin
+  if FFocusedTool <> Value then
+  begin
+    FFocusedTool := Value;
+  end;
+end;
+
 procedure TSVGEditor.SetPadding(const Value: TPadding);
 begin
   FPadding.Assign(Value);
@@ -3146,7 +3211,7 @@ begin
       Tool.Left := Tool.Left - Dx;
       Tool.Top := Tool.Top - Dy;
 
-      Tool.UpdateHandles;
+      Tool.UpdateToolParts;
     end;
 
     FTopLeft := Value;
@@ -3190,6 +3255,9 @@ begin
       aTool.Apply;
 
     UpdatePage([rsCalcCache]);
+
+    if FFocusedTool = aTool then
+      FFocusedTool := nil;
 
     FreeAndNil(aTool);
   end;

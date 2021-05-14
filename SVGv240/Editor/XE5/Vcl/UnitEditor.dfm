@@ -100,18 +100,18 @@ object frmEditor: TfrmEditor
     DisabledImages = ilDisabled
     Images = ilNormal
     TabOrder = 2
-    object ToolButton1: TToolButton
-      Left = 0
-      Top = 0
-      Action = aToolTransform
-      ImageIndex = 1
-      Wrap = True
-    end
     object ToolButton2: TToolButton
       Left = 0
-      Top = 38
+      Top = 0
       Action = aToolShape
       ImageIndex = 0
+      Wrap = True
+    end
+    object ToolButton1: TToolButton
+      Left = 0
+      Top = 38
+      Action = aToolTransform
+      ImageIndex = 1
     end
   end
   object ActionManager1: TActionManager
@@ -321,13 +321,13 @@ object frmEditor: TfrmEditor
     object aToolShape: TAction
       Category = 'Tool'
       Caption = 'Shape'
+      Checked = True
       GroupIndex = 1
       Hint = 'Shape tool'
     end
     object aToolTransform: TAction
       Category = 'Tool'
       Caption = 'Transform'
-      Checked = True
       GroupIndex = 1
       Hint = 'Transform tool'
     end
@@ -605,7 +605,7 @@ object frmEditor: TfrmEditor
     Left = 208
     Top = 56
     Bitmap = {
-      494C010104001C003C0018001800FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C010104001C00440018001800FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000600000003000000001002000000000000048
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -1215,7 +1215,7 @@ object frmEditor: TfrmEditor
     Left = 208
     Top = 104
     Bitmap = {
-      494C010102000800240018001800FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C0101020008002C0018001800FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000600000001800000001002000000000000024
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -1528,7 +1528,7 @@ object frmEditor: TfrmEditor
     Left = 208
     Top = 152
     Bitmap = {
-      494C010102000800240018001800FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C0101020008002C0018001800FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000600000001800000001002000000000000024
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
