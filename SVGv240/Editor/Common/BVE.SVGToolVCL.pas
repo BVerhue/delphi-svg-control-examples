@@ -523,8 +523,10 @@ begin
     Dx := X - FMouseDown.X;
     Dy := Y - FMouseDown.Y;
 
-    if FMoveable and Selected then
-       MoveDelta(Dx, Dy);
+    if ((Dx <> 0) or (Dy <> 0)) and FMoveable and Selected then
+    begin
+      MoveDelta(Dx, Dy);
+    end;
   end;
 
   inherited;

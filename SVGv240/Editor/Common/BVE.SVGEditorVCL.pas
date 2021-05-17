@@ -236,6 +236,8 @@ type
     function GetData: TSVGPathPointList;
     function GetObjectBounds: TSVGRect;
     procedure SetObjectBounds(aRect: TSVGRect);
+
+    procedure SetAttrPathData(const aValue: TSVGUnicodeString);
   protected
     function GetHandlePoint(const aIndex: Integer): TPoint; override;
 
@@ -784,7 +786,8 @@ begin
     FEditor.Matrix,
     TSVGMatrix.CreateTranslation(
       -AbsoluteContentRect.Left - FEditor.TopLeft.X,
-      -AbsoluteContentRect.Top - FEditor.TopLeft.Y));
+      -AbsoluteContentRect.Top - FEditor.TopLeft.Y)
+    );
 end;
 
 function TSVGEditorTool.GetRefFontSize: TSVGFloat;
@@ -1267,13 +1270,28 @@ var
 begin
   inherited;
 
-  R := GetObjectBounds;
-  if R.IsUndefined then
-    Exit;
+  case FSVGObject.ElementType of
+    elRect,
+    elCircle,
+    elEllipse:
+      begin
+        R := GetObjectBounds;
+        if R.IsUndefined then
+          Exit;
 
-  R.Offset(aDx, aDy);
+        R.Offset(aDx / FEditor.Scale, aDy / FEditor.Scale);
 
-  SetObjectBounds(R);
+        SetObjectBounds(R);
+      end;
+
+    elPath:
+      begin
+        FPathGeometry.ApplyMatrix(
+          TSVGMatrix.CreateTranslation(aDx / FEditor.Scale, aDy / FEditor.Scale));
+
+        SetAttrPathData(FPathGeometry.AsString);
+      end;
+  end;
 
   if assigned(FCache) then
   begin
@@ -1286,7 +1304,7 @@ begin
     end;
   end;
 
-  CalcBounds;
+  //CalcBounds;
   UpdateBitmap;
   Invalidate;
 end;
@@ -1304,37 +1322,6 @@ var
   LineSegment: ISVGLineSegment;
   BezierSegment: ISVGBezierSegment;
   QuadSegment: ISVGQuadSegment;
-
-  procedure SetAttrPathData(const aValue: TSVGUnicodeString);
-  var
-    Path: ISVGPath;
-    Attr: ISVGAttribute;
-    //PathShape: ISVGPathShape;
-    //PathDataList: ISVGPathDataList;
-    //PathData: ISVGPathData;
-  begin
-    CmdListSetAttribute('d', aValue);
-
-    { Update 10
-    if Supports(FSVGObject, ISVGPathShape, PathShape) then
-    begin
-      PathDataList := TSVGRenderContextManager.CreatePathDataList;
-      PathData := PathDataList.CreatePathData;
-      PathDataList.Add(PathData);
-
-      FPathGeometry.ConvertToPathData(PathData as ISVGPathDataSink);
-
-      PathShape.SetPathDataList(FRoot, PathDataList);
-      Exit;
-    end;}
-
-    // Work around because of a bug
-    if Supports(FSVGObject, ISVGPath, Path) then
-    begin
-      if Path.TryGetAttribute('d', Attr) then
-        Attr.Value.Parse(FRoot, aValue);
-    end;
-  end;
 
   procedure PathSetPrevPoint(const aP: TSVGPoint);
   begin
@@ -1672,6 +1659,37 @@ begin
   end;
 
   inherited;
+end;
+
+procedure TSVGEditorToolShape.SetAttrPathData(const aValue: TSVGUnicodeString);
+var
+  Path: ISVGPath;
+  Attr: ISVGAttribute;
+  //PathShape: ISVGPathShape;
+  //PathDataList: ISVGPathDataList;
+  //PathData: ISVGPathData;
+begin
+  CmdListSetAttribute('d', aValue);
+
+  { Update 10
+  if Supports(FSVGObject, ISVGPathShape, PathShape) then
+  begin
+    PathDataList := TSVGRenderContextManager.CreatePathDataList;
+    PathData := PathDataList.CreatePathData;
+    PathDataList.Add(PathData);
+
+    FPathGeometry.ConvertToPathData(PathData as ISVGPathDataSink);
+
+    PathShape.SetPathDataList(FRoot, PathDataList);
+    Exit;
+  end;}
+
+  // Work around because of a bug
+  if Supports(FSVGObject, ISVGPath, Path) then
+  begin
+    if Path.TryGetAttribute('d', Attr) then
+      Attr.Value.Parse(FRoot, aValue);
+  end;
 end;
 
 procedure TSVGEditorToolShape.SetObjectBounds(aRect: TSVGRect);
