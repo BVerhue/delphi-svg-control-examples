@@ -183,6 +183,8 @@ type
     procedure CmdListSetAttribute(const aAttrName, aAttrValue: TSVGUnicodeString); overload;
     procedure CmdListSetAttribute(const aAttrName: TSVGUnicodeString; aDimValue: TSVGDimension); overload;
 
+    procedure PaintRenderContext(aRC: ISVGRenderContext); virtual;
+
     procedure UpdateBitmap;
   public
     constructor Create(aEditor: TSVGEditor; aRoot: ISVGRoot;
@@ -244,6 +246,8 @@ type
     procedure DoCreateToolParts; override;
     procedure DoSetHandlePoint(const aIndex: Integer; const Value: TPoint); override;
     procedure DoMovePosition(const aDx, aDy: Integer); override;
+
+    procedure PaintRenderContext(aRC: ISVGRenderContext); override;
   public
     constructor Create(aEditor: TSVGEditor; aRoot: ISVGRoot;
       aObject: ISVGObject; aParentCache: ISVGObjectCache); override;
@@ -858,6 +862,11 @@ begin
   Canvas.Draw(ContentRect.Left, ContentRect.Top, FBitmap);
 end;
 
+procedure TSVGEditorTool.PaintRenderContext(aRC: ISVGRenderContext);
+begin
+  FSVGObject.PaintIndirect(FRoot, False, FParentCache);
+end;
+
 procedure TSVGEditorTool.SetBounds(ALeft, ATop, AWidth, AHeight: Integer);
 begin
   inherited;
@@ -939,7 +948,7 @@ begin
 
         RC.Matrix := AlignMatrix;
 
-        FSVGObject.PaintIndirect(FRoot, False, FParentCache);
+        PaintRenderContext(RC);
       finally
         RC.EndScene;
       end;
@@ -1659,6 +1668,41 @@ begin
   end;
 
   inherited;
+end;
+
+procedure TSVGEditorToolShape.PaintRenderContext(aRC: ISVGRenderContext);
+{var
+  FIgure: ISVGPathFigure;
+  Segment: ISVGPathSegment;
+  PrevPoint: TSVGPoint;
+  R: TSVGRect;}
+begin
+  inherited;
+
+  {case FSVGObject.ElementType of
+    elPath:
+      begin
+        if FFigureIndex < FPathGeometry.Figures.Count then
+        begin
+          Figure := FPathGeometry.Figures[FFigureIndex];
+
+          if FSegmentIndex < Figure.Segments.Count then
+          begin
+            Segment := Figure.Segments[FSegmentIndex];
+
+            if FSegmentIndex > 0 then
+              PrevPoint := Figure.Segments[FSegmentIndex - 1].EndPoint
+            else
+              PrevPoint := Figure.StartPoint;
+
+            R := Segment.CalcBBox(PrevPoint);
+
+            aRC.ApplyStroke(TSVGSolidBrush.Create(SVGColorGray), 1);
+            aRC.DrawRect(R);
+          end;
+        end;
+      end;
+  end;}
 end;
 
 procedure TSVGEditorToolShape.SetAttrPathData(const aValue: TSVGUnicodeString);

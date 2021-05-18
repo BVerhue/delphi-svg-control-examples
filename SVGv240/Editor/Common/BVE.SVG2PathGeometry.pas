@@ -35,6 +35,8 @@ type
 
     procedure ApplyMatrix(const aMatrix: TSVGMatrix);
 
+    function CalcBBox(const aStartPoint: TSVGPoint): TSVGRect;
+
     property IsRelative: Boolean read GetIsRelative write SetIsRelative;
     property EndPoint: TSVGPoint read GetEndPoint write SetEndPoint;
   end;
@@ -809,13 +811,16 @@ end;
 
 // http://fridrich.blogspot.com/2011/06/bounding-box-of-svg-elliptical-arc.html
 function TSVGArcSegment.CalcBBox(const aStartPoint: TSVGPoint): TSVGRect;
-{var
+var
   R: TSVGPoint;
   x1Prime, y1Prime: TSVGFloat;
   Radicant, Ratio, Factor: TSVGFloat;
   cxPrime, cyPrime, cx, cy: TSVGFloat;
   xmin, xmax, ymin, ymax: TSVGFloat;
-  txmin, txmax, tymin, tymax: TSVGFloat;}
+  txmin, txmax, tymin, tymax: TSVGFloat;
+  tmpX, tmpY: TSVGFloat;
+  Angle1, Angle2: TSVGFloat;
+  OtherArc: Boolean;
 
   procedure UpdateBoundsX(const aX: TSVGFloat);
   begin
@@ -835,7 +840,12 @@ function TSVGArcSegment.CalcBBox(const aStartPoint: TSVGPoint): TSVGRect;
       Result.Bottom := aY;
   end;
 
-  {function getAngle(const bx, by: TSVGFloat): TSVGFloat;
+  function FMod(const ANumerator, ADenominator: TSVGFloat): TSVGFloat;
+  begin
+    Result := ANumerator - Trunc(ANumerator / ADenominator) * ADenominator;
+  end;
+
+  function getAngle(const bx, by: TSVGFloat): TSVGFloat;
   var
     Sign: TSVGFloat;
   begin
@@ -844,8 +854,8 @@ function TSVGArcSegment.CalcBBox(const aStartPoint: TSVGPoint): TSVGRect;
     else
       Sign := -1.0;
 
-    Result := (2*PI + Sign * ArcCos( bx / Sqrt(bx * bx + by * by))) mod (2*PI);
-  end;}
+    Result := FMod(2*PI + Sign * ArcCos( bx / Sqrt(bx * bx + by * by)), 2*PI);
+  end;
 
   procedure Swap(var aValue1, aValue2: TSVGFloat);
   var
@@ -861,8 +871,6 @@ begin
   Result.Right := aStartPoint.X;
   Result.Top := aStartPoint.Y;
   Result.Bottom := aStartPoint.Y;
-
-  { TODO
 
   if Radius.X < 0.0 then
     R.X := -Radius.X
@@ -882,8 +890,8 @@ begin
     Exit;
   end;
 
-  x1Prime := cos(Angle)*(aStartPoint.X - Point.X)/2 + sin(Angle)*(aStartPoint.y - Point.Y)/2;
-  y1Prime := -sin(Angle)*(aStartPoint.X - Point.X)/2 + cos(Angle)*(aStartPoint.y - Point.Y)/2;
+  x1Prime := Cos(Angle)*(aStartPoint.X - Point.X)/2 + Sin(Angle)*(aStartPoint.y - Point.Y)/2;
+  y1Prime := -Sin(Angle)*(aStartPoint.X - Point.X)/2 + Cos(Angle)*(aStartPoint.y - Point.Y)/2;
 
   Radicant := (R.X*R.X*R.Y*R.Y - R.X*R.X*y1Prime*y1Prime - R.Y*R.Y*x1Prime*x1Prime);
   Radicant := Radicant / (R.X*R.X*y1Prime*y1Prime + R.Y*R.Y*x1Prime*x1Prime);
@@ -915,8 +923,8 @@ begin
     cyPrime := -Factor * R.Y * x1Prime / R.X;
   end;
 
-  cx := cxPrime*cos(Angle) - cyPrime*sin(Angle) + (aStartPoint.X + Point.X)/2;
-  cy := cxPrime*sin(Angle) + cyPrime*cos(Angle) + (aStartPoint.Y + Point.Y)/2;
+  cx := cxPrime*Cos(Angle) - cyPrime*Sin(Angle) + (aStartPoint.X + Point.X)/2;
+  cy := cxPrime*Sin(Angle) + cyPrime*Cos(Angle) + (aStartPoint.Y + Point.Y)/2;
 
   if (Angle = 0) or (Angle = PI) then
   begin
@@ -940,59 +948,101 @@ begin
       ymax := cy + R.X;
       tymax := getAngle(0, R.X);
     end else begin
-      txmin := -ArcTan2(R.Y*Tan(Angle)/R.X);
-      txmax = PI - ArcTan2(R.Y*Tan(Angle)/R.X);
-      xmin = cx + R.X*cos(txmin)*cos(Angle) - R.Y*sin(txmin)*sin(Angle);
-      xmax = cx + R.X*cos(txmax)*cos(Angle) - R.Y*sin(txmax)*sin(Angle);
+      //txmin = -atan(ry*tan(phi)/rx);
+      //txmax = M_PI - atan (ry*tan(phi)/rx);
+
+      txmin := -ArcTan(R.Y * Tan(Angle) / R.X);
+      txmax := PI - ArcTan(R.Y * Tan(Angle) / R.X);
+
+      xmin := cx + R.X * Cos(txmin) * Cos(Angle) - R.Y * Sin(txmin) * Sin(Angle);
+      xmax := cx + R.X * Cos(txmax) * Cos(Angle) - R.Y * Sin(txmax) * Sin(Angle);
+
       if (xmin > xmax) then
       begin
         Swap(xmin,xmax);
         Swap(txmin,txmax);
       end;
-      double tmpY = cy + RadiusX*cos(txmin)*sin(Angle) + RadiusY*sin(txmin)*cos(Angle);
-      txmin = getAngle(xmin - cx, tmpY - cy);
-      tmpY = cy + RadiusX*cos(txmax)*sin(Angle) + RadiusY*sin(txmax)*cos(Angle);
-      txmax = getAngle(xmax - cx, tmpY - cy);
 
+      tmpY := cy + R.X * Cos(txmin) * Sin(Angle) + R.Y * Sin(txmin) * Cos(Angle);
+      txmin := getAngle(xmin - cx, tmpY - cy);
 
-      tymin = atan(RadiusY/(tan(Angle)*RadiusX));
-      tymax = atan(RadiusY/(tan(Angle)*RadiusX))+M_PI;
-      ymin = cy + RadiusX*cos(tymin)*sin(Angle) + RadiusY*sin(tymin)*cos(Angle);
-      ymax = cy + RadiusX*cos(tymax)*sin(Angle) + RadiusY*sin(tymax)*cos(Angle);
+      tmpY := cy + R.X * Cos(txmax) * Sin(Angle) + R.Y * Sin(txmax) * Cos(Angle);
+      txmax := getAngle(xmax - cx, tmpY - cy);
+
+      //tymin = atan(ry/(tan(phi)*rx));
+      //tymax = atan(ry/(tan(phi)*rx))+M_PI;
+      tymin := ArcTan(R.Y / (Tan(Angle) * R.X));
+      tymax := ArcTan(R.Y / (Tan(Angle) * R.X)) + PI;
+
+      ymin := cy + R.X * Cos(tymin) * Sin(Angle) + R.Y * Sin(tymin) * Cos(Angle);
+      ymax := cy + R.X * Cos(tymax) * Sin(Angle) + R.Y * Sin(tymax) * Cos(Angle);
+
       if (ymin > ymax) then
       begin
-        std::swap(ymin,ymax);
-        std::swap(tymin,tymax);
+        Swap(ymin,ymax);
+        Swap(tymin,tymax);
       end;
-      double tmpX = cx + RadiusX*cos(tymin)*cos(Angle) - RadiusY*sin(tymin)*sin(Angle);
-      tymin = getAngle(tmpX - cx, ymin - cy);
-      tmpX = cx + RadiusX*cos(tymax)*cos(Angle) - RadiusY*sin(tymax)*sin(Angle);
-      tymax = getAngle(tmpX - cx, ymax - cy);
+
+      tmpX := cx + R.X * Cos(tymin) * Cos(Angle) - R.Y * Sin(tymin) * Sin(Angle);
+      tymin := getAngle(tmpX - cx, ymin - cy);
+
+      tmpX := cx + R.X * Cos(tymax) * Cos(Angle) - R.Y * Sin(tymax) * Sin(Angle);
+      tymax := getAngle(tmpX - cx, ymax - cy);
     end;
 
-  double angle1 = getAngle(aStartPoint - cx, y1 - cy);
-  double angle2 = getAngle(Point - cx, y2 - cy);
+  Angle1 := getAngle(aStartPoint.X - cx, aStartPoint.Y - cy);
+  Angle2 := getAngle(Point.X - cx, Point.Y - cy);
 
-  if (!sweep)
-    std::swap(angle1, angle2);
+  if not SweepDirection then
+    Swap(angle1, angle2);
 
-  bool otherArc = false;
+  OtherArc := False;
   if (angle1 > angle2) then
   begin
-    std::swap(angle1, angle2);
-    otherArc = true;
+    Swap(angle1, angle2);
+    OtherArc := True;
   end;
 
-  if ((!otherArc && (angle1 > txmin || angle2 < txmin)) || (otherArc && !(angle1 > txmin || angle2 < txmin)))
-    xmin = aStartPoint < Point ? aStartPoint : Point;
-  if ((!otherArc && (angle1 > txmax || angle2 < txmax)) || (otherArc && !(angle1 > txmax || angle2 < txmax)))
-    xmax = aStartPoint > Point ? aStartPoint : Point;
-  if ((!otherArc && (angle1 > tymin || angle2 < tymin)) || (otherArc && !(angle1 > tymin || angle2 < tymin)))
-    ymin = y1 < y2 ? y1 : y2;
-  if ((!otherArc && (angle1 > tymax || angle2 < tymax)) || (otherArc && !(angle1 > tymax || angle2 < tymax)))
-    ymax = y1 > y2 ? y1 : y2;
+  if ((not OtherArc and ((angle1 > txmin) or (angle2 < txmin)))
+  or (OtherArc and not((angle1 > txmin) or (angle2 < txmin)))) then
+  begin
+    if aStartPoint.X < Point.X then
+      xmin := aStartPoint.X
+    else
+      xmin := Point.X;
+  end;
 
-  }
+  if ((not OtherArc and ((angle1 > txmax) or (angle2 < txmax)))
+  or (OtherArc and not((angle1 > txmax) or (angle2 < txmax)))) then
+  begin
+    if aStartPoint.X > Point.X then
+      xmax := aStartPoint.X
+    else
+      xmax := Point.X;
+  end;
+
+  if ((not OtherArc and ((angle1 > tymin) or (angle2 < tymin)))
+  or (OtherArc and not((angle1 > tymin) or (angle2 < tymin)))) then
+  begin
+    if aStartPoint.Y < Point.Y then
+      ymin := aStartPoint.Y
+    else
+      ymin := Point.Y;
+  end;
+
+  if ((not OtherArc and ((angle1 > tymax) or (angle2 < tymax)))
+  or (OtherArc and not((angle1 > tymax) or (angle2 < tymax)))) then
+  begin
+    if aStartPoint.Y > Point.Y then
+      ymax := aStartPoint.Y
+    else
+      ymax := Point.Y;
+  end;
+
+  Result.Left := xmin;
+  Result.Right := xmax;
+  Result.Top := ymin;
+  Result.Bottom := ymax;
 end;
 
 constructor TSVGArcSegment.Create;
