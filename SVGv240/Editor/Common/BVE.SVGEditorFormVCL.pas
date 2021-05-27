@@ -288,7 +288,8 @@ begin
   CheckSelectionIsGroup(True);
 
   //FEditor.ElementAdd('<path d="M100,100 L200,100, L200,200 L100,200 Z" />');
-  FEditor.ElementAdd('<path d="M100,100 L200,100, C250,100 250,200, 200,200 L100,200 Z" />');
+  //FEditor.ElementAdd('<path d="M100,100 L200,100, C250,100 250,200, 200,200 Q150,220 100,200 Z" />');
+  FEDitor.ElementAdd('<path d="M 10 315 L 110 215 A 30 50 0 0 1 162.55 162.45 L 172.55 152.45 A 30 50 -45 0 1 215.1 109.9 L 315 10" />');
 end;
 
 procedure TSVGEditorForm.ActionAddPolygonExecute(Sender: TObject);

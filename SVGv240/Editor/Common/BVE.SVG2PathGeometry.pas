@@ -1,4 +1,4 @@
-unit BVE.SVG2PathGeometry;
+﻿unit BVE.SVG2PathGeometry;
 //------------------------------------------------------------------------------
 //
 //                          SVG Control Package 2.0
@@ -89,6 +89,15 @@ type
     procedure SetAngle(const Value: TSVGFloat);
     procedure SetRadius(const Value: TSVGPoint);
     procedure SetSweepDirection(const Value: Boolean);
+
+    function GetVectorAngle(const aP1, aP2: TSVGPoint): TSVGFloat;
+    function GetEllipsePointForAngle(const aCP, aR: TSVGPoint; const aAngle,
+      aArcAngle: TSVGFloat): TSVGPoint;
+
+    procedure GetCenterParameters(const aStartPoint: TSVGPoint;
+      var aCP: TSVGPoint; var aStartAngle, aDeltaAngle: TSVGFloat);
+    function SetCenterParameters(const aCP, aR: TSVGPoint;
+      const aAngle, aStartAngle, aDeltaAngle: TSVGFloat): TSVGPoint;
 
     property IsLargeArc: Boolean read GetIsLargeArc write SetIsLargeArc;
     property Point: TSVGPoint read GetPoint write SetPoint;
@@ -250,6 +259,15 @@ type
 
     function CalcBBox(const aStartPoint: TSVGPoint): TSVGRect; override;
 
+    function GetVectorAngle(const aP1, aP2: TSVGPoint): TSVGFloat;
+    function GetEllipsePointForAngle(const aCP, aR: TSVGPoint; const aAngle,
+      aArcAngle: TSVGFloat): TSVGPoint;
+
+    procedure GetCenterParameters(const aStartPoint: TSVGPoint;
+      var aCP: TSVGPoint; var aStartAngle, aDeltaAngle: TSVGFloat);
+    function SetCenterParameters(const aCP, aR: TSVGPoint;
+      const aAngle, aStartAngle, aDeltaAngle: TSVGFloat): TSVGPoint;
+
     procedure ApplyMatrix(const aMatrix: TSVGMatrix); override;
 
     property IsLargeArc: Boolean read GetIsLargeArc write SetIsLargeArc;
@@ -326,7 +344,11 @@ type
 
 implementation
 
-{ TSVGPathSegment }
+// -----------------------------------------------------------------------------
+//
+//                            TSVGPathSegment
+//
+// -----------------------------------------------------------------------------
 
 constructor TSVGPathSegment.Create;
 begin
@@ -353,7 +375,11 @@ begin
   end;
 end;
 
-{ TSVGLineSegment }
+// -----------------------------------------------------------------------------
+//
+//                            TSVGLineSegment
+//
+// -----------------------------------------------------------------------------
 
 procedure TSVGLineSegment.ApplyMatrix(const aMatrix: TSVGMatrix);
 begin
@@ -415,7 +441,11 @@ begin
   end;
 end;
 
-{ TSVGBezierSegment }
+// -----------------------------------------------------------------------------
+//
+//                           TSVGBezierSegment
+//
+// -----------------------------------------------------------------------------
 
 procedure TSVGBezierSegment.ApplyMatrix(const aMatrix: TSVGMatrix);
 begin
@@ -424,13 +454,13 @@ begin
   Point3 := TransformPoint(Point3, aMatrix);
 end;
 
-{// https://github.com/adobe-webplatform/Snap.svg/blob/b242f49e6798ac297a3dad0dfb03c0893e394464/src/path.js#L856
+// https://github.com/adobe-webplatform/Snap.svg/blob/b242f49e6798ac297a3dad0dfb03c0893e394464/src/path.js#L856
 function TSVGBezierSegment.CalcBBox(const aStartPoint: TSVGPoint): TSVGRect;
 var
-  i: Integer;
+  i, Count: Integer;
   a, b, c, t, t1, t2, b2ac, sqrtb2ac: TSVGFLoat;
   mt, x, y: TSVGFloat;
-  TValueList: TList<TSVGFloat>;
+  Values: array[0..3] of TSVGFloat;
 
   procedure UpdateBounds(const aX, aY: TSVGFloat);
   begin
@@ -444,173 +474,80 @@ var
       Result.Top := aY;
 
     if aY > Result.Bottom then
-      Result.Bottom := aX;
-  end;
-
-begin
-  TValueList := TList<TSVGFloat>.Create;
-  try
-    for i := 0 to 1 do
-    begin
-      if (i = 0) then
-      begin
-        b := 6 * aStartPoint.X - 12 * Point1.X + 6 * Point2.X;
-        a := -3 * aStartPoint.X + 9 * Point1.X - 9 * Point2.X + 3 * Point3.X;
-        c := 3 * Point1.X - 3 * aStartPoint.X;
-      end else begin
-        b := 6 * aStartPoint.Y - 12 * Point1.Y + 6 * Point2.Y;
-        a := -3 * aStartPoint.Y + 9 * Point1.Y - 9 * Point2.Y + 3 * Point3.Y;
-        c := 3 * Point1.Y - 3 * aStartPoint.Y;
-      end;
-
-      if (abs(a) < 1e-12) then
-      begin
-        if (abs(b) < 1e-12) then
-          Continue;
-
-        t := -c / b;
-        if (0 < t) and (t < 1) then
-            TValueList.Add(t);
-
-        Continue;
-      end;
-
-      b2ac := b * b - 4 * c * a;
-      sqrtb2ac := Sqrt(b2ac);
-      if (b2ac < 0) then
-        Continue;
-
-      t1 := (-b + sqrtb2ac) / (2 * a);
-      if (0 < t1) and (t1 < 1) then
-        TValueList.Add(t1);
-
-      t2 := (-b - sqrtb2ac) / (2 * a);
-      if (0 < t2) and (t2 < 1) then
-          TValueList.Add(t2);
-    end;
-
-    Result.Left := aStartPoint.X;
-    Result.Right := aStartPoint.X;
-    Result.Top := aStartPoint.Y;
-    Result.Bottom := aStartPoint.Y;
-
-    i := TValueList.Count - 1;
-    while (i >= 0) do
-    begin
-      t := TValueList[i];
-      mt := 1 - t;
-
-      x := mt * mt * mt * aStartPoint.X + 3 * mt * mt * t * Point1.X + 3 * mt * t * t * Point2.X + t * t * t * Point3.X;
-      y := mt * mt * mt * aStartPoint.Y + 3 * mt * mt * t * Point1.Y + 3 * mt * t * t * Point2.Y + t * t * t * Point3.Y;
-
-      UpdateBounds(x, y);
-
-      Dec(i);
-    end;
-
-    UpdateBounds(Point3.X, Point3.Y);
-
-  finally
-    TValueList.Free;
-  end;
-end;}
-
-// https://www.iquilezles.org/www/articles/bezierbbox/bezierbbox.htm
-function TSVGBezierSegment.CalcBBox(const aStartPoint: TSVGPoint): TSVGRect;
-var
-  a, b, c, h: TSVGPoint;
-  t, s, q: TSVGFloat;
-
-  procedure UpdateBoundsX(const aX: TSVGFloat);
-  begin
-    if aX < Result.Left then
-      Result.Left := aX;
-
-    if aX > Result.Right then
-      Result.Right := aX;
-  end;
-
-  procedure UpdateBoundsY(const aY: TSVGFloat);
-  begin
-    if aY < Result.Top then
-      Result.Top := aY;
-
-    if aY > Result.Bottom then
       Result.Bottom := aY;
   end;
 
 begin
+  Count := 0;
+  for i := 0 to 1 do
+  begin
+    if (i = 0) then
+    begin
+      b := 6 * aStartPoint.X - 12 * Point1.X + 6 * Point2.X;
+      a := -3 * aStartPoint.X + 9 * Point1.X - 9 * Point2.X + 3 * Point3.X;
+      c := 3 * Point1.X - 3 * aStartPoint.X;
+    end else begin
+      b := 6 * aStartPoint.Y - 12 * Point1.Y + 6 * Point2.Y;
+      a := -3 * aStartPoint.Y + 9 * Point1.Y - 9 * Point2.Y + 3 * Point3.Y;
+      c := 3 * Point1.Y - 3 * aStartPoint.Y;
+    end;
+
+    if abs(a) < 1e-12 then
+    begin
+      if abs(b) < 1e-12 then
+        Continue;
+
+      t := -c / b;
+      if (0 < t) and (t < 1) then
+      begin
+        Values[Count] := t;
+        Inc(Count);
+      end;
+
+      Continue;
+    end;
+
+    b2ac := b * b - 4 * c * a;
+    if (b2ac < 0) then
+      Continue;
+
+    sqrtb2ac := Sqrt(b2ac);
+
+    t1 := (-b + sqrtb2ac) / (2 * a);
+    if (0 < t1) and (t1 < 1) then
+    begin
+      Values[Count] := t1;
+      Inc(Count);
+    end;
+
+    t2 := (-b - sqrtb2ac) / (2 * a);
+    if (0 < t2) and (t2 < 1) then
+    begin
+      Values[Count] := t2;
+      Inc(Count);
+    end;
+  end;
+
   Result.Left := aStartPoint.X;
   Result.Right := aStartPoint.X;
   Result.Top := aStartPoint.Y;
   Result.Bottom := aStartPoint.Y;
 
-  UpdateBoundsX(Point3.X);
-  UpdateBoundsY(Point3.Y);
-
-  c.X := -1.0 * aStartPoint.X + 1.0 * Point1.X;
-  c.Y := -1.0 * aStartPoint.Y + 1.0 * Point1.Y;
-  b.X :=  1.0 * aStartPoint.X - 2.0 * Point1.X + 1.0 * Point2.X;
-  b.Y :=  1.0 * aStartPoint.Y - 2.0 * Point1.Y + 1.0 * Point2.Y;
-  a.X := -1.0 * aStartPoint.X + 3.0 * Point1.X - 3.0 * Point2.X + 1.0 * Point3.X;
-  a.Y := -1.0 * aStartPoint.Y + 3.0 * Point1.Y - 3.0 * Point2.Y + 1.0 * Point3.Y;
-
-  h.X := b.X * b.X - a.X * c.X;
-  h.Y := b.Y * b.Y - a.Y * c.Y;
-
-  if h.X > 0.0 then
+  i := Count - 1;
+  while (i >= 0) do
   begin
-    h.X := Sqrt(h.X);
+    t := Values[i];
+    mt := 1 - t;
 
-    t := (-b.X - h.X) / a.X;
-    if (t > 0.0) and (t < 1.0) then
-    begin
-      s := 1.0 - t;
-      q := s * s * s * aStartPoint.x
-        + 3.0 * s * s * t * Point1.x
-        + 3.0 * s * t * t * Point2.x
-        + t * t * t * Point3.x;
-      UpdateBoundsX(q);
-    end;
+    x := mt * mt * mt * aStartPoint.X + 3 * mt * mt * t * Point1.X + 3 * mt * t * t * Point2.X + t * t * t * Point3.X;
+    y := mt * mt * mt * aStartPoint.Y + 3 * mt * mt * t * Point1.Y + 3 * mt * t * t * Point2.Y + t * t * t * Point3.Y;
 
-    t := (-b.X + h.X) / a.X;
-    if (t > 0.0) and (t < 1.0) then
-    begin
-      s := 1.0 - t;
-      q := s * s * s * aStartPoint.x
-        + 3.0 * s * s * t * Point1.x
-        + 3.0 * s * t * t * Point2.x
-        + t * t * t * Point3.x;
-      UpdateBoundsX(q);
-    end;
+    UpdateBounds(x, y);
+
+    Dec(i);
   end;
 
-  if h.Y > 0.0 then
-  begin
-    h.Y := Sqrt(h.Y);
-
-    t := (-b.Y - h.Y) / a.Y;
-    if (t > 0.0) and (t < 1.0) then
-    begin
-      s := 1.0 - t;
-      q := s * s * s * aStartPoint.Y
-        + 3.0 * s * s * t * Point1.Y
-        + 3.0 * s * t * t * Point2.Y
-        + t * t * t * Point3.Y;
-      UpdateBoundsY(q);
-    end;
-
-    t := (-b.Y + h.Y) / a.Y;
-    if (t > 0.0) and (t < 1.0) then
-    begin
-      s := 1.0 - t;
-      q := s * s * s * aStartPoint.Y
-        + 3.0 * s * s * t * Point1.Y
-        + 3.0 * s * t * t * Point2.Y
-        + t * t * t * Point3.Y;
-      UpdateBoundsY(q);
-    end;
-  end;
+  UpdateBounds(Point3.X, Point3.Y);
 end;
 
 constructor TSVGBezierSegment.Create;
@@ -676,7 +613,11 @@ begin
   end;
 end;
 
-{ TSVGQuadSegment }
+// -----------------------------------------------------------------------------
+//
+//                           TSVGQuadSegment
+//
+// -----------------------------------------------------------------------------
 
 procedure TSVGQuadSegment.ApplyMatrix(const aMatrix: TSVGMatrix);
 begin
@@ -684,10 +625,13 @@ begin
   Point2 := TransformPoint(Point2, aMatrix);
 end;
 
-// https://www.iquilezles.org/www/articles/bezierbbox/bezierbbox.htm
+// https://github.polettix.it/ETOOBUSY/2020/07/17/bbox-quadratic-bezier/
 function TSVGQuadSegment.CalcBBox(const aStartPoint: TSVGPoint): TSVGRect;
 var
-  t, s, q: TSVGPoint;
+  i, Count: Integer;
+  a, b, t: TSVGFLoat;
+  mt, x, y: TSVGFloat;
+  Values: array[0..1] of TSVGFloat;
 
   procedure UpdateBounds(const aX, aY: TSVGFloat);
   begin
@@ -704,39 +648,51 @@ var
       Result.Bottom := aY;
   end;
 
-  function Clamp(const aValue, aMin, aMax: TSVGFloat): TSVGFloat;
+begin
+  Count := 0;
+  for i := 0 to 1 do
   begin
-    if aValue < aMin then
-      Result := aMin
-    else
-      if aValue > aMax then
-        Result := aMax
-      else
-        Result := aValue;
+    if (i = 0) then
+    begin
+      b := aStartPoint.X - 2 * Point1.X + Point2.X;
+      a := -aStartPoint.X + Point1.X;
+    end else begin
+      b := aStartPoint.Y - 2 * Point1.Y + Point2.Y;
+      a := -aStartPoint.Y + Point1.Y;
+    end;
+
+    if abs(b) > 1e-12 then
+    begin
+      t := -a / b;
+
+      if (0 < t) and (t < 1) then
+      begin
+        Values[Count] := t;
+        Inc(Count);
+      end;
+    end;
   end;
 
-begin
   Result.Left := aStartPoint.X;
   Result.Right := aStartPoint.X;
   Result.Top := aStartPoint.Y;
   Result.Bottom := aStartPoint.Y;
 
-  UpdateBounds(Point2.X, Point2.Y);
-
-  if (Point1.X < Result.Left) or (Point1.X > Result.Right)
-  or (Point1.Y < Result.Top) or (Point1.Y > Result.Bottom) then
+  i := Count - 1;
+  while (i >= 0) do
   begin
-    t.X := Clamp((aStartPoint.X - Point1.X) / (aStartPoint.X - 2.0 * Point1.X + Point2.X), 0.0, 1.0);
-    t.Y := Clamp((aStartPoint.Y - Point1.Y) / (aStartPoint.Y - 2.0 * Point1.Y + Point2.Y), 0.0, 1.0);
+    t := Values[i];
+    mt := 1 - t;
 
-    s.X := 1.0 - t.X;
-    s.Y := 1.0 - t.Y;
+    x := mt * mt * aStartPoint.X + 2 * mt * t * Point1.X + t * t * Point2.X;
+    y := mt * mt * aStartPoint.Y + 2 * mt * t * Point1.Y + t * t * Point2.Y;
 
-    q.X := s.X * s.X * aStartPoint.X + 2.0 * s.X * t.X * Point1.X + t.X * t.X * Point2.X;
-    q.Y := s.Y * s.Y * aStartPoint.Y + 2.0 * s.Y * t.Y * Point1.Y + t.Y * t.Y * Point2.Y;
+    UpdateBounds(x, y);
 
-    UpdateBounds(q.X, q.Y);
+    Dec(i);
   end;
+
+  UpdateBounds(Point2.X, Point2.Y);
 end;
 
 constructor TSVGQuadSegment.Create;
@@ -788,7 +744,11 @@ begin
   end;
 end;
 
-{ TSVGArcSegment }
+// -----------------------------------------------------------------------------
+//
+//                           TSVGArcSegment
+//
+// -----------------------------------------------------------------------------
 
 procedure TSVGArcSegment.ApplyMatrix(const aMatrix: TSVGMatrix);
 var
@@ -1045,6 +1005,155 @@ begin
   Result.Bottom := ymax;
 end;
 
+//https://stackoverflow.com/questions/9017100/calculate-center-of-svg-arc
+//https://observablehq.com/@toja/ellipse-and-elliptical-arc-conversion
+{function TSVGArcSegment.CalcEllipse(const aStartPoint: TSVGPoint;
+  var aCP: TSVGPoint; var aStartAngle, aDeltaAngle: TSVGFloat): Boolean;
+var
+  s_phi, c_phi, hd_x, hd_y, hs_x, hs_y: TSVGFloat;
+  x1_, y1_, rxry, rxy1_, ryx1_, sum_of_sq, coe: TSVGFloat;
+  cx_, cy_, xcr1, xcr2, ycr1, ycr2: TSVGFloat;
+  PIx2: TSVGFloat;
+
+    function Radian(const ux, uy, vx, vy: TSVGFloat): TSVGFloat;
+    var
+      dot, md: TSVGFloat;
+    begin
+      dot := ux * vx + uy * vy;
+      md := Sqrt((ux * ux + uy * uy) * (vx * vx + vy * vy));
+      Result := ArcCos(dot / md);
+      if ux * vy - uy * vx < 0.0 then
+        Result := -Result;
+    end;
+
+begin
+  //var cx,cy,theta1,delta_theta;
+
+  Result := True;
+
+  if (Radius.X = 0.0) or (Radius.Y = 0.0) then
+  begin
+    Result := False;  // invalid arguments
+    Exit;
+  end;
+
+  s_phi := Sin(Angle * PI / 180);
+  c_phi := Cos(Angle * PI / 180);
+  hd_x := (aStartPoint.X - Point.X) / 2.0;   // half diff of x
+  hd_y := (aStartPoint.Y - Point.Y) / 2.0;   // half diff of y
+  hs_x := (aStartPoint.X + Point.X) / 2.0;   // half sum of x
+  hs_y := (aStartPoint.Y + Point.Y) / 2.0;   // half sum of y
+
+  // F6.5.1
+  x1_ := c_phi * hd_x + s_phi * hd_y;
+  y1_ := c_phi * hd_y - s_phi * hd_x;
+
+  rxry := Radius.X * Radius.Y;
+  rxy1_ := Radius.X * y1_;
+  ryx1_ := Radius.Y * x1_;
+  sum_of_sq := rxy1_ * rxy1_ + ryx1_ * ryx1_;   // sum of square
+  coe := Sqrt(abs(rxry * rxry - sum_of_sq) / sum_of_sq);
+  if IsLargeArc = SweepDirection then
+    coe := -coe;
+
+  // F6.5.2
+  cx_ := coe * rxy1_ / Radius.Y;
+  cy_ := -coe * ryx1_ / Radius.X;
+
+  // F6.5.3
+  aCP.X := c_phi * cx_ - s_phi * cy_ + hs_x;
+  aCP.Y := s_phi * cx_ + c_phi * cy_ + hs_y;
+
+  xcr1 := (x1_ - cx_) / Radius.X;
+  xcr2 := (x1_ + cx_) / Radius.X;
+  ycr1 := (y1_ - cy_) / Radius.Y;
+  ycr2 := (y1_ + cy_) / Radius.Y;
+
+  // F6.5.5
+  aStartAngle := Radian(1.0, 0.0, xcr1, ycr1);
+
+  // F6.5.6
+  aDeltaAngle := Radian(xcr1, ycr1, -xcr2, -ycr2);
+  PIx2 := PI * 2.0;
+  while( aDeltaAngle > PIx2 ) do
+    aDeltaAngle := aDeltaAngle - PIx2;
+
+  while( aDeltaAngle < 0.0 ) do
+    aDeltaAngle := aDeltaAngle + PIx2;
+
+  if not SweepDirection then
+    aDeltaAngle := aDeltaAngle - PIx2;
+end;}
+
+procedure TSVGArcSegment.GetCenterParameters(const aStartPoint: TSVGPoint;
+  var aCP: TSVGPoint; var aStartAngle, aDeltaAngle: TSVGFloat);
+var
+  SinPhi, CosPhi: TSVGFloat;
+  x, y, px, py, prx, pry, L, rx, ry, M, Sign, tcx, tcy: TSVGFLoat;
+begin
+  SinPhi := Sin(Angle * PI / 180);
+  CosPhi := Cos(Angle * PI / 180);
+
+  // Step 1: simplify through translation/rotation
+  x :=  CosPhi * (aStartPoint.X - Point.X) / 2 + SinPhi * (aStartPoint.Y - Point.Y) / 2;
+  y := -SinPhi * (aStartPoint.X - Point.X) / 2 + CosPhi * (aStartPoint.Y - Point.Y) / 2;
+
+  px := x * x;
+  py := y * y;
+  prx := Radius.X * Radius.X;
+  pry := Radius.Y * Radius.Y;
+
+  // correct of out-of-range radii
+  L := px / prx + py / pry;
+
+  if (L > 1) then
+  begin
+    rx := Sqrt(L) * Abs(Radius.X);
+    ry := Sqrt(L) * Abs(Radius.Y);
+
+    prx := rx * rx;
+    pry := ry * ry;
+  end else begin
+    rx := Abs(Radius.X);
+    ry := Abs(Radius.Y);
+  end;
+
+  // Step 2 + 3: compute center
+  if IsLargeArc = SweepDirection then
+    Sign := -1
+  else
+    Sign := 1;
+
+  M := Sqrt(Abs(prx * pry - prx * py - pry * px) / (prx * py + pry * px)) * Sign;
+
+  tcx := M * (rx * y) / ry;
+  tcy := M * (-ry * x) / rx;
+
+  aCP.X := CosPhi * tcx - SinPhi * tcy + (aStartPoint.X + Point.X) / 2;
+  aCP.Y := SinPhi * tcx + CosPhi * tcy + (aStartPoint.Y + Point.Y) / 2;
+
+  // Step 4: compute angles
+  aStartAngle := GetVectorAngle(
+    SVGPoint(1, 0),
+    SVGPoint((x - tcx) / rx, (y - tcy) / ry));
+
+  aDeltaAngle := GetVectorAngle(
+      SVGPoint((x - tcx) / rx, (y - tcy) / ry),
+      SVGPoint((-x - tcx) / rx, (-y - tcy) / ry));
+
+  while aDeltaAngle > (2 * PI) do
+    aDeltaAngle := aDeltaAngle - 2 * PI;
+
+  while aDeltaAngle < 0.0 do
+    aDeltaAngle := aDeltaAngle + 2 * PI;
+
+  if (not SweepDirection) and (aDeltaAngle > 0) then
+    aDeltaAngle := aDeltaAngle - 2 * PI;
+
+  if SweepDirection and (aDeltaAngle < 0) then
+    aDeltaAngle := aDeltaAngle + 2 * PI;
+end;
+
 constructor TSVGArcSegment.Create;
 begin
   inherited Create;
@@ -1059,6 +1168,18 @@ end;
 destructor TSVGArcSegment.Destroy;
 begin
   inherited;
+end;
+
+function TSVGArcSegment.GetEllipsePointForAngle(const aCP, aR: TSVGPoint;
+  const aAngle, aArcAngle: TSVGFloat): TSVGPoint;
+var
+  M, N: TSVGFloat;
+begin
+  M := Abs(aR.X) * Cos(aArcAngle);
+  N := Abs(aR.Y) * Sin(aArcAngle);
+
+  Result.X := aCP.X + Cos(aAngle) * M - Sin(aAngle) * N;
+  Result.Y := aCP.Y + Sin(aAngle) * M + Cos(aAngle) * N;
 end;
 
 function TSVGArcSegment.GetEndPoint: TSVGPoint;
@@ -1091,6 +1212,17 @@ begin
   Result := FSweepDirection;
 end;
 
+function TSVGArcSegment.GetVectorAngle(const aP1, aP2: TSVGPoint): TSVGFloat;
+var
+  Dot, Md: TSVGFloat;
+begin
+  Dot := aP1.X * aP2.X + aP1.Y * aP2.Y;
+  Md := Sqrt((aP1.X * aP1.X + aP1.Y * aP1.Y) * (aP2.X * aP2.X + aP2.Y * aP2.Y));
+  Result := ArcCos(Dot / Md);
+  if aP1.X * aP2.Y - aP2.Y * aP1.X < 0.0 then
+    Result := -Result;
+end;
+
 procedure TSVGArcSegment.SetEndPoint(const Value: TSVGPoint);
 begin
   Point := Value;
@@ -1120,6 +1252,19 @@ begin
   end;
 end;
 
+// https://observablehq.com/@toja/ellipse-and-elliptical-arc-conversion
+function TSVGArcSegment.SetCenterParameters(const aCP, aR: TSVGPoint;
+  const aAngle, aStartAngle, aDeltaAngle: TSVGFloat): TSVGPoint;
+begin
+  Result := GetEllipsePointForAngle(aCP, aR, aAngle, aStartAngle);
+  Point := GetEllipsePointForAngle(aCP, aR, aAngle, aStartAngle + aDeltaAngle);
+  Angle := aAngle * 180 / PI;
+  Radius := aR;
+
+  IsLargeArc := Abs(aDeltaAngle) > PI;
+  SweepDirection := aDeltaAngle > 0;
+end;
+
 procedure TSVGArcSegment.SetRadius(const Value: TSVGPoint);
 begin
   if FRadius <> Value then
@@ -1136,7 +1281,11 @@ begin
   end;
 end;
 
-{ TSVGPathFigure }
+// -----------------------------------------------------------------------------
+//
+//                           TSVGPathFigure
+//
+// -----------------------------------------------------------------------------
 
 procedure TSVGPathFigure.AddArc(const aRadius: TSVGPoint;
   const aAngle: TSVGFloat; const aLarge, aSweep: Boolean;
@@ -1241,7 +1390,11 @@ begin
   end;
 end;
 
-{ TSVGPathGeometry }
+// -----------------------------------------------------------------------------
+//
+//                          TSVGPathGeometry
+//
+// -----------------------------------------------------------------------------
 
 procedure TSVGPathGeometry.AddArc(const aP1, aRadius: TSVGPoint;
   aAngle: TSVGFloat; const aLargeFlag, aSweepFlag: Boolean;
@@ -1457,7 +1610,7 @@ begin
         begin
           StringBuilder.Append(' ');
 
-          if QuadSegment.IsRelative then
+          if ArcSegment.IsRelative then
             Cmd := 'a'
           else
             Cmd := 'A';
@@ -1473,7 +1626,7 @@ begin
              ArcSegment.Angle,
              Integer(ArcSegment.IsLargeArc),
              Integer(ArcSegment.SweepDirection),
-             P1.X, P2.Y],
+             P1.X, P1.Y],
             USFormatSettings));
         end;
       end;
@@ -1533,7 +1686,12 @@ begin
     FFigures.Clear;
     LastPoint := SVGPoint(0, 0);
 
-    Parser.ParsePath(Self, LastPoint);
+    Parser.SkipWhiteSpace;
+    while Parser.Pos < Parser.Length do
+    begin
+      Parser.ParsePath(Self, LastPoint);
+      Parser.SkipWhiteSpace;
+    end;
   finally
     Parser.Free;
   end;
