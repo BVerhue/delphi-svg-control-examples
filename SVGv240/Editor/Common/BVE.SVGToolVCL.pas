@@ -28,7 +28,7 @@ const
   svg_tool =
     '<?xml version="1.0" standalone="no"?>'
     + '<svg width="%4.2f" height="%4.2f" xmlns="http://www.w3.org/2000/svg" version="1.1">'
-    + '<rect x="%4.2f" y="%4.2f" width="%4.2f" height="%4.2f" fill="none" stroke="none" stroke-width="1" />'
+    + '<rect x="%4.2f" y="%4.2f" width="%4.2f" height="%4.2f" fill="none" stroke="gray" stroke-width="1" />'
     + '</svg>';
 
   svg_tool_handle =
@@ -142,7 +142,6 @@ type
     property RadiusX: TPoint read GetRadiusX;
     property RadiusY: TPoint read GetRadiusY;
   end;
-
 
   TSVGTool = class(TSVG2Control)
   private

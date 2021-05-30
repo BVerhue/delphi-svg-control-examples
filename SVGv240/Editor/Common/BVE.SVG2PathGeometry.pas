@@ -36,6 +36,7 @@ type
     procedure ApplyMatrix(const aMatrix: TSVGMatrix);
 
     function CalcBBox(const aStartPoint: TSVGPoint): TSVGRect;
+    function GetBBox(const aStartPoint: TSVGPoint): TSVGRect;
 
     property IsRelative: Boolean read GetIsRelative write SetIsRelative;
     property EndPoint: TSVGPoint read GetEndPoint write SetEndPoint;
@@ -122,6 +123,8 @@ type
 
     procedure ApplyMatrix(const aMatrix: TSVGMatrix);
 
+    function SegmentAtPt(const aPt: TSVGPoint; var aSegmentIndex: Integer): Boolean;
+
     property IsClosed: Boolean read GetIsClosed write SetIsClosed;
     property StartPoint: TSVGPoint read GetStartPoint write SetStartPoint;
     property Segments: TList<ISVGPathSegment> read GetSegments;
@@ -129,17 +132,25 @@ type
 
   ISVGPathGeometry = interface
     ['{44CD989C-3B9A-4212-86ED-D1ED0B9DEA24}']
-    function GetAsString: TSVGUnicodeString;
+    function GetAsPathString: TSVGUnicodeString;
+    function GetAsPolygonString: TSVGUnicodeString;
+    function GetAsPolylineString: TSVGUnicodeString;
     function GetFigures: TList<ISVGPathFigure>;
     function GetTransform: TSVGMatrix;
-    procedure SetAsString(const Value: TSVGUnicodeString);
+    procedure SetAsPathString(const Value: TSVGUnicodeString);
+    procedure SetAsPolygonString(const Value: TSVGUnicodeString);
+    procedure SetAsPolylineString(const Value: TSVGUnicodeString);
     procedure SetTransform(const Value: TSVGMatrix);
 
     procedure ApplyMatrix(const aMatrix: TSVGMatrix);
 
     procedure ConvertToPathData(aSink: ISVGPathDataSink);
 
-    property AsString: TSVGUnicodeString read GetAsString write SetAsString;
+    function SegmentAtPt(const aPt: TSVGPoint; var aFigureIndex, aSegmentIndex: Integer): Boolean;
+
+    property AsPathString: TSVGUnicodeString read GetAsPathString write SetAsPathString;
+    property AsPolygonString: TSVGUnicodeString read GetAsPolygonString write SetAsPolygonString;
+    property AsPolylineString: TSVGUnicodeString read GetAsPolylineString write SetAsPolylineString;
     property Figures: TList<ISVGPathFigure> read GetFigures;
     property Transform: TSVGMatrix read GetTransform write SetTransform;
   end;
@@ -147,6 +158,7 @@ type
   TSVGPathSegment = class(TInterfacedObject, ISVGPathSegment)
   private
     FIsRelative: Boolean;
+    FBBox: TSVGRect;
   protected
     function GetEndPoint: TSVGPoint; virtual; abstract;
     function GetIsRelative: Boolean;
@@ -159,6 +171,8 @@ type
     function CalcBBox(const aStartPoint: TSVGPoint): TSVGRect; virtual; abstract;
 
     procedure ApplyMatrix(const aMatrix: TSVGMatrix); virtual; abstract;
+
+    function GetBBox(const aStartPoint: TSVGPoint): TSVGRect;
 
     property IsRelative: Boolean read GetIsRelative write SetIsRelative;
     property EndPoint: TSVGPoint read GetEndPoint write SetEndPoint;
@@ -300,6 +314,8 @@ type
 
     procedure ApplyMatrix(const aMatrix: TSVGMatrix); virtual;
 
+    function SegmentAtPt(const aPt: TSVGPoint; var aSegmentIndex: Integer): Boolean;
+
     property IsClosed: Boolean read GetIsClosed write SetIsClosed;
     property StartPoint: TSVGPoint read GetStartPoint write SetStartPoint;
     property Segments: TList<ISVGPathSegment> read GetSegments;
@@ -310,11 +326,15 @@ type
     FFigures: TList<ISVGPathFigure>;
     FTransform: TSVGMatrix;
   protected
-    function GetAsString: TSVGUnicodeString;
+    function GetAsPathString: TSVGUnicodeString;
+    function GetAsPolygonString: TSVGUnicodeString;
+    function GetAsPolylineString: TSVGUnicodeString;
     function GetFigures: TList<ISVGPathFigure>;
     function GetLastFigure: ISVGPathFigure;
     function GetTransform: TSVGMatrix;
-    procedure SetAsString(const Value: TSVGUnicodeString);
+    procedure SetAsPathString(const Value: TSVGUnicodeString);
+    procedure SetAsPolygonString(const Value: TSVGUnicodeString);
+    procedure SetAsPolylineString(const Value: TSVGUnicodeString);
     procedure SetTransform(const Value: TSVGMatrix);
 
     property LastFigure: ISVGPathFigure read GetLastFigure;
@@ -337,7 +357,11 @@ type
 
     procedure ConvertToPathData(aSink: ISVGPathDataSink);
 
-    property AsString: TSVGUnicodeString read GetAsString write SetAsString;
+    function SegmentAtPt(const aPt: TSVGPoint; var aFigureIndex, aSegmentIndex: Integer): Boolean;
+
+    property AsPathString: TSVGUnicodeString read GetAsPathString write SetAsPathString;
+    property AsPolygonString: TSVGUnicodeString read GetAsPolygonString write SetAsPolygonString;
+    property AsPolylineString: TSVGUnicodeString read GetAsPolylineString write SetAsPolylineString;
     property Figures: TList<ISVGPathFigure> read GetFigures;
     property Transform: TSVGMatrix read GetTransform write SetTransform;
   end;
@@ -355,11 +379,20 @@ begin
   inherited Create;
 
   FIsRelative := False;
+  FBBox := TSVGRect.CreateUndefined;
 end;
 
 destructor TSVGPathSegment.Destroy;
 begin
   inherited;
+end;
+
+function TSVGPathSegment.GetBBox(const aStartPoint: TSVGPoint): TSVGRect;
+begin
+  if FBBox.IsUndefined then
+    FBBox := CalcBBox(aStartPoint);
+
+  Result := FBBox;
 end;
 
 function TSVGPathSegment.GetIsRelative: Boolean;
@@ -438,6 +471,7 @@ begin
   if Value <> FPoint then
   begin
     FPoint := Value;
+    FBBox := TSVGRect.CreateUndefined;
   end;
 end;
 
@@ -594,6 +628,7 @@ begin
   if Value <> FPoint1 then
   begin
     FPoint1 := Value;
+    FBBox := TSVGRect.CreateUndefined;
   end;
 end;
 
@@ -602,6 +637,7 @@ begin
   if Value <> FPoint2 then
   begin
     FPoint2 := Value;
+    FBBox := TSVGRect.CreateUndefined;
   end;
 end;
 
@@ -610,6 +646,7 @@ begin
   if Value <> FPoint3 then
   begin
     FPoint3 := Value;
+    FBBox := TSVGRect.CreateUndefined;
   end;
 end;
 
@@ -733,6 +770,7 @@ begin
   if FPoint1 <> value then
   begin
     FPoint1 := Value;
+    FBBox := TSVGRect.CreateUndefined;
   end;
 end;
 
@@ -741,6 +779,7 @@ begin
   if FPoint2 <> value then
   begin
     FPoint2 := Value;
+    FBBox := TSVGRect.CreateUndefined;
   end;
 end;
 
@@ -1233,6 +1272,7 @@ begin
   if FIsLargeArc <> Value then
   begin
     FIsLargeArc := Value;
+    FBBox := TSVGRect.CreateUndefined;
   end;
 end;
 
@@ -1241,6 +1281,7 @@ begin
   if FPoint <> Value then
   begin
     FPoint := Value;
+    FBBox := TSVGRect.CreateUndefined;
   end;
 end;
 
@@ -1249,6 +1290,7 @@ begin
   if FAngle <> Value then
   begin
     FAngle := Value;
+    FBBox := TSVGRect.CreateUndefined;
   end;
 end;
 
@@ -1270,6 +1312,7 @@ begin
   if FRadius <> Value then
   begin
     FRadius := Value;
+    FBBox := TSVGRect.CreateUndefined;
   end;
 end;
 
@@ -1278,6 +1321,7 @@ begin
   if FSweepDirection <> Value then
   begin
     FSweepDirection := Value;
+    FBBox := TSVGRect.CreateUndefined;
   end;
 end;
 
@@ -1375,6 +1419,28 @@ end;
 function TSVGPathFigure.GetStartPoint: TSVGPoint;
 begin
   Result := FStartPoint;
+end;
+
+function TSVGPathFigure.SegmentAtPt(const aPt: TSVGPoint;
+  var aSegmentIndex: Integer): Boolean;
+var
+  i: Integer;
+  R: TSVGRect;
+  P: TSVGPoint;
+begin
+  Result := False;
+  P := StartPoint;
+  for i := 0 to Segments.Count - 1 do
+  begin
+    R := Segments[i].GetBBox(P);
+    if R.ContainsPoint(aPt) then
+    begin
+      aSegmentIndex := i;
+      Result := True;
+      Break;
+    end else
+      P := Segments[i].EndPoint;
+  end;
 end;
 
 procedure TSVGPathFigure.SetIsClosed(const Value: Boolean);
@@ -1516,7 +1582,7 @@ begin
   //
 end;
 
-function TSVGPathGeometry.GetAsString: TSVGUnicodeString;
+function TSVGPathGeometry.GetAsPathString: TSVGUnicodeString;
 var
   Figure: ISVGPathFigure;
   Segment: ISVGPathSegment;
@@ -1643,6 +1709,78 @@ begin
   end;
 end;
 
+function TSVGPathGeometry.GetAsPolygonString: TSVGUnicodeString;
+var
+  Figure: ISVGPathFigure;
+  Segment: ISVGPathSegment;
+  LineSegment: ISVGLineSegment;
+  BezierSegment: ISVGBezierSegment;
+  QuadSegment: ISVGQuadSegment;
+  ArcSegment: ISVGArcSegment;
+  StringBuilder: TBaseStringBuilder;
+  P1: TSVGPoint;
+begin
+  Result := '';
+
+  StringBuilder := TBaseStringBuilder.Create;
+  try
+    for Figure in FFigures do
+    begin
+      P1 := TransformPoint(Figure.StartPoint, FTransform);
+
+      StringBuilder.Append(Format('%g,%g', [P1.X, P1.Y], USFormatSettings));
+
+      for Segment in Figure.Segments do
+      begin
+        if Supports(Segment, ISVGLineSegment, LineSegment) then
+        begin
+          StringBuilder.Append(' ');
+
+          P1 := TransformPoint(LineSegment.Point, FTransform);
+
+          StringBuilder.Append(Format('%g,%g', [P1.X, P1.Y], USFormatSettings));
+        end else
+
+        if Supports(Segment, ISVGBezierSegment, BezierSegment) then
+        begin
+          StringBuilder.Append(' ');
+
+          P1 := TransformPoint(BezierSegment.Point3, FTransform);
+
+          StringBuilder.Append(Format('%g,%g', [P1.X, P1.Y], USFormatSettings));
+        end else
+
+        if Supports(Segment, ISVGQuadSegment, QuadSegment) then
+        begin
+          StringBuilder.Append(' ');
+
+          P1 := TransformPoint(QuadSegment.Point2, FTransform);
+
+          StringBuilder.Append(Format('%g,%g', [P1.X, P1.Y], USFormatSettings));
+        end else
+
+        if Supports(Segment, ISVGArcSegment, ArcSegment) then
+        begin
+          StringBuilder.Append(' ');
+
+          P1 := TransformPoint(ArcSegment.Point, FTransform);
+
+          StringBuilder.Append(Format('%g,%g', [P1.X, P1.Y], USFormatSettings));
+        end;
+      end;
+    end;
+
+    Result := StringBuilder.ToUnicodeString;
+  finally
+    StringBuilder.Free;
+  end;
+end;
+
+function TSVGPathGeometry.GetAsPolylineString: TSVGUnicodeString;
+begin
+  Result := AsPolygonString;
+end;
+
 function TSVGPathGeometry.GetFigures: TList<ISVGPathFigure>;
 begin
   Result := FFigures;
@@ -1676,7 +1814,26 @@ begin
   Figure.StartPoint := aP;
 end;
 
-procedure TSVGPathGeometry.SetAsString(const Value: TSVGUnicodeString);
+function TSVGPathGeometry.SegmentAtPt(const aPt: TSVGPoint; var aFigureIndex,
+  aSegmentIndex: Integer): Boolean;
+var
+  i: Integer;
+begin
+  Result := False;
+
+  for i := 0 to Figures.Count - 1 do
+  begin
+    Result := Figures[i].SegmentAtPt(aPt, aSegmentIndex);
+
+    if Result then
+    begin
+      aFigureIndex := i;
+      Break;
+    end;
+  end;
+end;
+
+procedure TSVGPathGeometry.SetAsPathString(const Value: TSVGUnicodeString);
 var
   Parser: TSVGPathStringParser;
   LastPoint: TSVGPoint;
@@ -1692,6 +1849,36 @@ begin
       Parser.ParsePath(Self, LastPoint);
       Parser.SkipWhiteSpace;
     end;
+  finally
+    Parser.Free;
+  end;
+end;
+
+procedure TSVGPathGeometry.SetAsPolygonString(const Value: TSVGUnicodeString);
+var
+  Parser: TSVGPathStringParser;
+begin
+  Parser := TSVGPathStringParser.Create(Value);
+  try
+    FFigures.Clear;
+
+    Parser.SkipWhiteSpace;
+    Parser.ParsePolygon(Self, True);
+  finally
+    Parser.Free;
+  end;
+end;
+
+procedure TSVGPathGeometry.SetAsPolylineString(const Value: TSVGUnicodeString);
+var
+  Parser: TSVGPathStringParser;
+begin
+  Parser := TSVGPathStringParser.Create(Value);
+  try
+    FFigures.Clear;
+
+    Parser.SkipWhiteSpace;
+    Parser.ParsePolygon(Self, False);
   finally
     Parser.Free;
   end;

@@ -191,6 +191,8 @@ type
       aObject: ISVGObject; aParentCache: ISVGObjectCache); reintroduce; virtual;
     destructor Destroy; override;
 
+    procedure Init; virtual;
+
     procedure SetBounds(ALeft, ATop, AWidth, AHeight: Integer); override;
 
     procedure Apply; virtual;
@@ -223,36 +225,51 @@ type
       aObject: ISVGObject; aParentCache: ISVGObjectCache); override;
     destructor Destroy; override;
 
+    procedure Init; override;
+
     procedure SetBounds(ALeft, ATop, AWidth, AHeight: Integer); override;
   end;
 
   /// <summary>Shape tool, modifies the shape of an element.</summary>
   TSVGEditorToolShape = class(TSVGEditorTool)
   private
-    FPathDataList: ISVGPathDataList;
-
+    FPathGeometry: ISVGPathGeometry;
+    FFigureIndex: Integer;
+    FSegmentIndex: Integer;
     FCP: TSVGPoint;
     FR: TSVGPoint;
     FAngle: TSVGFloat;
     FStartAngle, FDeltaAngle: TSVGFloat;
 
-    function GetData: TSVGPathPointList;
     function GetObjectBounds: TSVGRect;
     procedure SetObjectBounds(aRect: TSVGRect);
 
     procedure SetAttrPathData(const aValue: TSVGUnicodeString);
   protected
     function GetHandlePoint(const aIndex: Integer): TPoint; override;
+    function GetPathFigure: ISVGPathFigure;
+    function GetPathSegment: ISVGPathSegment;
 
     procedure DoCreateToolParts; override;
     procedure DoSetHandlePoint(const aIndex: Integer; const Value: TPoint); override;
     procedure DoMovePosition(const aDx, aDy: Integer); override;
 
-    //procedure PaintRenderContext(aRC: ISVGRenderContext); override;
+    // Path editing
+    function PathSegmentPrev: ISVGPathSegment;
+    function PathSegmentNext: ISVGPathSegment;
+    function PathSegmentGetStartPoint: TSVGPoint;
+    procedure PathSegmentSetStartPoint(const aPoint: TSVGPoint);
+
+    // Path editing
+    property PathGeometry: ISVGPathGeometry read FPathGeometry;
+    property PathFigure: ISVGPathFigure read GetPathFigure;
+    property PathSegment: ISVGPathSegment read GetPathSegment;
   public
     constructor Create(aEditor: TSVGEditor; aRoot: ISVGRoot;
       aObject: ISVGObject; aParentCache: ISVGObjectCache); override;
     destructor Destroy; override;
+
+    procedure Init; override;
 
     procedure MouseMove(Shift: TShiftState; X, Y: Integer); override;
 
@@ -313,10 +330,6 @@ type
     FElementList: TDictionary<Integer, ISVGElement>;
     FMaxID: Integer;
 
-    FPathGeometry: ISVGPathGeometry;
-    FFigureIndex: Integer;
-    FSegmentIndex: Integer;
-
     FOnElementAdd: TElementAddEvent;
     FOnElementRemove: TElementRemoveEvent;
     FOnElementSelect: TElementSelectEvent;
@@ -335,8 +348,8 @@ type
 
     procedure ToolsCreate;
     procedure ToolsClear;
-    //procedure ToolsHide;
-    //procedure ToolsShow;
+    procedure ToolsHide;
+    procedure ToolsShow;
 
     procedure ElementListInit(aNode: IXMLNode; var aID: Integer);
 
@@ -349,8 +362,6 @@ type
     function GetCmdRedoCount: Integer;
     function GetCmdUndoCount: Integer;
     function GetElement(const aID: Integer): ISVGElement;
-    function GetPathSegment: ISVGPathSegment;
-    function GetPathFigure: ISVGPathFigure;
     function GetSelectedElement(const aIndex: Integer): Integer;
     function GetSelectedElementCount: Integer;
 
@@ -438,12 +449,6 @@ type
     procedure CmdUndo;
     procedure CmdRedo;
 
-    // Path editing
-    function PathSegmentPrev: ISVGPathSegment;
-    function PathSegmentNext: ISVGPathSegment;
-    function PathSegmentGetStartPoint: TSVGPoint;
-    procedure PathSegmentSetStartPoint(const aPoint: TSVGPoint);
-
     procedure ToolSelect(const aTool: TSVGToolClass);
 
     procedure LoadFromFile(const aFilename: string);
@@ -469,11 +474,6 @@ type
     property SelectedElementCount: Integer read GetSelectedElementCount;
     property SelectedElement[const aIndex: Integer]: Integer read GetSelectedElement;
     property TopLeft: TPoint read FTopLeft write SetTopLeft;
-
-    // Path editing
-    property PathGeometry: ISVGPathGeometry read FPathGeometry;
-    property PathFigure: ISVGPathFigure read GetPathFigure;
-    property PathSegment: ISVGPathSegment read GetPathSegment;
 
     property OnElementAdd: TElementAddEvent read FOnElementAdd write FOnElementAdd;
     property OnElementRemove: TElementRemoveEvent read FOnElementRemove write FOnElementRemove;
@@ -737,8 +737,6 @@ end;
 
 constructor TSVGEditorTool.Create(aEditor: TSVGEditor;
   aRoot: ISVGRoot; aObject: ISVGObject; aParentCache: ISVGObjectCache);
-var
-  i: Integer;
 begin
   FCmdList := TDictionary<TSVGUnicodeString, TSVGEditorCmdSetAttribute>.Create;
 
@@ -749,7 +747,7 @@ begin
   FSVGObject := aObject;
   FParentCache := aParentCache;
 
-  FOrigCTM := TSVGMatrix.CreateIdentity;
+  {FOrigCTM := TSVGMatrix.CreateIdentity;
 
   FObjectID := FEditor.GetElementID(FSVGObject);
 
@@ -770,11 +768,11 @@ begin
   end else
     FCache := nil;
 
-  CalcDimReferences;
+  CalcDimReferences;}
 
   inherited Create(aEditor);
 
-  CalcBounds;
+  {CalcBounds;
 
   if (AbsoluteContentRect.Right < AbsoluteContentRect.Left)
   or (AbsoluteContentRect.Bottom < AbsoluteContentRect.Top) then
@@ -786,7 +784,9 @@ begin
       AbsoluteContentRect.Right + FEditor.TopLeft.X - FEditor.Padding.Left,
       AbsoluteContentRect.Bottom + FEditor.TopLeft.Y - FEditor.Padding.Top);
 
-  UpdateBitmap;
+  UpdateBitmap;}
+
+  Init;
 end;
 
 destructor TSVGEditorTool.Destroy;
@@ -867,9 +867,56 @@ begin
 
   Result := T;
 
-  Result := TSVGMatrix.Multiply(Result, AlignMatrix);
+  //Result := TSVGMatrix.Multiply(Result, FParentCache.ViewportMatrix);
 
+  Result := TSVGMatrix.Multiply(Result, AlignMatrix);
   Result := TSVGMatrix.Multiply(Result, TSVGMatrix.CreateTranslation(Margin, Margin));
+end;
+
+procedure TSVGEditorTool.Init;
+var
+  i: Integer;
+  Pair: TPair<TSVGUnicodeString, TSVGEditorCmdSetAttribute>;
+begin
+  for Pair in FCmdList do
+    Pair.Value.Free;
+  FCmdList.Clear;
+
+  FOrigCTM := TSVGMatrix.CreateIdentity;
+
+  FObjectID := FEditor.GetElementID(FSVGObject);
+
+  if FSVGObject.CacheList.Count > 0 then
+  begin
+    i := 0;
+    while (i < FSVGObject.CacheList.Count)
+    and (FSVGObject.CacheList[i].ParentCache as IInterface <> FParentCache as IInterface) do
+      Inc(i);
+
+    if i < FSVGObject.CacheList.Count then
+      FCache := FSVGObject.CacheList[i]
+    else
+      FCache := FSVGObject.CacheList[0];
+
+    FOrigCTM := FCache.CTM;
+
+  end else
+    FCache := nil;
+
+  CalcDimReferences;
+  CalcBounds;
+
+  if (AbsoluteContentRect.Right < AbsoluteContentRect.Left)
+  or (AbsoluteContentRect.Bottom < AbsoluteContentRect.Top) then
+    FOrigBounds := AbsoluteContentRect
+  else
+    FOrigBounds := Rect(
+      AbsoluteContentRect.Left + FEditor.TopLeft.X - FEditor.Padding.Left,
+      AbsoluteContentRect.Top + FEditor.TopLeft.Y - FEditor.Padding.Top,
+      AbsoluteContentRect.Right + FEditor.TopLeft.X - FEditor.Padding.Left,
+      AbsoluteContentRect.Bottom + FEditor.TopLeft.Y - FEditor.Padding.Top);
+
+  UpdateBitmap;
 end;
 
 procedure TSVGEditorTool.KeyDown(var Key: Word; Shift: TShiftState);
@@ -997,8 +1044,6 @@ constructor TSVGEditorToolTransform.Create(aEditor: TSVGEditor; aRoot: ISVGRoot;
   aObject: ISVGObject; aParentCache: ISVGObjectCache);
 begin
   inherited Create(aEditor, aRoot, aObject, aParentCache);
-
-  CmdListAddAttribute('transform');
 end;
 
 destructor TSVGEditorToolTransform.Destroy;
@@ -1024,6 +1069,13 @@ begin
     Handle.Parent := Parent;
     HandleList.Add(Handle);
   end;
+end;
+
+procedure TSVGEditorToolTransform.Init;
+begin
+  inherited;
+
+  CmdListAddAttribute('transform');
 end;
 
 procedure TSVGEditorToolTransform.SetBounds(ALeft, ATop, AWidth,
@@ -1092,8 +1144,7 @@ end;
 constructor TSVGEditorToolShape.Create(aEditor: TSVGEditor; aRoot: ISVGRoot;
   aObject: ISVGObject; aParentCache: ISVGObjectCache);
 begin
-  FPathDataList := TSVGPathDataListUtil.Create;
-  {FPathGeometry := TSVGPathGeometry.Create;
+  FPathGeometry := TSVGPathGeometry.Create;
   FFigureIndex := 0;
   FSegmentIndex := 0;
 
@@ -1110,58 +1161,23 @@ begin
       begin
       end;
 
-    elPolygon,
+    elPolygon:
+      begin
+        FPathGeometry.AsPolygonString := aObject.Attributes['points'];
+      end;
+
     elPolyline:
       begin
-        FPathDataList.ParseSVGPolygonString(
-          aObject.Attributes['points'],
-          aObject.ElementType = elPolygon);
+        FPathGeometry.AsPolylineString := aObject.Attributes['points'];
       end;
 
     elPath:
       begin
-        FPathGeometry.AsString := aObject.Attributes['d'];
-      end;
-  end;}
-
-  inherited Create(aEditor, aRoot, aObject, aParentCache);
-
-  case FSVGObject.ElementType of
-    elRect:
-      begin
-        CmdListAddAttribute('x');
-        CmdListAddAttribute('y');
-        CmdListAddAttribute('width');
-        CmdListAddAttribute('height');
-      end;
-
-    elCircle:
-      begin
-        CmdListAddAttribute('cx');
-        CmdListAddAttribute('cy');
-        CmdListAddAttribute('r');
-      end;
-
-    elEllipse:
-      begin
-        CmdListAddAttribute('cx');
-        CmdListAddAttribute('cy');
-        CmdListAddAttribute('rx');
-        CmdListAddAttribute('ry');
-      end;
-
-    elPolygon,
-    elPolyline:
-      begin
-        CmdListAddAttribute('points');
-      end;
-
-    elPath:
-      begin
-        CmdListAddAttribute('d');
+        FPathGeometry.AsPathString := aObject.Attributes['d'];
       end;
   end;
 
+  inherited Create(aEditor, aRoot, aObject, aParentCache);
 end;
 
 destructor TSVGEditorToolShape.Destroy;
@@ -1175,7 +1191,6 @@ var
   ToolHandle: TSVGToolHandle;
   ToolLine: TSVGToolLine;
   ToolEllipse: TSVGToolEllipse;
-  Points: TSVGPathPointList;
   Segment: ISVGPathSegment;
   LineSegment: ISVGLineSegment;
   BezierSegment: ISVGBezierSegment;
@@ -1214,21 +1229,10 @@ begin
       end;
 
     elPolygon,
-    elPolyLine:
-      begin
-        Points := GetData;
-
-        for i := 0 to Points.Count - 1 do
-        begin
-          ToolHandle := TSVGToolHandle.Create(Self, i, 4, svg_handle_shape_1);
-          ToolHandle.Parent := Parent;
-          HandleList.Add(ToolHandle);
-        end;
-      end;
-
+    elPolyLine,
     elPath:
       begin
-        Segment := FEditor.PathSegment;
+        Segment := PathSegment;
         if assigned(Segment) then
         begin
           if Supports(Segment, ISVGLineSegment, LineSegment) then
@@ -1298,7 +1302,7 @@ begin
 
             FR := ArcSegment.Radius;
             FAngle := ArcSegment.Angle * PI / 180;
-            ArcSegment.GetCenterParameters(FEditor.PathSegmentGetStartPoint, FCP, FStartAngle, FDeltaAngle);
+            ArcSegment.GetCenterParameters(PathSegmentGetStartPoint, FCP, FStartAngle, FDeltaAngle);
 
             ToolEllipse := TSVGToolEllipse.Create(Self, 0, 1, 2, svg_tool_ellipse);
             ToolEllipse.Parent := Parent;
@@ -1334,8 +1338,14 @@ procedure TSVGEditorToolShape.DoMovePosition(const aDx, aDy: Integer);
 var
   R: TSVGRect;
   SaveCTM: TSVGMatrix;
+  T, S: TSVGMatrix;
+  P: TSVGPoint;
 begin
   inherited;
+
+  T := FCache.CTM;
+  S := TSVGMatrix.CreateScaling(T.m11, T.m22);
+  P := TransformPoint(SVGPoint(aDx, aDy), S.Inverse);
 
   case FSVGObject.ElementType of
     elRect,
@@ -1346,17 +1356,33 @@ begin
         if R.IsUndefined then
           Exit;
 
-        R.Offset(aDx / FEditor.Scale, aDy / FEditor.Scale);
+        R.Offset(P.X, P.Y);
 
         SetObjectBounds(R);
       end;
 
+    elPolygon:
+      begin
+        PathGeometry.ApplyMatrix(
+          TSVGMatrix.CreateTranslation(P.X, P.Y));
+
+        SetAttrPathData(PathGeometry.AsPolygonString);
+      end;
+
+    elPolyLine:
+      begin
+        PathGeometry.ApplyMatrix(
+          TSVGMatrix.CreateTranslation(P.X, P.Y));
+
+        SetAttrPathData(PathGeometry.AsPolylineString);
+      end;
+
     elPath:
       begin
-        FEditor.PathGeometry.ApplyMatrix(
-          TSVGMatrix.CreateTranslation(aDx / FEditor.Scale, aDy / FEditor.Scale));
+        PathGeometry.ApplyMatrix(
+          TSVGMatrix.CreateTranslation(P.X, P.Y));
 
-        SetAttrPathData(FEditor.PathGeometry.AsString);
+        SetAttrPathData(PathGeometry.AsPathString);
       end;
   end;
 
@@ -1371,7 +1397,6 @@ begin
     end;
   end;
 
-  //CalcBounds;
   UpdateBitmap;
   Invalidate;
 end;
@@ -1382,8 +1407,6 @@ var
   P: TSVGPoint;
   R: TSVGRect;
   SaveCTM: TSVGMatrix;
-  Points: TSVGPathPointList;
-  PointKind: TSVGPathPointKind;
   Segment: ISVGPathSegment;
   LineSegment: ISVGLineSegment;
   BezierSegment: ISVGBezierSegment;
@@ -1439,24 +1462,16 @@ begin
       end;
 
     elPolyLine,
-    elPolygon:
-      begin
-        Points := GetData;
-
-        PointKind := Points[aIndex].Kind;
-
-        Points[aIndex] := TSVGPathPoint.Create(PointKind, P);
-      end;
-
+    elPolygon,
     elPath:
       begin
-        Segment := FEditor.PathSegment;
+        Segment := PathSegment;
         if assigned(Segment) then
         begin
           if Supports(Segment, ISVGLineSegment, LineSegment) then
           begin
             case aIndex of
-              0: FEditor.PathSegmentSetStartPoint(P);
+              0: PathSegmentSetStartPoint(P);
               1: LineSegment.Point := P;
             end;
           end else
@@ -1464,7 +1479,7 @@ begin
           if Supports(Segment, ISVGBezierSegment, BezierSegment) then
           begin
             case aIndex of
-              0: FEditor.PathSegmentSetStartPoint(P);
+              0: PathSegmentSetStartPoint(P);
               1: BezierSegment.Point1 := P;
               2: BezierSegment.Point2 := P;
               3: BezierSegment.Point3 := P;
@@ -1474,7 +1489,7 @@ begin
           if Supports(Segment, ISVGQuadSegment, QuadSegment) then
           begin
             case aIndex of
-              0: FEditor.PathSegmentSetStartPoint(P);
+              0: PathSegmentSetStartPoint(P);
               1: QuadSegment.Point1 := P;
               2: QuadSegment.Point2 := P;
             end;
@@ -1507,12 +1522,17 @@ begin
                  end;
             end;
 
-            FEditor.PathSegmentSetStartPoint(ArcSegment.SetCenterParameters(FCP, FR, FAngle, FStartAngle, FDeltaAngle));
-
-            UpdateToolParts;
+            PathSegmentSetStartPoint(ArcSegment.SetCenterParameters(FCP, FR, FAngle, FStartAngle, FDeltaAngle));
           end;
 
-          SetAttrPathData(FEditor.PathGeometry.AsString);
+          case FSVGObject.ElementType of
+            elPolyLine:
+              SetAttrPathData(PathGeometry.AsPolylineString);
+            elPolygon:
+              SetAttrPathData(PathGeometry.AsPolygonString);
+            elPath:
+              SetAttrPathData(PathGeometry.AsPathString);
+          end;
         end;
       end;
   end;
@@ -1530,17 +1550,8 @@ begin
 
   CalcBounds;
   UpdateBitmap;
+  UpdateToolParts;
   Invalidate;
-end;
-
-function TSVGEditorToolShape.GetData: TSVGPathPointList;
-var
-  PathDataUtil: ISVGPathDataUtil;
-begin
-  if Supports(FPathDataList[0], ISVGPathDataUtil, PathDataUtil) then
-    Result := PathDataUtil.Data
-  else
-    raise Exception.Create('PathData does not support ISVGPathDataUtil.');
 end;
 
 function TSVGEditorToolShape.GetHandlePoint(const aIndex: Integer): TPoint;
@@ -1549,7 +1560,6 @@ var
   Rect: ISVGRect;
   Circle: ISVGCircle;
   Ellipse: ISVGEllipse;
-  Points: TSVGPathPointList;
   Segment: ISVGPathSegment;
   LineSegment: ISVGLineSegment;
   BezierSegment: ISVGBezierSegment;
@@ -1585,20 +1595,14 @@ begin
 
   case FSVGObject.ElementType of
     elPolyLine,
-    elPolygon:
-      begin
-        Points := GetData;
-
-        P := Points[aIndex].Point;
-      end;
-
+    elPolygon,
     elPath:
       begin
-        Segment := FEditor.PathSegment;
+        Segment := PathSegment;
 
         if assigned(Segment) then
         begin
-          PrevPoint := FEditor.PathSegmentGetStartPoint;
+          PrevPoint := PathSegmentGetStartPoint;
 
           if Supports(Segment, ISVGLineSegment, LineSegment) then
           begin
@@ -1666,13 +1670,11 @@ var
 begin
   if Supports(FSVGObject, ISVGRect, Rect) then
   begin
-
     Result := SVGRect(
       CalcX(Rect.X),
       CalcY(Rect.Y),
       CalcX(Rect.X) + CalcX(Rect.Width),
       CalcY(Rect.Y) + CalcY(Rect.Height));
-
   end else
 
   if Supports(FSVGObject, ISVGCircle, Circle) then
@@ -1696,9 +1698,75 @@ begin
     Result := TSVGRect.CreateUndefined;
 end;
 
+function TSVGEditorToolShape.GetPathFigure: ISVGPathFigure;
+begin
+  Result := nil;
+
+  if not assigned(FPathGeometry) then
+    Exit;
+
+  if FFigureIndex < FPathGeometry.Figures.Count then
+    Result := FPathGeometry.Figures[FFigureIndex];
+end;
+
+function TSVGEditorToolShape.GetPathSegment: ISVGPathSegment;
+var
+  Figure: ISVGPathFigure;
+begin
+  Result := nil;
+
+  if not assigned(FPathGeometry) then
+    Exit;
+
+  Figure := PathFigure;
+  if assigned(Figure) and (FSegmentIndex < Figure.Segments.Count) then
+    Result := Figure.Segments[FSegmentIndex];
+end;
+
+procedure TSVGEditorToolShape.Init;
+begin
+  inherited;
+
+  case FSVGObject.ElementType of
+    elRect:
+      begin
+        CmdListAddAttribute('x');
+        CmdListAddAttribute('y');
+        CmdListAddAttribute('width');
+        CmdListAddAttribute('height');
+      end;
+
+    elCircle:
+      begin
+        CmdListAddAttribute('cx');
+        CmdListAddAttribute('cy');
+        CmdListAddAttribute('r');
+      end;
+
+    elEllipse:
+      begin
+        CmdListAddAttribute('cx');
+        CmdListAddAttribute('cy');
+        CmdListAddAttribute('rx');
+        CmdListAddAttribute('ry');
+      end;
+
+    elPolygon,
+    elPolyline:
+      begin
+        CmdListAddAttribute('points');
+      end;
+
+    elPath:
+      begin
+        CmdListAddAttribute('d');
+      end;
+  end;
+end;
+
 procedure TSVGEditorToolShape.KeyDown(var Key: Word; Shift: TShiftState);
 begin
-  if FSVGObject.ElementType = elPath then
+  if FSVGObject.ElementType in [elPath, elPolygon, elPolyline] then
   begin
       if (ssAlt in Shift) then
       begin
@@ -1706,7 +1774,7 @@ begin
         begin
           ClearToolParts;
           try
-            FEditor.PathSegmentNext;
+            PathSegmentNext;
           finally
             CreateToolParts;
             UpdateBitmap;
@@ -1717,7 +1785,7 @@ begin
         begin
           ClearToolParts;
           try
-            FEditor.PathSegmentPrev;
+            PathSegmentPrev;
           finally
             CreateToolParts;
             UpdateBitmap;
@@ -1731,21 +1799,111 @@ begin
 end;
 
 procedure TSVGEditorToolShape.MouseMove(Shift: TShiftState; X, Y: Integer);
+var
+  P: TSVGPoint;
+  i,  j: Integer;
 begin
+  if FSVGObject.ElementType in [elPath, elPolygon, elPolyline] then
+  begin
+    P := SVGPoint(X, Y);
+    P := ToolToSVG(P);
+
+    if not(ssLeft in Shift) and not(ssRight in Shift) then
+    begin
+      if FPathGeometry.SegmentAtPt(P, i, j)
+      and ((i <> FFigureIndex) or (j <> FSegmentIndex)) then
+      begin
+        ClearToolParts;
+        try
+          FFigureIndex := i;
+          FSegmentIndex := j;
+        finally
+          CreateToolParts;
+          UpdateBitmap;
+        end;
+      end;
+    end;
+  end;
+
   inherited;
+end;
+
+function TSVGEditorToolShape.PathSegmentGetStartPoint: TSVGPoint;
+var
+  Figure: ISVGPathFigure;
+begin
+  Figure := PathFigure;
+  if assigned(Figure) then
+  begin
+    if FSegmentIndex > 0 then
+      Result := Figure.Segments[FSegmentIndex - 1].EndPoint
+    else
+      Result := Figure.StartPoint;
+  end else
+    Result := SVGPoint(0.0, 0.0);
+end;
+
+function TSVGEditorToolShape.PathSegmentNext: ISVGPathSegment;
+var
+  Figure: ISVGPathFigure;
+begin
+  Figure := PathFigure;
+  if assigned(Figure) then
+  begin
+    Inc(FSegmentIndex);
+    if FSegmentIndex >= Figure.Segments.Count then
+    begin
+      FSegmentIndex := 0;
+      Inc(FFigureIndex);
+      if FFigureIndex >= FPathGeometry.Figures.Count then
+        FFigureIndex := 0;
+    end;
+  end;
+end;
+
+function TSVGEditorToolShape.PathSegmentPrev: ISVGPathSegment;
+var
+  Figure: ISVGPathFigure;
+begin
+  Dec(FSegmentIndex);
+  if FSegmentIndex < 0 then
+  begin
+    Dec(FFigureIndex);
+    if FFigureIndex < 0 then
+      FFigureIndex := FPathGeometry.Figures.Count - 1;
+
+    Figure := FPathGeometry.Figures[FFigureIndex];
+    FSegmentIndex := Figure.Segments.Count - 1;
+  end;
+end;
+
+procedure TSVGEditorToolShape.PathSegmentSetStartPoint(const aPoint: TSVGPoint);
+var
+  Figure: ISVGPathFigure;
+begin
+  Figure := PathFigure;
+  if assigned(Figure) then
+  begin
+    if FSegmentIndex > 0 then
+      Figure.Segments[FSegmentIndex - 1].EndPoint := aPoint
+    else
+      Figure.StartPoint := aPoint;
+  end;
 end;
 
 procedure TSVGEditorToolShape.SetAttrPathData(const aValue: TSVGUnicodeString);
 var
   Path: ISVGPath;
+  Polygon: ISVGPolygon;
+  Polyline: ISVGPolyline;
   Attr: ISVGAttribute;
   //PathShape: ISVGPathShape;
   //PathDataList: ISVGPathDataList;
   //PathData: ISVGPathData;
 begin
+  { Update 10
   CmdListSetAttribute('d', aValue);
 
-  { Update 10
   if Supports(FSVGObject, ISVGPathShape, PathShape) then
   begin
     PathDataList := TSVGRenderContextManager.CreatePathDataList;
@@ -1761,7 +1919,25 @@ begin
   // Work around because of a bug
   if Supports(FSVGObject, ISVGPath, Path) then
   begin
+    CmdListSetAttribute('d', aValue);
+
     if Path.TryGetAttribute('d', Attr) then
+      Attr.Value.Parse(FRoot, aValue);
+  end else
+
+  if Supports(FSVGObject, ISVGPolygon, Polygon) then
+  begin
+    CmdListSetAttribute('points', aValue);
+
+    if Polygon.TryGetAttribute('points', Attr) then
+      Attr.Value.Parse(FRoot, aValue);
+  end else
+
+  if Supports(FSVGObject, ISVGPolyline, Polyline) then
+  begin
+    CmdListSetAttribute('points', aValue);
+
+    if Polyline.TryGetAttribute('points', Attr) then
       Attr.Value.Parse(FRoot, aValue);
   end;
 end;
@@ -2628,12 +2804,12 @@ procedure TSVGEditor.DoUpdatePage(Sender: TObject);
 begin
   FTimerUpdatePage.Enabled := False;
 
-  ToolsClear;
+  ToolsHide;
   try
     CalcCanvasRect;
     UpdatePage([]);
   finally
-    ToolsCreate;
+    ToolsShow;
   end;
 end;
 
@@ -2920,31 +3096,6 @@ begin
   Result := StrToInt(ID);
 end;
 
-function TSVGEditor.GetPathFigure: ISVGPathFigure;
-begin
-  Result := nil;
-
-  if not assigned(FPathGeometry) then
-    Exit;
-
-  if FFigureIndex < FPathGeometry.Figures.Count then
-    Result := FPathGeometry.Figures[FFigureIndex];
-end;
-
-function TSVGEditor.GetPathSegment: ISVGPathSegment;
-var
-  Figure: ISVGPathFigure;
-begin
-  Result := nil;
-
-  if not assigned(FPathGeometry) then
-    Exit;
-
-  Figure := PathFigure;
-  if assigned(Figure) and (FSegmentIndex < Figure.Segments.Count) then
-    Result := Figure.Segments[FSegmentIndex];
-end;
-
 function TSVGEditor.GetSelectedElement(const aIndex: Integer): Integer;
 begin
   if aIndex < SelectedElementList.Count then
@@ -3169,69 +3320,6 @@ begin
     Canvas.Draw(-FTopLeft.X, -FTopLeft.Y, FBitmap);
 end;
 
-function TSVGEditor.PathSegmentGetStartPoint: TSVGPoint;
-var
-  Figure: ISVGPathFigure;
-begin
-  Figure := PathFigure;
-  if assigned(Figure) then
-  begin
-    if FSegmentIndex > 0 then
-      Result := Figure.Segments[FSegmentIndex - 1].EndPoint
-    else
-      Result := Figure.StartPoint;
-  end else
-    Result := SVGPoint(0.0, 0.0);
-end;
-
-function TSVGEditor.PathSegmentNext: ISVGPathSegment;
-var
-  Figure: ISVGPathFigure;
-begin
-  Figure := PathFigure;
-  if assigned(Figure) then
-  begin
-    Inc(FSegmentIndex);
-    if FSegmentIndex >= Figure.Segments.Count then
-    begin
-      FSegmentIndex := 0;
-      Inc(FFigureIndex);
-      if FFigureIndex >= FPathGeometry.Figures.Count then
-        FFigureIndex := 0;
-    end;
-  end;
-end;
-
-function TSVGEditor.PathSegmentPrev: ISVGPathSegment;
-var
-  Figure: ISVGPathFigure;
-begin
-  Dec(FSegmentIndex);
-  if FSegmentIndex < 0 then
-  begin
-    Dec(FFigureIndex);
-    if FFigureIndex < 0 then
-      FFigureIndex := FPathGeometry.Figures.Count - 1;
-
-    Figure := FPathGeometry.Figures[FFigureIndex];
-    FSegmentIndex := Figure.Segments.Count - 1;
-  end;
-end;
-
-procedure TSVGEditor.PathSegmentSetStartPoint(const aPoint: TSVGPoint);
-var
-  Figure: ISVGPathFigure;
-begin
-  Figure := PathFigure;
-  if assigned(Figure) then
-  begin
-    if FSegmentIndex > 0 then
-      Figure.Segments[FSegmentIndex - 1].EndPoint := aPoint
-    else
-      Figure.StartPoint := aPoint;
-  end;
-end;
-
 procedure TSVGEditor.RenderSVGObject(aSVGObject: ISVGObject;
   aParentCache: ISVGObjectCache; const aStage: TSVGRenderStage;
   var IsRendered: Boolean);
@@ -3330,7 +3418,7 @@ end;
 
 procedure TSVGEditor.SetScale(const Value: TSVGFloat);
 begin
-  ToolsClear;
+  ToolsHide;
   try
     if FScale <> Value then
     begin
@@ -3340,7 +3428,7 @@ begin
       UpdatePage([]);
     end;
   finally
-    ToolsCreate;
+    ToolsShow;
   end;
 end;
 
@@ -3422,17 +3510,6 @@ begin
   else
     ParentCache := nil;
 
-  case aSVGObject.ElementType of
-    elPath:
-      begin
-        FPathGeometry := TSVGPathGeometry.Create;
-        FFigureIndex := 0;
-        FSegmentIndex := 0;
-
-        FPathGeometry.AsString := aSVGObject.Attributes['d'];
-      end;
-  end;
-
   Result := FCurTool.Create(Self, FRoot, aSVGObject, ParentCache);
   Result.Parent := Self;
   Result.OnAttributeChange := ToolAttributeChangeEvent;
@@ -3465,6 +3542,9 @@ begin
   begin
     Tool := FToolList[0];
 
+    // Collect the areas behind the old tools, so we can update the
+    // image behind the tools later on
+
     R := TSVGRect.Create(Tool.BoundsRect);
     R.Offset(TopLeft.X, TopLeft.Y);
     R := TransformRect(R, FInvMatrix);
@@ -3494,6 +3574,9 @@ begin
 
       FToolList.Add(Tool);
 
+      // Add the areas behind the new tools, so we can update the
+      // image behind the tools
+
       R := TSVGRect.Create(Tool.BoundsRect);
       R.Offset(TopLeft.X, TopLeft.Y);
       R := TransformRect(R, FInvMatrix);
@@ -3501,6 +3584,8 @@ begin
       FUpdateRectList.Add(R);
     end;
   end;
+
+  // Render the image behind the tools
 
   for R in FUpdateRectList do
     FRoot.InvalidateRect(R);
@@ -3525,14 +3610,26 @@ begin
   end;
 end;
 
-{procedure TSVGEditor.ToolsHide;
+procedure TSVGEditor.ToolsHide;
 var
   Tool: TSVGEditorTool;
+  R: TSVGRect;
 begin
+  FUpdateRectList.Clear;
+
   for Tool in FToolList do
   begin
     if Tool.IsChanged then
       Tool.Apply;
+
+    // Collect the areas behind the tools, so we can update the
+    // image behind the tools later on
+
+    R := TSVGRect.Create(Tool.BoundsRect);
+    R.Offset(TopLeft.X, TopLeft.Y);
+    R := TransformRect(R, FInvMatrix);
+
+    FUpdateRectList.Add(R);
 
     Tool.Visible := False;
   end;
@@ -3541,12 +3638,31 @@ end;
 procedure TSVGEditor.ToolsShow;
 var
   Tool: TSVGEditorTool;
+  R: TSVGRect;
 begin
   for Tool in FToolList do
   begin
+    Tool.Init;
     Tool.Visible := True;
+
+    // Add the areas behind the tools
+
+    R := TSVGRect.Create(Tool.BoundsRect);
+    R.Offset(TopLeft.X, TopLeft.Y);
+    R := TransformRect(R, FInvMatrix);
+
+    FUpdateRectList.Add(R);
   end;
-end;}
+
+  // Render the image behind the tools
+
+  for R in FUpdateRectList do
+    FRoot.InvalidateRect(R);
+
+  UpdatePage([]);
+
+  FUpdateRectList.Clear;
+end;
 
 function TSVGEditor.PointToSVG(const aPoint: TPoint): TSVGPoint;
 begin

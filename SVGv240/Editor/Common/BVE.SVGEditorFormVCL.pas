@@ -103,7 +103,10 @@ type
 
     FFormPrintPreview: TSVGPrintPreviewForm;
 
+    FAttributeList: TStringList;
+
     FTimerUpdatePage: TTimer;
+    FTimerUpdateAttribute: TTimer;
 
     FOpenDialog: TOpenDialog;
     FSaveDialog: TSaveDialog;
@@ -154,6 +157,7 @@ type
     procedure TreeViewXMLChange(Sender: TObject; Node: TTreeNode);
 
     procedure TimerUpdatePageTimer(Sender: TObject);
+    procedure TimerUpdateAttributeTimer(Sender: TObject);
 
     procedure ValueListEditorAttributeEditButtonClick(Sender: TObject);
     procedure ValueListEditorAttributeValidate(Sender: TObject; ACol, ARow: Integer;
@@ -193,8 +197,10 @@ type
       const aIndex: Integer; const aElement: ISVGElement);
     procedure ElementRemove(Sender: TObject; const aElement: ISVGElement);
     procedure ElementSelect(Sender: TObject);
+
     procedure SetAttribute(Sender: TObject; const aElement: ISVGElement;
       const aName, aValue: TSVGUnicodeString);
+
     procedure ToolSelect(Sender: TObject; const aTool: TSVGToolClass);
 
     procedure TreeViewXMLNodeAdd(const aParent: IXMLNode; const aIndex: Integer;
@@ -491,6 +497,8 @@ end;
 
 destructor TSVGEditorForm.Destroy;
 begin
+  FAttributeList.Free;
+
   inherited;
 end;
 
@@ -511,6 +519,13 @@ begin
   FTimerUpdatePage.Enabled := False;
   FTimerUpdatePage.Interval := 250;
   FTimerUpdatePage.OnTimer := TimerUpdatePageTimer;
+
+  FAttributeList := TStringList.Create;
+
+  FTimerUpdateAttribute := TTimer.Create(Self);
+  FTimerUpdateAttribute.Enabled := False;
+  FTimerUpdateAttribute.Interval := 100;
+  FTimerUpdateAttribute.OnTimer := TimerUpdateAttributeTimer;
 
   FOpenDialog := TOpenDialog.Create(Self);
   FSaveDialog := TSaveDialog.Create(Self);
@@ -821,14 +836,10 @@ end;
 procedure TSVGEditorForm.SetAttribute(Sender: TObject;
   const aElement: ISVGElement; const aName, aValue: TSVGUnicodeString);
 begin
-  ValueListEditorAttribute.OnValidate := nil;
-  try
-    ValueListEditorAttribute.Values[aName] := aValue;
-  finally
-    ValueListEditorAttribute.OnValidate := ValueListEditorAttributeValidate;
-  end;
+  FAttributeList.Values[aName] := aValue;
 
-  EnableActions;
+  FTimerUpdateAttribute.Enabled := False;
+  FTimerUpdateAttribute.Enabled := True;
 end;
 
 procedure TSVGEditorForm.SetOpenDialog(const Value: TOpenDialog);
@@ -859,8 +870,30 @@ begin
   end;
 end;
 
+procedure TSVGEditorForm.TimerUpdateAttributeTimer(Sender: TObject);
+var
+  i: Integer;
+begin
+  FTimerUpdateAttribute.Enabled := False;
+
+  ValueListEditorAttribute.OnValidate := nil;
+  try
+    for i := 0 to FAttributeList.Count - 1 do
+    begin
+      ValueListEditorAttribute.Values[FAttributeList.Names[i]] := FAttributeList.ValueFromIndex[i];
+    end;
+  finally
+    FAttributeList.Clear;
+    ValueListEditorAttribute.OnValidate := ValueListEditorAttributeValidate;
+  end;
+
+  EnableActions;
+end;
+
 procedure TSVGEditorForm.TimerUpdatePageTimer(Sender: TObject);
 begin
+  FTimerUpdatePage.Enabled := False;
+
   FEditor.UpdatePage([]);
 end;
 
