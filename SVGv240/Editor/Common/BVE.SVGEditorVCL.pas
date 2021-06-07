@@ -158,7 +158,7 @@ type
   protected
     function GetAlignMatrix: TSVGMatrix;
     function GetViewportMatrix: TSVGMatrix;
-    function GetScreenBBox: TSVGRect;
+    function GetScreenBBox: TSVGRect; virtual;
 
     function GetRefFontSize: TSVGFloat;
     function GetRefWidth: TSVGFloat;
@@ -167,8 +167,8 @@ type
     function GetRefTop: TSVGFloat;
     function GetRefLength: TSVGFloat;
 
-    function SVGToTool(const aPoint: TSVGPoint): TSVGPoint;
-    function ToolToSVG(const aPoint: TSVGPoint): TSVGPoint;
+    function SVGToTool(const aPoint: TSVGPoint): TSVGPoint; virtual;
+    function ToolToSVG(const aPoint: TSVGPoint): TSVGPoint; virtual;
 
     procedure CalcDimReferences;
     procedure CalcBounds;
@@ -230,12 +230,18 @@ type
     procedure SetBounds(ALeft, ATop, AWidth, AHeight: Integer); override;
   end;
 
+  TSVGToolShapeMode = (tsmEdit, tsmAddLines);
+
   /// <summary>Shape tool, modifies the shape of an element.</summary>
   TSVGEditorToolShape = class(TSVGEditorTool)
   private
     FPathGeometry: ISVGPathGeometry;
     FFigureIndex: Integer;
     FSegmentIndex: Integer;
+
+    FMode: TSVGToolShapeMode;
+
+    // Arc edtitting
     FCP: TSVGPoint;
     FR: TSVGPoint;
     FAngle: TSVGFloat;
@@ -245,6 +251,7 @@ type
     procedure SetObjectBounds(aRect: TSVGRect);
 
     procedure SetAttrPathData(const aValue: TSVGUnicodeString);
+    procedure SetMode(const Value: TSVGToolShapeMode);
   protected
     function GetHandlePoint(const aIndex: Integer): TPoint; override;
     function GetPathFigure: ISVGPathFigure;
@@ -253,6 +260,8 @@ type
     procedure DoCreateToolParts; override;
     procedure DoSetHandlePoint(const aIndex: Integer; const Value: TPoint); override;
     procedure DoMovePosition(const aDx, aDy: Integer); override;
+
+    procedure DoHandleMouseDown(const aIndex: integer; Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
 
     // Path editing
     function PathSegmentPrev: ISVGPathSegment;
@@ -271,9 +280,50 @@ type
 
     procedure Init; override;
 
+    procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
     procedure MouseMove(Shift: TShiftState; X, Y: Integer); override;
 
     procedure KeyDown(var Key: Word; Shift: TShiftState); override;
+
+    property Mode: TSVGToolShapeMode read FMode write SetMode;
+  end;
+
+  /// <summary>Draw tool, for drawing a path.</summary>
+  TSVGEditorToolDraw = class(TSVGEditorTool)
+  private
+    FPointList: TList<TSVGPoint>;
+    FNewPoint: TSVGPoint;
+    FBoundsRect: TSVGRect;
+
+    FPolygon: ISVGPolygon;
+
+    procedure CreateToolPartsInternal;
+  protected
+    function GetHandlePoint(const aIndex: Integer): TPoint; override;
+    function GetPoints: TSVGUnicodeString;
+    function GetScreenBBox: TSVGRect; override;
+
+    procedure DoHandleMouseDown(const aIndex: integer; Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
+    procedure DoHandleMouseMove(const aIndex: integer; Shift: TShiftState; X, Y: Integer); override;
+
+    procedure DoSetHandlePoint(const aIndex: Integer; const Value: TPoint); override;
+    procedure DoCreateToolParts; override;
+
+    procedure PaintRenderContext(aRC: ISVGRenderContext); override;
+
+    function SVGToTool(const aPoint: TSVGPoint): TSVGPoint; override;
+    function ToolToSVG(const aPoint: TSVGPoint): TSVGPoint; override;
+
+    property Points: TSVGUnicodeString read GetPoints;
+  public
+    constructor Create(aEditor: TSVGEditor; aRoot: ISVGRoot;
+      aObject: ISVGObject; aParentCache: ISVGObjectCache); override;
+    destructor Destroy; override;
+
+    procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
+    procedure MouseMove(Shift: TShiftState; X, Y: Integer); override;
+
+    procedure Init; override;
   end;
 
   TElementSelectEvent = procedure(Sender: TObject) of object;
@@ -439,8 +489,8 @@ type
     procedure ElementsCut;
     procedure ElementsPaste;
     procedure ElementsDelete;
-    procedure ElementAdd(const aFragment: string);
-    procedure ElementsAdd(const aFragments: TStringList);
+    procedure ElementAdd(const aFragment: string; const aSelectAdded: Boolean);
+    procedure ElementsAdd(const aFragments: TStringList; const aSelectAdded: Boolean);
 
     procedure ElementsUnselectAll;
     procedure ElementsSelect(aList: TList<Integer>);
@@ -536,7 +586,15 @@ const
     + '<circle cx="50" cy="50" r="50" style="' + svg_handle_shape_2_style + '" />'
     + '</svg>';
 
+  svg_handle_shape_3_style = 'fill: none; stroke: blue; stroke-width: 16;';
 
+  svg_handle_shape_3 =
+    '<?xml version="1.0" standalone="no"?>'
+    + '<svg viewBox="0 0 100 100" xmlns="' + ns_uri_svg + '" version="1.1">'
+    + '<circle cx="50" cy="50" r="50" style="' + svg_handle_shape_3_style + '" />'
+    + '<circle cx="50" cy="50" r="1" style="' + svg_handle_shape_3_style + '" />'
+    + '</svg>';
+
 // -----------------------------------------------------------------------------
 //
 //                               TSVGEditorTool
@@ -747,44 +805,7 @@ begin
   FSVGObject := aObject;
   FParentCache := aParentCache;
 
-  {FOrigCTM := TSVGMatrix.CreateIdentity;
-
-  FObjectID := FEditor.GetElementID(FSVGObject);
-
-  if FSVGObject.CacheList.Count > 0 then
-  begin
-    i := 0;
-    while (i < FSVGObject.CacheList.Count)
-    and (FSVGObject.CacheList[i].ParentCache as IInterface <> FParentCache as IInterface) do
-      Inc(i);
-
-    if i < FSVGObject.CacheList.Count then
-      FCache := FSVGObject.CacheList[i]
-    else
-      FCache := FSVGObject.CacheList[0];
-
-    FOrigCTM := FCache.CTM;
-
-  end else
-    FCache := nil;
-
-  CalcDimReferences;}
-
   inherited Create(aEditor);
-
-  {CalcBounds;
-
-  if (AbsoluteContentRect.Right < AbsoluteContentRect.Left)
-  or (AbsoluteContentRect.Bottom < AbsoluteContentRect.Top) then
-    FOrigBounds := AbsoluteContentRect
-  else
-    FOrigBounds := Rect(
-      AbsoluteContentRect.Left + FEditor.TopLeft.X - FEditor.Padding.Left,
-      AbsoluteContentRect.Top + FEditor.TopLeft.Y - FEditor.Padding.Top,
-      AbsoluteContentRect.Right + FEditor.TopLeft.X - FEditor.Padding.Left,
-      AbsoluteContentRect.Bottom + FEditor.TopLeft.Y - FEditor.Padding.Top);
-
-  UpdateBitmap;}
 
   Init;
 end;
@@ -867,7 +888,8 @@ begin
 
   Result := T;
 
-  //Result := TSVGMatrix.Multiply(Result, FParentCache.ViewportMatrix);
+  {if assigned(FParentCache) then
+    Result := TSVGMatrix.Multiply(Result, FParentCache.ViewportMatrix);}
 
   Result := TSVGMatrix.Multiply(Result, AlignMatrix);
   Result := TSVGMatrix.Multiply(Result, TSVGMatrix.CreateTranslation(Margin, Margin));
@@ -1147,6 +1169,7 @@ begin
   FPathGeometry := TSVGPathGeometry.Create;
   FFigureIndex := 0;
   FSegmentIndex := 0;
+  FMode := tsmEdit;
 
   case aObject.ElementType of
     elRect:
@@ -1174,6 +1197,8 @@ begin
     elPath:
       begin
         FPathGeometry.AsPathString := aObject.Attributes['d'];
+        if FPathGeometry.Figures.Count = 0 then
+          FMode := tsmAddLines;
       end;
   end;
 
@@ -1334,17 +1359,56 @@ begin
   end;
 end;
 
+procedure TSVGEditorToolShape.DoHandleMouseDown(const aIndex: integer;
+  Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+var
+  P: TSVGPoint;
+  Figure: ISVGPathFigure;
+begin
+  inherited;
+
+  case Mode of
+    tsmAddLines:
+      begin
+        if FSVGObject.ElementType in [elPath, elPolygon, elPolyline] then
+        begin
+          ClearToolParts;
+          try
+
+            P := SVGPoint(X, Y);
+            P := ToolToSVG(P);
+
+            if FPathGeometry.Figures.Count = 0 then
+            begin
+              Figure := FPathGeometry.AddFigure(P);
+              FFigureIndex := FPathGeometry.Figures.Count - 1;
+            end else
+              Figure := PathFigure;
+
+            Figure.AddLine(P);
+            FSegmentIndex := Figure.Segments.Count - 1;
+          finally
+            CreateToolParts;
+            UpdateBitmap;
+          end;
+        end;
+      end;
+  end;
+end;
+
 procedure TSVGEditorToolShape.DoMovePosition(const aDx, aDy: Integer);
 var
   R: TSVGRect;
   SaveCTM: TSVGMatrix;
-  T, S: TSVGMatrix;
+  T, S, A: TSVGMatrix;
   P: TSVGPoint;
+  ArcSegment: ISVGArcSegment;
 begin
   inherited;
 
   T := FCache.CTM;
-  S := TSVGMatrix.CreateScaling(T.m11, T.m22);
+  A := AlignMatrix;
+  S := TSVGMatrix.CreateScaling(T.m11 * A.m11, T.m22 * A.m22);
   P := TransformPoint(SVGPoint(aDx, aDy), S.Inverse);
 
   case FSVGObject.ElementType of
@@ -1383,6 +1447,13 @@ begin
           TSVGMatrix.CreateTranslation(P.X, P.Y));
 
         SetAttrPathData(PathGeometry.AsPathString);
+
+        if Supports(PathSegment, ISVGArcSegment, ArcSegment) then
+        begin
+          FR := ArcSegment.Radius;
+          FAngle := ArcSegment.Angle * PI / 180;
+          ArcSegment.GetCenterParameters(PathSegmentGetStartPoint, FCP, FStartAngle, FDeltaAngle);
+        end;
       end;
   end;
 
@@ -1798,31 +1869,85 @@ begin
   inherited;
 end;
 
+procedure TSVGEditorToolShape.MouseDown(Button: TMouseButton;
+  Shift: TShiftState; X, Y: Integer);
+var
+  P: TSVGPoint;
+  Figure: ISVGPathFigure;
+begin
+  case Mode of
+    tsmAddLines:
+      begin
+        if FSVGObject.ElementType in [elPath, elPolygon, elPolyline] then
+        begin
+          ClearToolParts;
+          try
+
+            P := SVGPoint(X, Y);
+            P := ToolToSVG(P);
+
+            if FPathGeometry.Figures.Count = 0 then
+            begin
+              Figure := FPathGeometry.AddFigure(P);
+              FFigureIndex := FPathGeometry.Figures.Count - 1;
+            end else
+              //Figure := PathFigure;
+              Exit;
+
+            Figure.AddLine(P);
+            FSegmentIndex := Figure.Segments.Count - 1;
+          finally
+            CreateToolParts;
+            UpdateBitmap;
+          end;
+        end;
+      end;
+  end;
+
+  inherited;
+end;
+
 procedure TSVGEditorToolShape.MouseMove(Shift: TShiftState; X, Y: Integer);
 var
   P: TSVGPoint;
   i,  j: Integer;
+  Figure: ISVGPathFigure;
 begin
-  if FSVGObject.ElementType in [elPath, elPolygon, elPolyline] then
-  begin
-    P := SVGPoint(X, Y);
-    P := ToolToSVG(P);
-
-    if not(ssLeft in Shift) and not(ssRight in Shift) then
-    begin
-      if FPathGeometry.SegmentAtPt(P, i, j)
-      and ((i <> FFigureIndex) or (j <> FSegmentIndex)) then
+  case Mode of
+    tsmAddLines:
       begin
-        ClearToolParts;
-        try
-          FFigureIndex := i;
-          FSegmentIndex := j;
-        finally
-          CreateToolParts;
-          UpdateBitmap;
+        if FSVGObject.ElementType in [elPath, elPolygon, elPolyline] then
+        begin
+          Figure := PathFigure;
+
+          if assigned(Figure) then
+            DoSetHandlePoint(Figure.Segments.Count - 1, Point(X, Y));
         end;
       end;
-    end;
+    tsmEdit:
+      begin
+        if FSVGObject.ElementType in [elPath, elPolygon, elPolyline] then
+        begin
+          P := SVGPoint(X, Y);
+          P := ToolToSVG(P);
+
+          if not(ssLeft in Shift) and not(ssRight in Shift) then
+          begin
+            if FPathGeometry.SegmentAtPt(P, i, j)
+            and ((i <> FFigureIndex) or (j <> FSegmentIndex)) then
+            begin
+              ClearToolParts;
+              try
+                FFigureIndex := i;
+                FSegmentIndex := j;
+              finally
+                CreateToolParts;
+                UpdateBitmap;
+              end;
+            end;
+          end;
+        end;
+      end;
   end;
 
   inherited;
@@ -1942,6 +2067,11 @@ begin
   end;
 end;
 
+procedure TSVGEditorToolShape.SetMode(const Value: TSVGToolShapeMode);
+begin
+  FMode := Value;
+end;
+
 procedure TSVGEditorToolShape.SetObjectBounds(aRect: TSVGRect);
 var
   Rect: ISVGRect;
@@ -1975,6 +2105,258 @@ begin
   begin
     // See SetAttrPathData
   end;
+end;
+
+// -----------------------------------------------------------------------------
+//
+//                           TSVGEditorToolDraw
+//
+// -----------------------------------------------------------------------------
+
+constructor TSVGEditorToolDraw.Create(aEditor: TSVGEditor; aRoot: ISVGRoot;
+  aObject: ISVGObject; aParentCache: ISVGObjectCache);
+begin
+  FPointList := TList<TSVGPoint>.Create;
+  FBoundsRect := TSVGRect.CreateUndefined;
+  FPolygon := nil;
+
+  inherited Create(aEditor, aRoot, aObject, aParentCache);
+end;
+
+procedure TSVGEditorToolDraw.CreateToolPartsInternal;
+var
+  ToolLine: TSVGToolLine;
+  ToolHandle: TSVGToolHandle;
+begin
+  ClearToolParts;
+
+  ToolLine := TSVGToolLine.Create(Self, 1, 2);
+  ToolLine.Parent := Parent;
+  GuideList.Add(ToolLine);
+
+  ToolHandle := TSVGToolHandle.Create(Self, 0, 4, svg_handle_shape_1);
+  ToolHandle.Parent := Parent;
+  HandleList.Add(ToolHandle);
+
+  ToolHandle := TSVGToolHandle.Create(Self, 1, 4, svg_handle_shape_1);
+  ToolHandle.Parent := Parent;
+  HandleList.Add(ToolHandle);
+
+  ToolHandle := TSVGToolHandle.Create(Self, 2, 4, svg_handle_shape_3);
+  ToolHandle.Parent := Parent;
+  HandleList.Add(ToolHandle);
+end;
+
+destructor TSVGEditorToolDraw.Destroy;
+begin
+  FPointList.Free;
+
+  inherited;
+end;
+
+procedure TSVGEditorToolDraw.DoCreateToolParts;
+begin
+  inherited;
+end;
+
+procedure TSVGEditorToolDraw.DoHandleMouseDown(const aIndex: integer;
+  Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+var
+  P: TPoint;
+  Handle: TSVGToolHandle;
+begin
+  inherited;
+
+  if aIndex = 2 then
+  begin
+    P := Point(HandleList[aIndex].Left + X, HandleList[aIndex].Top + Y);
+
+    if ssDouble in Shift then
+    begin
+      Handle := HandleList[0];
+
+      if PtInRect(Handle.BoundsRect, P) then
+        FEditor.ElementAdd('<polygon points="' + GetPoints + '" />', False)
+      else
+        FEditor.ElementAdd('<polyline points="' + GetPoints + '" />', False)
+    end else
+      MouseDown(Button, Shift, P.X - Left, P.Y - Top);
+  end;
+end;
+
+procedure TSVGEditorToolDraw.DoHandleMouseMove(const aIndex: integer;
+  Shift: TShiftState; X, Y: Integer);
+var
+  P: TPoint;
+  Handle: TSVGToolHandle;
+begin
+  inherited;
+
+  if aIndex = 2 then
+  begin
+    P := Point(HandleList[aIndex].Left + X, HandleList[aIndex].Top + Y);
+
+    MouseMove(Shift, P.X - Left, P.Y - Top);
+
+    Handle := HandleList[0];
+
+    if PtInRect(Handle.BoundsRect, P) then
+      Handle.SVG.Text := svg_handle_shape_2
+    else
+      Handle.SVG.Text := svg_handle_shape_1;
+  end;
+end;
+
+procedure TSVGEditorToolDraw.DoSetHandlePoint(const aIndex: Integer;
+  const Value: TPoint);
+begin
+  //inherited;
+
+  if aIndex = 2 then
+  begin
+    FNewPoint := SVGPoint(Value.X, Value.Y);
+    FNewPoint := ToolToSVG(FNewPoint);
+  end;
+
+  UpdateToolParts;
+end;
+
+function TSVGEditorToolDraw.GetHandlePoint(const aIndex: Integer): TPoint;
+begin
+  if (aIndex = 0) and (FPointList.Count > 0) then
+    Result := SVGToTool(FPointList[0]).Round
+  else
+
+  if (aIndex = 1) and (FPointList.Count > 0) then
+    Result := SVGToTool(FPointList[FPointList.Count - 1]).Round;
+
+  if aIndex = 2 then
+    Result := SVGToTool(FNewPoint).Round;
+end;
+
+function TSVGEditorToolDraw.GetPoints: TSVGUnicodeString;
+var
+  i: Integer;
+  M: TSVGMatrix;
+  P: TSVGPoint;
+begin
+  M := FCache.CTM;
+  M := TSVGMatrix.Multiply(M, FCache.ViewportMatrix);
+  M := M.Inverse;
+
+  Result := '';
+  for i := 0 to FPointList.Count - 1 do
+  begin
+    P := TransformPoint(FPointList[i], M);
+
+    if Result <> '' then
+      Result := Result + ' ';
+    Result := Result + Format('%g,%g', [P.X, P.Y], USFormatSettings);
+  end;
+end;
+
+function TSVGEditorToolDraw.GetScreenBBox: TSVGRect;
+var
+  M: TSVGMatrix;
+begin
+  M := AlignMatrix;
+  M := TSVGMatrix.Multiply(M, TSVGMatrix.CreateTranslation(Margin, Margin));
+
+  //Result := TSVGRect.Union(inherited, TransformRect(FBoundsRect, M.Inverse));
+  Result := TSVGRect.Union(FCache.ScreenBBox, FBoundsRect);
+end;
+
+procedure TSVGEditorToolDraw.Init;
+begin
+  inherited;
+end;
+
+procedure TSVGEditorToolDraw.MouseDown(Button: TMouseButton; Shift: TShiftState;
+  X, Y: Integer);
+var
+  P: TSVGPoint;
+begin
+  if (ssLeft in Shift) and not(ssDouble in Shift) then
+  begin
+    P := SVGPoint(X, Y);
+    P := ToolToSVG(P);
+
+    FPointList.Add(P);
+
+    if FPointList.Count = 1 then
+    begin
+      CreateToolPartsInternal;
+      FBoundsRect := TSVGRect.Create(P.X, P.Y, P.X, P.Y);
+
+      //FPolygon := FRoot.CreateElement(EL_POLYGON) as ISVGPolygon;
+      //FSVGObject.ChildNodes.Add(FPolygon);
+
+    end else begin
+      if P.X < FBoundsRect.Left then
+        FBoundsRect.Left := P.X;
+
+      if P.Y < FBoundsRect.Top then
+        FBoundsRect.Top := P.Y;
+
+      if P.X > FBoundsRect.Right then
+        FBoundsRect.Right := P.X;
+
+      if P.Y > FBoundsRect.Bottom then
+        FBoundsRect.Bottom := P.Y;
+    end;
+
+    if assigned(FPolygon) then
+      FPolygon.Points := GetPoints;
+
+    CalcBounds;
+    UpdateBitmap;
+  end;
+
+  inherited;
+end;
+
+procedure TSVGEditorToolDraw.MouseMove(Shift: TShiftState; X, Y: Integer);
+begin
+  DoSetHandlePoint(2, Point(X, Y));
+
+  inherited;
+end;
+
+procedure TSVGEditorToolDraw.PaintRenderContext(aRC: ISVGRenderContext);
+var
+  i: Integer;
+begin
+  inherited;
+
+  aRC.ApplyStroke(TSVGSolidBrush.Create(SVGColorGray), 1);
+
+  for i := 1 to FPointList.Count - 1 do
+    aRC.DrawLine(
+      FPointList[i - 1].X,
+      FPointList[i - 1].Y,
+      FPointList[i].X,
+      FPointList[i].Y
+      );
+end;
+
+function TSVGEditorToolDraw.SVGToTool(const aPoint: TSVGPoint): TSVGPoint;
+var
+  M: TSVGMatrix;
+begin
+  M := AlignMatrix;
+  M := TSVGMatrix.Multiply(M, TSVGMatrix.CreateTranslation(Margin, Margin));
+
+  Result := TransformPoint(aPoint, M);
+end;
+
+function TSVGEditorToolDraw.ToolToSVG(const aPoint: TSVGPoint): TSVGPoint;
+var
+  M: TSVGMatrix;
+begin
+  M := AlignMatrix;
+  M := TSVGMatrix.Multiply(M, TSVGMatrix.CreateTranslation(Margin, Margin));
+
+  Result := TransformPoint(aPoint, M.Inverse);
 end;
 
 // -----------------------------------------------------------------------------
@@ -2563,6 +2945,8 @@ procedure TSVGEditor.CmdRedo;
 var
   Cmd: TSVGEditorCmd;
 begin
+  ToolsClear;
+
   if FCmdRedoStack.Count > 0 then
   begin
     Cmd := FCmdRedoStack.Pop;
@@ -2617,6 +3001,8 @@ procedure TSVGEditor.CmdUndo;
 var
   Cmd: TSVGEditorCmd;
 begin
+  ToolsClear;
+
   if FCmdUndoStack.Count > 0 then
   begin
     Cmd := FCmdUndoStack.Pop;
@@ -2825,7 +3211,8 @@ begin
   end;
 end;
 
-procedure TSVGEditor.ElementAdd(const aFragment: string);
+procedure TSVGEditor.ElementAdd(const aFragment: string;
+  const aSelectAdded: Boolean);
 var
   sl: TStringList;
 begin
@@ -2833,7 +3220,7 @@ begin
   try
     sl.Add(aFragment);
 
-    ElementsAdd(sl);
+    ElementsAdd(sl, aSelectAdded);
   finally
     sl.Free;
   end;
@@ -2864,7 +3251,8 @@ begin
     ElementListInit(aNode.ChildNodes[i], aID);
 end;
 
-procedure TSVGEditor.ElementsAdd(const aFragments: TStringList);
+procedure TSVGEditor.ElementsAdd(const aFragments: TStringList;
+  const aSelectAdded: Boolean);
 var
   i: Integer;
   ID: Integer;
@@ -2885,31 +3273,40 @@ begin
 
   CmdGroup := TSVGEditorCmdGroup.Create;
   try
-    CmdElementSelect := TSVGEditorCmdElementsSelect.Create;
+    CmdElementSelect := nil;
 
-    // Unselect current selection
-    for ID in FSelectedElementList do
+    if aSelectAdded then
     begin
-      CmdElementSelect.Unselect.Add(ID);
+      CmdElementSelect := TSVGEditorCmdElementsSelect.Create;
+
+      // Unselect current selection
+      for ID in FSelectedElementList do
+      begin
+        CmdElementSelect.Unselect.Add(ID);
+      end;
     end;
 
     for i := 0 to aFragments.Count - 1 do
     begin
       CmdElementAdd := CmdElementAddCreate(Parent, -1, aFragments[i]);
 
-      DOMNode := CmdElementAdd.DOMDocument.documentElement.firstChild;
-      while assigned(DOMNOde) do
+      if assigned(CmdElementSelect) then
       begin
-        if Supports(DOMNode, IDOMElement, DOMElement) then
-          CmdElementSelect.Select.Add(GetElementID(DOMElement));
+        DOMNode := CmdElementAdd.DOMDocument.documentElement.firstChild;
+        while assigned(DOMNOde) do
+        begin
+          if Supports(DOMNode, IDOMElement, DOMElement) then
+            CmdElementSelect.Select.Add(GetElementID(DOMElement));
 
-        DOMNode := DomNode.nextSibling;
+          DOMNode := DomNode.nextSibling;
+        end;
       end;
 
       CmdGroup.CmdList.Add(CmdElementAdd);
     end;
 
-    CmdGroup.CmdList.Add(CmdElementSelect);
+    if assigned(CmdElementSelect) then
+      CmdGroup.CmdList.Add(CmdElementSelect);
 
     CmdExec(CmdGroup, False);
 
@@ -3061,7 +3458,7 @@ begin
     if sl.Count = 0 then
       Exit;
 
-    ElementsAdd(sl);
+    ElementsAdd(sl, True);
 
   finally
     sl.Free;
@@ -3168,7 +3565,7 @@ procedure TSVGEditor.Init;
 begin
   if assigned(FRoot) then
   begin
-    FRoot.SVG.SetAttributeNS('xmlns:svge', ns_svg_editor, ns_svg_editor);
+    FRoot.SVG.SetAttributeNS('xmlns:svge', ns_uri_xmlns, ns_svg_editor);
 
     ElementListInit(FRoot.SVG, FMaxID);
 
@@ -3234,7 +3631,7 @@ begin
 
   Parser := TSVGSaxParser.Create(nil);
   try
-     Parser.Parse(FFileName, FRoot);
+    Parser.Parse(FFileName, FRoot);
   finally
     Parser.Free;
   end;
@@ -3267,11 +3664,18 @@ var
   i: Integer;
   SVGObject: ISVGObject;
   TempList: TList<Integer>;
+  ToolDraw: TSVGEditorToolDraw;
 begin
   inherited;
 
   if (Button = mbLeft) and CanFocus and not Focused then
     SetFocus;
+
+  if (FToolList.Count > 0) and (FToolList[0] is TSVGEditorToolDraw) then
+  begin
+    ToolDraw := FToolList[0] as TSVGEditorToolDraw;
+    ToolDraw.MouseDown(Button, Shift, X - ToolDraw.Left, Y - ToolDraw.Top);
+  end else
 
   if assigned(FRoot) then
   begin
@@ -3302,8 +3706,16 @@ begin
 end;
 
 procedure TSVGEditor.MouseMove(Shift: TShiftState; X, Y: Integer);
+var
+  ToolDraw: TSVGEditorToolDraw;
 begin
   inherited;
+
+  if (FToolList.Count > 0) and (FToolList[0] is TSVGEditorToolDraw) then
+  begin
+    ToolDraw := FToolList[0] as TSVGEditorToolDraw;
+    ToolDraw.MouseMove(Shift, X - ToolDraw.Left, Y - ToolDraw.Top);
+  end;
 end;
 
 procedure TSVGEditor.MouseUp(Button: TMouseButton; Shift: TShiftState; X,
@@ -3505,7 +3917,8 @@ var
   ParentObject: ISVGObject;
   ParentCache: ISVGObjectCache;
 begin
-  if Supports(aSVGObject.ParentNode, ISVGObject, ParentObject) then
+  if Supports(aSVGObject.ParentNode, ISVGObject, ParentObject)
+  and (ParentObject.CacheList.Count > 0) then
     ParentCache := ParentObject.CacheList[0]
   else
     ParentCache := nil;

@@ -142,6 +142,8 @@ type
     procedure SetAsPolylineString(const Value: TSVGUnicodeString);
     procedure SetTransform(const Value: TSVGMatrix);
 
+    function AddFigure(const aStartPoint: TSVGPoint): ISVGPathFigure;
+
     procedure ApplyMatrix(const aMatrix: TSVGMatrix);
 
     procedure ConvertToPathData(aSink: ISVGPathDataSink);
@@ -341,6 +343,8 @@ type
   public
     constructor Create;
     destructor Destroy; override;
+
+    function AddFigure(const aStartPoint: TSVGPoint): ISVGPathFigure;
 
     procedure ApplyMatrix(const aMatrix: TSVGMatrix);
 
@@ -1467,6 +1471,14 @@ procedure TSVGPathGeometry.AddArc(const aP1, aRadius: TSVGPoint;
   const aP2: TSVGPoint);
 begin
   LastFigure.AddArc(aRadius, aAngle, aLargeFlag, aSweepFlag, aP2);
+end;
+
+function TSVGPathGeometry.AddFigure(const aStartPoint: TSVGPoint): ISVGPathFigure;
+begin
+  Result := TSVGPathFigure.Create;
+  Result.StartPoint := aStartPoint;
+
+  Figures.Add(Result);
 end;
 
 procedure TSVGPathGeometry.AddQuadCurve(const aP1, aCP, aP2: TSVGPoint);

@@ -68,6 +68,8 @@ type
       const aSVG: string = svg_tool_handle); reintroduce; virtual;
     destructor Destroy; override;
 
+    procedure Click; override;
+    procedure DblClick; override;
     procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
     procedure MouseMove(Shift: TShiftState; X, Y: Integer); override;
     procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
@@ -89,6 +91,10 @@ type
     constructor Create(aTool: TSVGTool); reintroduce; virtual;
     destructor Destroy; override;
 
+    procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
+    procedure MouseMove(Shift: TShiftState; X, Y: Integer); override;
+    procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
+
     procedure UpdateBounds; virtual; abstract;
   end;
 
@@ -178,6 +184,13 @@ type
     procedure DoSetFocusedHandle(const aHandle: TSVGToolHandle); virtual;
     procedure DoMovePosition(const aDx, aDy: Integer); virtual;
 
+    procedure DoHandleClick(const aIndex: integer); virtual;
+    procedure DoHandleDblClick(const aIndex: integer); virtual;
+    procedure DoHandleMouseDown(const aIndex: integer; Button: TMouseButton; Shift: TShiftState; X, Y: Integer); virtual;
+    procedure DoHandleMouseMove(const aIndex: integer; Shift: TShiftState; X, Y: Integer); virtual;
+    procedure DoHandleMouseUp(const aIndex: integer; Button: TMouseButton; Shift: TShiftState; X, Y: Integer); virtual;
+
+    procedure UpdateSVG; virtual;
     procedure UpdateToolHandles;
     procedure UpdateToolGuides;
   public
@@ -227,6 +240,13 @@ uses
 //
 // -----------------------------------------------------------------------------
 
+procedure TSVGToolHandle.Click;
+begin
+  inherited;
+
+  FTool.DoHandleClick(FIndex);
+end;
+
 constructor TSVGToolHandle.Create(aTool: TSVGTool; const aIndex: Integer;
   const aSize: Integer = 4; const aSVG: string = svg_tool_handle);
 begin
@@ -237,6 +257,13 @@ begin
   FIndex := aIndex;
 
   FSVG := aSVG;
+end;
+
+procedure TSVGToolHandle.DblClick;
+begin
+  inherited;
+
+  FTool.DoHandleDblClick(FIndex);
 end;
 
 destructor TSVGToolHandle.Destroy;
@@ -267,6 +294,10 @@ begin
 
     SetFocus;
   end;
+
+  FTool.DoHandleMouseDown(FIndex, Button, Shift, X, Y);
+
+  inherited;
 end;
 
 procedure TSVGToolHandle.MouseMove(Shift: TShiftState; X, Y: Integer);
@@ -290,12 +321,15 @@ begin
     end;
   end;
 
+  FTool.DoHandleMouseMove(FIndex, Shift, X, Y);
   inherited;
 end;
 
 procedure TSVGToolHandle.MouseUp(Button: TMouseButton; Shift: TShiftState; X,
   Y: Integer);
 begin
+  FTool.DoHandleMouseUp(FIndex, Button, Shift, X, Y);
+
   inherited;
 end;
 
@@ -345,6 +379,29 @@ end;
 destructor TSVGToolGuide.Destroy;
 begin
   inherited;
+end;
+
+procedure TSVGToolGuide.MouseDown(Button: TMouseButton; Shift: TShiftState; X,
+  Y: Integer);
+begin
+  inherited;
+
+  FTool.MouseDown(Button, Shift, Left + X - FTool.Left, Top + Y - FTool.Top);
+end;
+
+procedure TSVGToolGuide.MouseMove(Shift: TShiftState; X, Y: Integer);
+begin
+  inherited;
+
+  FTool.MouseMove(Shift, Left + X - FTool.Left, Top + Y - FTool.Top);
+end;
+
+procedure TSVGToolGuide.MouseUp(Button: TMouseButton; Shift: TShiftState; X,
+  Y: Integer);
+begin
+  inherited;
+
+  FTool.MouseUp(Button, Shift, Left + X - FTool.Left, Top + Y - FTool.Top);
 end;
 
 // -----------------------------------------------------------------------------
@@ -495,7 +552,7 @@ procedure TSVGToolEllipse.Resize;
 begin
   inherited;
 
-  SVG.Text := FSVG;
+  //SVG.Text := FSVG;
 
   SVG.Text := Format(svg_tool_ellipse,
     [1.0 * Width,
@@ -620,6 +677,34 @@ begin
     Handle.Parent := Parent;
     FHandleList.Add(Handle);
   end;
+end;
+
+procedure TSVGTool.DoHandleClick(const aIndex: integer);
+begin
+  //
+end;
+
+procedure TSVGTool.DoHandleDblClick(const aIndex: integer);
+begin
+  //
+end;
+
+procedure TSVGTool.DoHandleMouseDown(const aIndex: integer;
+  Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+begin
+  //
+end;
+
+procedure TSVGTool.DoHandleMouseMove(const aIndex: integer; Shift: TShiftState;
+  X, Y: Integer);
+begin
+  //
+end;
+
+procedure TSVGTool.DoHandleMouseUp(const aIndex: integer; Button: TMouseButton;
+  Shift: TShiftState; X, Y: Integer);
+begin
+  //
 end;
 
 procedure TSVGTool.DoSetFocusedHandle(const aHandle: TSVGToolHandle);
@@ -755,13 +840,7 @@ begin
       UpdateToolParts;
   end;
 
-  SVG.Text := Format(svg_tool,
-    [1.0 * Width,
-     1.0 * Height,
-     1.0 * FMargin,
-     1.0 * FMargin,
-     Width - FMargin * 2.0,
-     Height - FMargin * 2.0], USFormatSettings);
+  UpdateSVG;
 end;
 
 procedure TSVGTool.Select;
@@ -855,6 +934,17 @@ var
 begin
   for Handle in FHandleList do
     Handle.UpdateBounds;
+end;
+
+procedure TSVGTool.UpdateSVG;
+begin
+  SVG.Text := Format(svg_tool,
+    [1.0 * Width,
+     1.0 * Height,
+     1.0 * FMargin,
+     1.0 * FMargin,
+     Width - FMargin * 2.0,
+     Height - FMargin * 2.0], USFormatSettings);
 end;
 
 procedure TSVGTool.UpdateToolGuides;

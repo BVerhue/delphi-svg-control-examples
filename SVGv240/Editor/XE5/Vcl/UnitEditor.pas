@@ -84,6 +84,9 @@ type
     SVG2ImageList1: TSVG2ImageList;
     ilNormal: TSVG2LinkedImageList;
     ilDisabled: TSVG2LinkedImageList;
+    ToolButton3: TToolButton;
+    aToolDraw: TAction;
+    aZoom1to4: TAction;
     procedure FormCreate(Sender: TObject);
   end;
 
@@ -108,8 +111,10 @@ begin
   ActionDelete := aDelete;
   ActionZoom1to1 := aZoom1to1;
   ActionZoom1to2 := aZoom1to2;
+  ActionZoom1to4 := aZoom1to4;
   ActionToolShape := aToolShape;
   ActionToolTransform := aToolTransform;
+  ActionToolDraw := aToolDraw;
   ActionNew := aNew;
   ActionPrint := aPrint;
   ActionExit := aExit;

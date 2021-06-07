@@ -77,14 +77,16 @@ type
     FActionSaveAs: TAction;
     FActionAddRect: TAction;
     FActionOpen: TAction;
-    FActionToolTransform: TAction;
+    FActionZoom1to1: TAction;
     FActionZoom1to2: TAction;
+    FActionZoom1to4: TAction;
     FActionAddImage: TAction;
     FActionAddPolyline: TAction;
     FActionPrint: TAction;
-    FActionZoom1to1: TAction;
     FActionUndo: TAction;
+    FActionToolDraw: TAction;
     FActionToolShape: TAction;
+    FActionToolTransform: TAction;
     FActionRedo: TAction;
     FActionCopy: TAction;
     FActionDelete: TAction;
@@ -115,6 +117,7 @@ type
 
     {$IFnDEF FPC}
     procedure WMDROPFILES(var Msg: TWMDropFiles); message WM_DROPFILES;
+    procedure SetActionZoom1to4(const Value: TAction);
     {$ELSE}
     procedure OnDropFiles(Sender: TObject; const FileNames: array of String);
     {$ENDIF}
@@ -140,6 +143,7 @@ type
     procedure SetActionPrint(const Value: TAction);
     procedure SetActionRedo(const Value: TAction);
     procedure SetActionSaveAs(const Value: TAction);
+    procedure SetActionToolDraw(const Value: TAction);
     procedure SetActionToolShape(const Value: TAction);
     procedure SetActionToolTransform(const Value: TAction);
     procedure SetActionUndo(const Value: TAction);
@@ -167,6 +171,7 @@ type
     procedure ActionOpenExecute(Sender: TObject);
     procedure ActionZoom1to1Execute(Sender: TObject);
     procedure ActionZoom1to2Execute(Sender: TObject);
+    procedure ActionZoom1to4Execute(Sender: TObject);
     procedure ActionSaveAsExecute(Sender: TObject);
     procedure ActionAddRectExecute(Sender: TObject);
     procedure ActionAddSVGExecute(Sender: TObject);
@@ -177,6 +182,7 @@ type
     procedure ActionUndoExecute(Sender: TObject);
     procedure ActionRedoExecute(Sender: TObject);
     procedure ActionToolTransformExecute(Sender: TObject);
+    procedure ActionToolDrawExecute(Sender: TObject);
     procedure ActionToolShapeExecute(Sender: TObject);
     procedure ActionNewExecute(Sender: TObject);
     procedure ActionPrintExecute(Sender: TObject);
@@ -226,6 +232,8 @@ type
     property ActionDelete: TAction read FActionDelete write SetActionDelete;
     property ActionZoom1to1: TAction read FActionZoom1to1 write SetActionZoom1to1;
     property ActionZoom1to2: TAction read FActionZoom1to2 write SetActionZoom1to2;
+    property ActionZoom1to4: TAction read FActionZoom1to4 write SetActionZoom1to4;
+    property ActionToolDraw: TAction read FActionToolDraw write SetActionToolDraw;
     property ActionToolShape: TAction read FActionToolShape write SetActionToolShape;
     property ActionToolTransform: TAction read FActionToolTransform write SetActionToolTransform;
     property ActionNew: TAction read FActionNew write SetActionNew;
@@ -262,21 +270,21 @@ procedure TSVGEditorForm.ActionAddCircleExecute(Sender: TObject);
 begin
   CheckSelectionIsGroup(True);
 
-  FEditor.ElementAdd('<circle cx="100" cy="100" r="50" />');
+  FEditor.ElementAdd('<circle cx="100" cy="100" r="50" />', True);
 end;
 
 procedure TSVGEditorForm.ActionAddEllipseExecute(Sender: TObject);
 begin
   CheckSelectionIsGroup(True);
 
-  FEditor.ElementAdd('<ellipse cx="100" cy="80" rx="80" ry="50" />');
+  FEditor.ElementAdd('<ellipse cx="100" cy="80" rx="80" ry="50" />', True);
 end;
 
 procedure TSVGEditorForm.ActionAddGroupExecute(Sender: TObject);
 begin
   CheckSelectionIsGroup(True);
 
-  FEditor.ElementAdd('<g />');
+  FEditor.ElementAdd('<g />', True);
 end;
 
 procedure TSVGEditorForm.ActionAddImageExecute(Sender: TObject);
@@ -295,14 +303,15 @@ begin
 
   //FEditor.ElementAdd('<path d="M100,100 L200,100, L200,200 L100,200 Z" />');
   //FEditor.ElementAdd('<path d="M100,100 L200,100, C250,100 250,200, 200,200 Q150,220 100,200 Z" />');
-  FEDitor.ElementAdd('<path d="M 10 315 L 110 215 A 30 50 0 0 1 162.55 162.45 L 172.55 152.45 A 30 50 -45 0 1 215.1 109.9 L 315 10" />');
+  //FEDitor.ElementAdd('<path d="M 10 315 L 110 215 A 30 50 0 0 1 162.55 162.45 L 172.55 152.45 A 30 50 -45 0 1 215.1 109.9 L 315 10" />');
+  FEDitor.ElementAdd('<path d="" />', True);
 end;
 
 procedure TSVGEditorForm.ActionAddPolygonExecute(Sender: TObject);
 begin
   CheckSelectionIsGroup(True);
 
-  FEditor.ElementAdd('<polygon points="100,100 200,100, 200,200" />');
+  FEditor.ElementAdd('<polygon points="100,100 200,100, 200,200" />', True);
 end;
 
 procedure TSVGEditorForm.ActionAddPolylineExecute(Sender: TObject);
@@ -314,7 +323,7 @@ procedure TSVGEditorForm.ActionAddRectExecute(Sender: TObject);
 begin
   CheckSelectionIsGroup(True);
 
-  FEditor.ElementAdd('<rect x="100" y="100" width="100" height="100" />');
+  FEditor.ElementAdd('<rect x="100" y="100" width="100" height="100" />', True);
 end;
 
 procedure TSVGEditorForm.ActionAddSVGExecute(Sender: TObject);
@@ -330,7 +339,7 @@ begin
     try
       sl.LoadFromFile(FOpenDialog.FileName);
 
-      FEditor.ElementAdd(sl.Text);
+      FEditor.ElementAdd(sl.Text, True);
     finally
       sl.Free;
     end;
@@ -432,6 +441,11 @@ begin
   end;
 end;
 
+procedure TSVGEditorForm.ActionToolDrawExecute(Sender: TObject);
+begin
+  FEditor.ToolSelect(TSVGEditorToolDraw);
+end;
+
 procedure TSVGEditorForm.ActionToolShapeExecute(Sender: TObject);
 begin
   FEditor.ToolSelect(TSVGEditorToolShape);
@@ -460,6 +474,11 @@ end;
 procedure TSVGEditorForm.ActionZoom1to2Execute(Sender: TObject);
 begin
   FEditor.Scale := 2;
+end;
+
+procedure TSVGEditorForm.ActionZoom1to4Execute(Sender: TObject);
+begin
+  FEditor.Scale := 4;
 end;
 
 function TSVGEditorForm.CheckSelectionIsGroup(
@@ -647,6 +666,7 @@ begin
 
   ActionToolTransform.Enabled := ElementsSelected;
   ActionToolShape.Enabled := ElementsSelected;
+  ActionToolDraw.Enabled := CanAddElement;
 end;
 
 procedure TSVGEditorForm.SetActionAddCircle(const Value: TAction);
@@ -798,6 +818,13 @@ begin
     FActionSaveAs.OnExecute := ActionSaveAsExecute;
 end;
 
+procedure TSVGEditorForm.SetActionToolDraw(const Value: TAction);
+begin
+  FActionToolDraw := Value;
+  if assigned(FActionToolDraw) then
+    FActionToolDraw.OnExecute := ActionToolDrawExecute;
+end;
+
 procedure TSVGEditorForm.SetActionToolShape(const Value: TAction);
 begin
   FActionToolShape := Value;
@@ -831,6 +858,13 @@ begin
   FActionZoom1to2 := Value;
   if assigned(FActionZoom1to2) then
     FActionZoom1to2.OnExecute := ActionZoom1to2Execute;
+end;
+
+procedure TSVGEditorForm.SetActionZoom1to4(const Value: TAction);
+begin
+  FActionZoom1to4 := Value;
+  if assigned(FActionZoom1to4) then
+    FActionZoom1to4.OnExecute := ActionZoom1to4Execute;
 end;
 
 procedure TSVGEditorForm.SetAttribute(Sender: TObject;
@@ -905,7 +939,11 @@ begin
   else
 
   if aTool = TSVGEditorToolShape then
-    ActionToolShape.Checked := True;
+    ActionToolShape.Checked := True
+  else
+
+  if aTool = TSVGEditorToolDraw then
+    ActionToolDraw.Checked := True;
 
   EnableActions;
 end;
