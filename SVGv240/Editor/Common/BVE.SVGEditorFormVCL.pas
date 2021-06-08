@@ -167,6 +167,8 @@ type
     procedure ValueListEditorAttributeValidate(Sender: TObject; ACol, ARow: Integer;
       const KeyName, KeyValue: string);
     procedure ValueListEditorAttributeUpdate;
+    procedure ValueListEditorAttributeEnter(Sender: TObject);
+    procedure ValueListEditorAttributeExit(Sender: TObject);
 
     procedure ActionOpenExecute(Sender: TObject);
     procedure ActionZoom1to1Execute(Sender: TObject);
@@ -642,12 +644,20 @@ begin
   ActionPrint.Enabled := SVGDocLoaded;
   ActionExit.Enabled := True;
 
-  ActionCopy.Enabled := CanDeleteElement;
-  ActionCut.Enabled := CanDeleteElement;
-  ActionDelete.Enabled := CanDeleteElement;
-  ActionPaste.Enabled := CanAddElement;
-  ActionUndo.Enabled := FEditor.CmdUndoCount > 0;
-  ActionRedo.Enabled := FEditor.CmdRedoCount > 0;
+  if ActiveControl = FValueListEditorAttribute then
+  begin
+
+    ActionDelete.Enabled := False;
+
+  end else begin
+
+    ActionCopy.Enabled := CanDeleteElement;
+    ActionCut.Enabled := CanDeleteElement;
+    ActionDelete.Enabled := CanDeleteElement;
+    ActionPaste.Enabled := CanAddElement;
+    ActionUndo.Enabled := FEditor.CmdUndoCount > 0;
+    ActionRedo.Enabled := FEditor.CmdRedoCount > 0;
+  end;
 
   ActionAddRect.Enabled := CanAddElement;
   ActionAddSVG.Enabled := CanAddElement;
@@ -899,6 +909,8 @@ begin
   FValueListEditorAttribute := Value;
   if assigned(FValueListEditorAttribute) then
   begin
+    FValueListEditorAttribute.OnEnter := ValueListEditorAttributeEnter;
+    FValueListEditorAttribute.OnExit := ValueListEditorAttributeExit;
     FValueListEditorAttribute.OnValidate := ValueListEditorAttributeValidate;
     FValueListEditorAttribute.OnEditButtonClick := ValueListEditorAttributeEditButtonClick;
   end;
@@ -1154,6 +1166,16 @@ begin
   AttrValue := InputBox('Attribute value', AttrName, ValueListEditorAttribute.Values[AttrName]);
 
   FEditor.SetAttribute(AttrName, AttrValue);
+end;
+
+procedure TSVGEditorForm.ValueListEditorAttributeEnter(Sender: TObject);
+begin
+  EnableActions;
+end;
+
+procedure TSVGEditorForm.ValueListEditorAttributeExit(Sender: TObject);
+begin
+  EnableActions;
 end;
 
 procedure TSVGEditorForm.ValueListEditorAttributeUpdate;

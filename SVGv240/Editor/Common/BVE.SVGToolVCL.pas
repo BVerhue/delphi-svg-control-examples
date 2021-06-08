@@ -288,6 +288,8 @@ end;
 procedure TSVGToolHandle.MouseDown(Button: TMouseButton; Shift: TShiftState; X,
   Y: Integer);
 begin
+  inherited;
+
   if ssLeft in Shift then
   begin
     FMouseDown := TPoint.Create(X, Y);
@@ -296,8 +298,6 @@ begin
   end;
 
   FTool.DoHandleMouseDown(FIndex, Button, Shift, X, Y);
-
-  inherited;
 end;
 
 procedure TSVGToolHandle.MouseMove(Shift: TShiftState; X, Y: Integer);
@@ -305,6 +305,8 @@ var
   Dx, Dy: Integer;
   P: TPoint;
 begin
+  inherited;
+
   if ssLeft in Shift then
   begin
     Dx := X - FMouseDown.X;
@@ -322,15 +324,14 @@ begin
   end;
 
   FTool.DoHandleMouseMove(FIndex, Shift, X, Y);
-  inherited;
 end;
 
 procedure TSVGToolHandle.MouseUp(Button: TMouseButton; Shift: TShiftState; X,
   Y: Integer);
 begin
-  FTool.DoHandleMouseUp(FIndex, Button, Shift, X, Y);
-
   inherited;
+
+  FTool.DoHandleMouseUp(FIndex, Button, Shift, X, Y);
 end;
 
 procedure TSVGToolHandle.Resize;
