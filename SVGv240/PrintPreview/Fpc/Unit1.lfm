@@ -1,0 +1,48 @@
+object Form1: TForm1
+  Left = 793
+  Height = 466
+  Top = 417
+  Width = 635
+  Caption = 'Form1'
+  ClientHeight = 446
+  ClientWidth = 635
+  Color = clBtnFace
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'Tahoma'
+  Menu = MainMenu1
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
+  LCLVersion = '2.0.10.0'
+  object SVG2Image1: TSVG2Image
+    Left = 0
+    Height = 446
+    Top = 0
+    Width = 635
+    Align = alClient
+  end
+  object MainMenu1: TMainMenu
+    Left = 144
+    Top = 40
+    object File1: TMenuItem
+      Caption = 'File'
+      object LoadSVG1: TMenuItem
+      end
+      object N1: TMenuItem
+        Caption = '-'
+      end
+      object Print1: TMenuItem
+      end
+      object N2: TMenuItem
+        Caption = '-'
+      end
+      object Quit1: TMenuItem
+      end
+    end
+  end
+  object OpenPictureDialog1: TOpenPictureDialog
+    Filter = 'Scalable Vector Graphics (*.svg)|*.svg'
+    Left = 239
+    Top = 40
+  end
+end

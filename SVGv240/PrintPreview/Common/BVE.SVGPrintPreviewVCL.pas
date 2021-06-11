@@ -1,5 +1,9 @@
 unit BVE.SVGPrintPreviewVCL;
 
+{$IFDEF FPC}
+  {$MODE Delphi}
+{$ENDIF}
+
 // ------------------------------------------------------------------------------
 //
 //                          SVG Control Package 2.0
@@ -7,22 +11,43 @@ unit BVE.SVGPrintPreviewVCL;
 //
 // ------------------------------------------------------------------------------
 
-// The SVG Editor need at least version v2.40 update 9 of the SVG library
+// [The "BSD licence"]
+//
+//  Copyright (c) 2013 Bruno Verhue
+//  All rights reserved.
+//
+//  Redistribution and use in source and binary forms, with or without
+//  modification, are permitted provided that the following conditions
+//  are met:
+//  1. Redistributions of source code must retain the above copyright
+//     notice, this list of conditions and the following disclaimer.
+//  2. Redistributions in binary form must reproduce the above copyright
+//     notice, this list of conditions and the following disclaimer in the
+//     documentation and/or other materials provided with the distribution.
+//  3. The name of the author may not be used to endorse or promote products
+//     derived from this software without specific prior written permission.
+//
+//  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+//  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+//  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+//  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+//  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+//  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+//  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+//  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+//  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+//  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-{$Include ContextSettingsVCL.inc}
-
-{$IFDEF SVGDirect2d3D11}
-  {$DEFINE SVGSupportsCmdList}
-{$ENDIF}
-
-{$IFDEF SVGGDIP}
-  {$DEFINE SVGSupportsCmdList}
-{$ENDIF}
-
+///  <summary>
+///    Print preview control
+///  </summary>
+///  <remarks>
+///    The SVG Print Preview need at least version v2.40 update 9 of the SVG library
+///  </remarks>
 
 interface
-
 uses
+  {$IFnDEF FPC}
   Winapi.Windows,
   Winapi.Messages,
   System.Types,
@@ -34,13 +59,33 @@ uses
   Vcl.Controls,
   Vcl.ExtCtrls,
   Vcl.Printers,
+  {$ELSE}
+  Windows,
+  Messages,
+  Types,
+  SysUtils,
+  Classes,
+  Generics.Collections,
+  Math,
+  Graphics,
+  Controls,
+  ExtCtrls,
+  Printers,
+  {$ENDIF}
   BVE.SVG2Types,
   BVE.SVG2Intf,
   BVE.SVG2Elements,
-  BVE.SVGToolVCL;
+  {$IFnDEF FPC}
+  BVE.SVG2Elements.VCL
+  {$ELSE}
+  BVE.SVG2Elements.FPC
+  {$ENDIF}
+  ;
 
 type
   TSVGPrintUnits = (puMm, puCm, puInch, puPixel);
+
+  TSVGSupportsCmdList = (sclUnknown, sclYes, sclNo);
 
   TSVGPrintPreview = class(TCustomControl)
   private
@@ -65,9 +110,9 @@ type
 
     FNeedRecreatePreview: Boolean;
 
-    {$IFDEF SVGSupportsCmdList}
+    FSupportsCmdList: TSVGSupportsCmdList;
+
     FCmdList: ISVGRenderContextCmdList;
-    {$ENDIF}
     FCmdListWidth: Integer;
     FCmdListHeight: Integer;
 
@@ -84,12 +129,17 @@ type
 
     FGlueEdge: TSVGFloat;
 
+    {$IFnDEF FPC}
     FPagePreviewList: TList<TBitmap>;
+    {$ELSE}
+    FPagePreviewList: TList<ISVGIntfBitmap>;
+    {$ENDIF}
 
     function CalcRCUnits(const aValue, aDPI: TSVGFloat): TSVGFloat;
     procedure CalcPrinterDimensions;
     function CalcViewport: TSVGRect;
     function CalcViewportMatrix: TSVGMatrix;
+    function SupportsCmdList: Boolean;
   protected
     function GetPageCount: Integer;
     function GetPageViewBox(const aIndex: Integer): TSVGRect;
@@ -114,9 +164,7 @@ type
     procedure PagePreviewListClear;
     procedure PagePreviewListCreate;
 
-    {$IFDEF SVGSupportsCmdList}
     procedure RenderToCmdList;
-    {$ENDIF}
 
     property PageViewbox[const aIndex: Integer]: TSVGRect read GetPageViewBox;
   public
@@ -147,8 +195,7 @@ type
 implementation
 uses
   BVE.SVG2GeomUtility,
-  BVE.SVG2Context,
-  BVE.SVG2Elements.VCL;
+  BVE.SVG2Context;
 
 { TSVGPrintPreview }
 
@@ -210,8 +257,13 @@ begin
   FPrinterPageWidth := Printer.PageWidth;
   FPrinterPageHeight := Printer.PageHeight;
 
+  {$IFnDEF FPC}
   FDPIX := GetDeviceCaps(Printer.Handle, LOGPIXELSX);
   FDPIY := GetDeviceCaps(Printer.Handle, LOGPIXELSY);
+  {$ELSE}
+  FDPIX := Printer.XDPI;
+  FDPIY := Printer.YDPI;
+  {$ENDIF}
 
   if FDPIX = 0 then
     FDPIX := 96;
@@ -281,7 +333,11 @@ begin
   inherited;
 
   FRoot := nil;
+  {$IFnDEF FPC}
   FPagePreviewList := TList<TBitmap>.Create;
+  {$ELSE}
+  FPagePreviewList := TList<ISVGIntfBitmap>.Create;
+  {$ENDIF}
   FPreviewPageMargin := 10;
 
   FViewportScale := 1.0;
@@ -303,6 +359,8 @@ begin
   FAspectRatioMeetOrSlice := TSVGAspectRatioMeetOrSlice.arMeet;
 
   FNeedRecreatePreview := False;
+
+  FSupportsCmdList := sclUnknown;
 end;
 
 destructor TSVGPrintPreview.Destroy;
@@ -397,7 +455,9 @@ procedure TSVGPrintPreview.PagePreviewListClear;
 begin
   while FPagePreviewList.Count > 0 do
   begin
+    {$IFnDEF FPC}
     FPagePreviewList[0].Free;
+    {$ENDIF}
     FPagePreviewList.Delete(0);
   end;
 end;
@@ -407,7 +467,11 @@ var
   i, Count: Integer;
   R: TSVGRect;
   Viewport: TSVGRect;
+  {$IFnDEF FPC}
   Bitmap: TBitmap;
+  {$ELSE}
+  Bitmap: ISVGIntfBitmap;
+  {$ENDIF}
   RC: ISVGRenderContext;
   M, MV: TSVGMatrix;
 begin
@@ -417,10 +481,8 @@ begin
 
   PagePreviewListClear;
 
-  {$IFDEF SVGSupportsCmdList}
-  if not assigned(FCmdList) then
+  if SupportsCmdList and (not assigned(FCmdList)) then
     Exit;
-  {$ENDIF}
 
   PagePreviewCalcSize;
 
@@ -439,6 +501,7 @@ begin
       TSVGMatrix.CreateScaling(FViewportScale, FViewportScale));
 
     Bitmap := TSVGRenderContextManager.CreateCompatibleBitmap(FPreviewPageWidth, FPreviewPageHeight);
+
     FPagePreviewList.Add(Bitmap);
 
     RC := TSVGRenderContextManager.CreateRenderContextBitmap(Bitmap);
@@ -464,17 +527,16 @@ begin
 
         // Draw SVG
 
-        {$IFDEF SVGSupportsCmdList}
-        RC.DrawCmdList(FCmdList, SVGRect(0, 0, FCmdListWidth, FCmdListHeight));
-        {$ELSE}
-        SVGRenderToRenderContext(
-          FRoot,
-          RC,
-          FCmdListWidth,
-          FCmdListHeight,
-          [sroFilters, sroClippath],
-          False);
-        {$ENDIF}
+        if SupportsCmdList then
+          RC.DrawCmdList(FCmdList, SVGRect(0, 0, FCmdListWidth, FCmdListHeight))
+        else
+          SVGRenderToRenderContext(
+            FRoot,
+            RC,
+            FCmdListWidth,
+            FCmdListHeight,
+            [sroFilters, sroClippath],
+            False);
 
       finally
         RC.PopClipRect;
@@ -505,7 +567,11 @@ begin
     X := FPreviewPageMargin + (i mod PagesHorizontal) * (FPreviewPageWidth + FPreviewPageMargin);
     Y := FPreviewPageMargin + (i div PagesHorizontal) * (FPreviewPageHeight + FPreviewPageMargin);
 
+    {$IFnDEF FPC}
     Canvas.Draw(X, Y, FPagePreviewList[i]);
+    {$ELSE}
+    FPagePreviewList[i].Draw(X, Y, Canvas);
+    {$ENDIF}
   end;
 end;
 
@@ -520,10 +586,8 @@ var
 begin
   CalcPrinterDimensions;
 
-  {$IFDEF SVGSupportsCmdList}
-  if not assigned(FCmdList) then
+  if SupportsCmdList and (not assigned(FCmdList)) then
     Exit;
-  {$ENDIF}
 
   Count := PageCount;
 
@@ -555,17 +619,16 @@ begin
           RC.Matrix := TSVGMatrix.Multiply(RC.Matrix, M);
           RC.Matrix := TSVGMatrix.Multiply(RC.Matrix, MV);
 
-          {$IFDEF SVGSupportsCmdList}
-          RC.DrawCmdList(FCmdList, SVGRect(0, 0, FCmdListWidth, FCmdListHeight));
-          {$ELSE}
-          SVGRenderToRenderContext(
-            FRoot,
-            RC,
-            FCmdListWidth,
-            FCmdListHeight,
-            [sroFilters, sroClippath],
-            False);
-          {$ENDIF}
+          if SupportsCmdList then
+            RC.DrawCmdList(FCmdList, SVGRect(0, 0, FCmdListWidth, FCmdListHeight))
+          else
+            SVGRenderToRenderContext(
+              FRoot,
+              RC,
+              FCmdListWidth,
+              FCmdListHeight,
+              [sroFilters, sroClippath],
+              False);
         finally
           RC.PopClipRect;
         end;
@@ -579,7 +642,6 @@ begin
   end;
 end;
 
-{$IFDEF SVGSupportsCmdList}
 procedure TSVGPrintPreview.RenderToCmdList;
 var
   RC: ISVGRenderContext;
@@ -608,7 +670,6 @@ begin
     RC.EndScene;
   end;
 end;
-{$ENDIF}
 
 procedure TSVGPrintPreview.Repaint;
 begin
@@ -758,17 +819,40 @@ begin
     FCmdListWidth := Round(R.Width);
     FCmdListHeight := Round(R.Height);
 
-    {$IFDEF SVGSupportsCmdList}
+    if SupportsCmdList then
+    begin
+      // We render the SVG to a commandlist with the intrinsic size of the SVG
+      // and will later scale the commandlist over the page(s)
 
-    // We render the SVG to a commandlist with the intrinsic size of the SVG
-    // and will later scale the commandlist over the page(s)
-
-    RenderToCmdList;
-    {$ENDIF}
+      RenderToCmdList;
+    end;
   end;
 
   FNeedRecreatePreview := True;
   Invalidate;
+end;
+
+function TSVGPrintPreview.SupportsCmdList: Boolean;
+begin
+  if FSupportsCmdList = sclUnknown then
+  begin
+    try
+      // TODO: the Direct2D WIC rendercontext doesn't support
+      // the command list, but we can't check that at the moment.
+
+      FCmdList := TSVGRenderContextManager.CreateCmdList;
+      if assigned(FCMdList) then
+      begin
+        FSupportsCmdList := sclYes;
+      end else
+        FSupportsCmdList := sclNo;
+
+      except on E:Exception do
+        FSupportsCmdList := sclNo;
+    end;
+  end;
+
+  Result := FSupportsCmdList = sclYes;
 end;
 
 end.

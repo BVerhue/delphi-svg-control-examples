@@ -101,6 +101,10 @@ uses UnitPrintPreview;
 
 procedure TfrmEditor.FormCreate(Sender: TObject);
 begin
+  frmPrintPreview := TfrmPrintPreview.Create(Self);
+
+  FormPrintPreview := frmPrintPreview;
+
   ActionOpen := aOpen;
   ActionSaveAs := aSaveAs;
   ActionUndo := aUndo;

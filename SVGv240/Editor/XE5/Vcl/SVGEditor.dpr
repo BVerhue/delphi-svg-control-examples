@@ -6,10 +6,10 @@ uses
   BVE.SVGToolVCL in '..\..\Common\BVE.SVGToolVCL.pas',
   BVE.SVGEditorVCL in '..\..\Common\BVE.SVGEditorVCL.pas',
   BVE.SVGEditorFormVCL in '..\..\Common\BVE.SVGEditorFormVCL.pas',
-  UnitPrintPreview in 'UnitPrintPreview.pas' {frmPrintPreview},
-  BVE.SVGPrintPreviewFormVCL in '..\..\Common\BVE.SVGPrintPreviewFormVCL.pas',
-  BVE.SVGPrintPreviewVCL in '..\..\Common\BVE.SVGPrintPreviewVCL.pas',
-  BVE.SVG2PathGeometry in '..\..\Common\BVE.SVG2PathGeometry.pas';
+  BVE.SVG2PathGeometry in '..\..\Common\BVE.SVG2PathGeometry.pas',
+  UnitPrintPreview in '..\..\..\PrintPreview\Vcl\UnitPrintPreview.pas' {frmPrintPreview},
+  BVE.SVGPrintPreviewFormVCL in '..\..\..\PrintPreview\Common\BVE.SVGPrintPreviewFormVCL.pas',
+  BVE.SVGPrintPreviewVCL in '..\..\..\PrintPreview\Common\BVE.SVGPrintPreviewVCL.pas';
 
 {$R *.res}
 
@@ -21,6 +21,5 @@ begin
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
   Application.CreateForm(TfrmEditor, frmEditor);
-  Application.CreateForm(TfrmPrintPreview, frmPrintPreview);
   Application.Run;
 end.
