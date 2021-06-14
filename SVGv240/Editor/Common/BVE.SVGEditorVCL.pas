@@ -288,7 +288,7 @@ type
     property Mode: TSVGToolShapeMode read FMode write SetMode;
   end;
 
-  /// <summary>Draw tool, for drawing a path.</summary>
+  /// <summary>Draw tool, for drawing a polygon.</summary>
   TSVGEditorToolDraw = class(TSVGEditorTool)
   private
     FPointList: TList<TSVGPoint>;
@@ -338,6 +338,9 @@ type
 
   TSVGEditor = class(TCustomControl)
   const
+    // For undo/redo commands we cannot work with pointers because objects
+    // can be recreated, in stead we must use an "id". The following namespace
+    // and attribute is used to add an id to elements.
     ns_svg_editor = 'https://www.bverhue.nl/svg_editor';
     at_local_id = 'editor_id';
     prefix_local_id = 'svge';
