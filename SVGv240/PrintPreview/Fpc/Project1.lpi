@@ -53,7 +53,9 @@
       <Unit2>
         <Filename Value="UnitPrintPreview.pas"/>
         <IsPartOfProject Value="True"/>
+        <ComponentName Value="frmPrintPreview"/>
         <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
       </Unit2>
       <Unit3>
         <Filename Value="..\Common\BVE.SVGPrintPreviewFormVCL.pas"/>

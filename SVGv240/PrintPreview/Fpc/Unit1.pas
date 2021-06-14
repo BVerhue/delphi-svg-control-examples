@@ -48,8 +48,6 @@ unit Unit1;
 interface
 
 uses
-  Windows,
-  Messages,
   SysUtils,
   Variants,
   Classes,
@@ -64,12 +62,15 @@ uses
   BVE.SVG2Image.FPC;
 
 type
+
+  { TForm1 }
+
   TForm1 = class(TForm)
-    SVG2Image1: TSVG2Image;
-    ActionList1: TActionList;
     aLoadSVG: TAction;
     aPrintSVG: TAction;
     aQuit: TAction;
+    SVG2Image1: TSVG2Image;
+    ActionList1: TActionList;
     MainMenu1: TMainMenu;
     File1: TMenuItem;
     LoadSVG1: TMenuItem;
@@ -98,7 +99,9 @@ var
 
 implementation
 uses
+  {$IFnDEF FPC}
   ShellAPI,
+  {$ENDIF}
   UnitPrintPreview;
 
 const

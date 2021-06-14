@@ -3,6 +3,7 @@ object Form1: TForm1
   Height = 466
   Top = 417
   Width = 635
+  AllowDropFiles = True
   Caption = 'Form1'
   ClientHeight = 446
   ClientWidth = 635
@@ -27,16 +28,19 @@ object Form1: TForm1
     object File1: TMenuItem
       Caption = 'File'
       object LoadSVG1: TMenuItem
+        Action = aLoadSVG
       end
       object N1: TMenuItem
         Caption = '-'
       end
       object Print1: TMenuItem
+        Action = aPrintSVG
       end
       object N2: TMenuItem
         Caption = '-'
       end
       object Quit1: TMenuItem
+        Action = aQuit
       end
     end
   end
@@ -44,5 +48,21 @@ object Form1: TForm1
     Filter = 'Scalable Vector Graphics (*.svg)|*.svg'
     Left = 239
     Top = 40
+  end
+  object ActionList1: TActionList
+    Left = 56
+    Top = 40
+    object aLoadSVG: TAction
+      Caption = 'Load SVG...'
+      OnExecute = aLoadSVGExecute
+    end
+    object aPrintSVG: TAction
+      Caption = 'Print SVG...'
+      OnExecute = aPrintSVGExecute
+    end
+    object aQuit: TAction
+      Caption = 'Quit'
+      OnExecute = aQuitExecute
+    end
   end
 end

@@ -47,8 +47,6 @@ unit UnitPrintPreview;
 
 interface
 uses
-  Windows,
-  Messages,
   SysUtils,
   Variants,
   Classes,
@@ -62,7 +60,11 @@ uses
   BVE.SVGPrintPreviewFormVCL;
 
 type
+
+  { TfrmPrintPreview }
+
   TfrmPrintPreview = class(TSVGPrintPreviewForm)
+    aIdenticalMargins: TAction;
     Panel1: TPanel;
     Splitter1: TSplitter;
     eOutputDevice: TEdit;
@@ -105,8 +107,9 @@ type
     eMarginLeft: TEdit;
     GroupBox4: TGroupBox;
     cbIdenticalMargins: TCheckBox;
-    aIdenticalMargins: TAction;
     procedure FormCreate(Sender: TObject);
+    procedure RadioButton1Click(Sender: TObject);
+    procedure RadioButton2Click(Sender: TObject);
   private
     { Private declarations }
   public
@@ -146,6 +149,16 @@ begin
   EditMarginRight := eMarginRight;
   EditMarginBottom := eMarginBottom;
   EditGlueEdge := eGlueEdge;
+end;
+
+procedure TfrmPrintPreview.RadioButton1Click(Sender: TObject);
+begin
+  aOrientationPortait.Execute;
+end;
+
+procedure TfrmPrintPreview.RadioButton2Click(Sender: TObject);
+begin
+  aOrientationLandscape.Execute;
 end;
 
 end.
