@@ -45,6 +45,11 @@ unit BVE.SVGPrintPreviewVCL;
 ///    The SVG Print Preview need at least version v2.40 update 9 of the SVG library
 ///  </remarks>
 
+// Only rendercontext GDI+ and Direct2D 3D11 support the command list, in
+// that case this define can be activated
+
+{-$Define SVGSupportsCmdList}
+
 interface
 uses
   {$IFnDEF FPC}
@@ -85,8 +90,6 @@ uses
 type
   TSVGPrintUnits = (puMm, puCm, puInch, puPixel);
 
-  TSVGSupportsCmdList = (sclUnknown, sclYes, sclNo);
-
   TSVGPrintPreview = class(TCustomControl)
   private
     // Only one SVG can be printed, however, the SVG can be printer
@@ -109,8 +112,6 @@ type
     FPreviewPageHeight: Integer;
 
     FNeedRecreatePreview: Boolean;
-
-    FSupportsCmdList: TSVGSupportsCmdList;
 
     FCmdList: ISVGRenderContextCmdList;
     FCmdListWidth: Integer;
@@ -359,8 +360,6 @@ begin
   FAspectRatioMeetOrSlice := TSVGAspectRatioMeetOrSlice.arMeet;
 
   FNeedRecreatePreview := False;
-
-  FSupportsCmdList := sclUnknown;
 end;
 
 destructor TSVGPrintPreview.Destroy;
@@ -814,6 +813,8 @@ begin
 
   if assigned(FRoot) then
   begin
+    CalcPrinterDimensions;
+
     R := FRoot.CalcIntrinsicSize(SVGRect(0, 0, FPrinterPageWidth, FPrinterPageHeight));
 
     FCmdListWidth := Round(R.Width);
@@ -834,25 +835,11 @@ end;
 
 function TSVGPrintPreview.SupportsCmdList: Boolean;
 begin
-  if FSupportsCmdList = sclUnknown then
-  begin
-    try
-      // TODO: the Direct2D WIC rendercontext doesn't support
-      // the command list, but we can't check that at the moment.
-
-      FCmdList := TSVGRenderContextManager.CreateCmdList;
-      if assigned(FCMdList) then
-      begin
-        FSupportsCmdList := sclYes;
-      end else
-        FSupportsCmdList := sclNo;
-
-      except on E:Exception do
-        FSupportsCmdList := sclNo;
-    end;
-  end;
-
-  Result := FSupportsCmdList = sclYes;
+  {$IFDEF SVGSupportsCmdList}
+  Result := True;
+  {$ELSE}
+  Result := False;
+  {$ENDIF}
 end;
 
 end.

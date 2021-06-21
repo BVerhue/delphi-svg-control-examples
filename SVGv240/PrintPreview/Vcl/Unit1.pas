@@ -105,7 +105,7 @@ const
   '<?xml version="1.0" standalone="no"?>'
   + '<svg viewBox="0 0 1000 300" xmlns="http://www.w3.org/2000/svg" version="1.1">'
   + '<g font-family="Arial" font-size="45" >'
-  + '<text x="500" y="150" fill="black" text-anchor="middle">Drop ''n SVG...</text>'
+  + '<text x="500" y="150" fill="black" text-anchor="middle">Drop an SVG...</text>'
   + '</g>'
   + '</svg>';
 
