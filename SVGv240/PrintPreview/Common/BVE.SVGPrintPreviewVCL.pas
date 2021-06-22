@@ -322,9 +322,12 @@ begin
       CalcRCUnits(FMarginLeft, FDPIX),
       CalcRCUnits(FMarginTop, FDPIY));
 
-    Result := TSVGMatrix.Multiply(
-      Result,
-      TSVGMatrix.CreateScaling(FPxToPt.X, FPxToPt.Y));
+    {if not SupportsCmdList then
+    begin
+      Result := TSVGMatrix.Multiply(
+        Result,
+        TSVGMatrix.CreateScaling(FPxToPt.X, FPxToPt.Y));
+    end;}
   end;
 
 end;
@@ -480,8 +483,27 @@ begin
 
   PagePreviewListClear;
 
-  if SupportsCmdList and (not assigned(FCmdList)) then
+  //if SupportsCmdList and (not assigned(FCmdList)) then
+  //  Exit;
+
+  if not assigned(FRoot) then
     Exit;
+
+  ViewPort := CalcViewport;
+
+  //R := FRoot.CalcIntrinsicSize(SVGRect(0, 0, FPrinterPageWidth, FPrinterPageHeight));
+  R := FRoot.CalcIntrinsicSize(ViewPort);
+
+  FCmdListWidth := Round(R.Width);
+  FCmdListHeight := Round(R.Height);
+
+  if SupportsCmdList then
+  begin
+    // We render the SVG to a commandlist with the intrinsic size of the SVG
+    // and will later scale the commandlist over the page(s)
+
+    RenderToCmdList;
+  end;
 
   PagePreviewCalcSize;
 
@@ -489,7 +511,6 @@ begin
 
   M := CalcViewportMatrix;
 
-  ViewPort := CalcViewport;
 
   for i := 0 to Count - 1 do
   begin
@@ -585,14 +606,30 @@ var
 begin
   CalcPrinterDimensions;
 
-  if SupportsCmdList and (not assigned(FCmdList)) then
+  //if SupportsCmdList and (not assigned(FCmdList)) then
+  //  Exit;
+
+  if not assigned(FRoot) then
     Exit;
+
+  ViewPort := CalcViewport;
+  //R := FRoot.CalcIntrinsicSize(SVGRect(0, 0, FPrinterPageWidth, FPrinterPageHeight));
+  R := FRoot.CalcIntrinsicSize(ViewPort);
+
+  FCmdListWidth := Round(R.Width);
+  FCmdListHeight := Round(R.Height);
+
+  if SupportsCmdList then
+  begin
+    // We render the SVG to a commandlist with the intrinsic size of the SVG
+    // and will later scale the commandlist over the page(s)
+
+    RenderToCmdList;
+  end;
 
   Count := PageCount;
 
   M := CalcViewportMatrix;
-
-  ViewPort := CalcViewport;
 
   PrintJob := TSVGRenderContextManager.CreatePrintJob(aPrintJobName);
 
@@ -648,7 +685,7 @@ begin
   if not assigned(FRoot) then
     Exit;
 
-  CalcPrinterDimensions;
+  //CalcPrinterDimensions;
 
   FCmdList := TSVGRenderContextManager.CreateCmdList;
 
@@ -806,12 +843,10 @@ begin
 end;
 
 procedure TSVGPrintPreview.SetRoot(const Value: ISVGRoot);
-var
-  R: TSVGRect;
 begin
   FRoot := Value;
 
-  if assigned(FRoot) then
+  {if assigned(FRoot) then
   begin
     CalcPrinterDimensions;
 
@@ -827,7 +862,7 @@ begin
 
       RenderToCmdList;
     end;
-  end;
+  end;}
 
   FNeedRecreatePreview := True;
   Invalidate;
