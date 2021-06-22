@@ -185,6 +185,8 @@ type
 
     procedure PaintRenderContext(aRC: ISVGRenderContext); virtual;
 
+    function CheckDisplay(aCache: ISVGObjectCache): Boolean;
+
     procedure UpdateBitmap;
   public
     constructor Create(aEditor: TSVGEditor; aRoot: ISVGRoot;
@@ -760,6 +762,23 @@ begin
   Result := TSVGDimension.CalcAsY(aValue, aDimType, Self);
 end;
 
+function TSVGEditorTool.CheckDisplay(aCache: ISVGObjectCache): Boolean;
+var
+  Attr: ISVGAttribute;
+begin
+  Result := True;
+
+  Attr := aCache.CSA.AttrArray[atDisplay];
+  if assigned(Attr) and (Attr.AsDisplay = TSVGDisplay.dpNone) then
+  begin
+    Result := False;
+    Exit;
+  end;
+
+  if Result and assigned(aCache.ParentCache) then
+    Result := CheckDisplay(aCache.ParentCache);
+end;
+
 procedure TSVGEditorTool.CmdListAddAttribute(
   const aAttrName: TSVGUnicodeString);
 var
@@ -999,6 +1018,7 @@ var
   SaveStyle: TSVGStyleAttributeRec;
   SaveViewport: TSVGRect;
   W, H: Integer;
+  Test: Boolean;
 begin
   W := ContentRect.Width;
   H := ContentRect.Height;
