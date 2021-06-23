@@ -30,17 +30,17 @@ object frmPrintPreview: TfrmPrintPreview
     Align = alLeft
     BevelOuter = bvNone
     TabOrder = 0
-    ExplicitHeight = 641
     object Label1: TLabel
       AlignWithMargins = True
       Left = 16
       Top = 12
-      Width = 68
+      Width = 230
       Height = 13
       Margins.Left = 16
       Margins.Top = 12
       Align = alTop
       Caption = 'Output device'
+      ExplicitWidth = 68
     end
     object eOutputDevice: TEdit
       AlignWithMargins = True
@@ -55,7 +55,6 @@ object frmPrintPreview: TfrmPrintPreview
       Align = alTop
       Color = clBtnFace
       TabOrder = 0
-      ExplicitWidth = 209
     end
     object Button1: TButton
       AlignWithMargins = True
@@ -70,38 +69,6 @@ object frmPrintPreview: TfrmPrintPreview
       Action = aPrinterSelect
       Align = alTop
       TabOrder = 1
-      ExplicitTop = 64
-      ExplicitWidth = 97
-    end
-    object Panel2: TPanel
-      Left = 0
-      Top = 633
-      Width = 249
-      Height = 31
-      Align = alBottom
-      BevelOuter = bvNone
-      TabOrder = 2
-      ExplicitTop = 610
-      object Button2: TButton
-        AlignWithMargins = True
-        Left = 90
-        Top = 3
-        Width = 75
-        Height = 25
-        Action = aPrint
-        Align = alRight
-        TabOrder = 0
-      end
-      object Button3: TButton
-        AlignWithMargins = True
-        Left = 171
-        Top = 3
-        Width = 75
-        Height = 25
-        Action = aCancel
-        Align = alRight
-        TabOrder = 1
-      end
     end
     object GroupBox1: TGroupBox
       AlignWithMargins = True
@@ -234,7 +201,6 @@ object frmPrintPreview: TfrmPrintPreview
       Align = alTop
       Caption = 'Pages'
       TabOrder = 4
-      ExplicitTop = 485
       object Label2: TLabel
         Left = 21
         Top = 32
@@ -281,7 +247,6 @@ object frmPrintPreview: TfrmPrintPreview
       Align = alTop
       Caption = 'Scale / Aspect ratio'
       TabOrder = 5
-      ExplicitTop = 346
       object Label10: TLabel
         Left = 21
         Top = 58
@@ -348,7 +313,6 @@ object frmPrintPreview: TfrmPrintPreview
         Align = alLeft
         TabOrder = 0
         TabStop = True
-        ExplicitHeight = 29
       end
       object RadioButton2: TRadioButton
         AlignWithMargins = True
@@ -363,8 +327,35 @@ object frmPrintPreview: TfrmPrintPreview
         Action = aOrientationLandscape
         Align = alRight
         TabOrder = 1
-        ExplicitLeft = 142
-        ExplicitHeight = 29
+      end
+    end
+    object Panel2: TPanel
+      Left = 0
+      Top = 633
+      Width = 249
+      Height = 31
+      Align = alBottom
+      BevelOuter = bvNone
+      TabOrder = 2
+      object Button2: TButton
+        AlignWithMargins = True
+        Left = 90
+        Top = 3
+        Width = 75
+        Height = 25
+        Action = aPrint
+        Align = alRight
+        TabOrder = 0
+      end
+      object Button3: TButton
+        AlignWithMargins = True
+        Left = 171
+        Top = 3
+        Width = 75
+        Height = 25
+        Action = aCancel
+        Align = alRight
+        TabOrder = 1
       end
     end
   end

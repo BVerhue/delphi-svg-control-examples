@@ -239,7 +239,7 @@ begin
 
   Printer.Orientation := TPrinterOrientation.poLandscape;
 
-  FPrintPreview.Repaint
+  FPrintPreview.Repaint;
 end;
 
 procedure TSVGPrintPreviewForm.ActionOrientationPortaitExecute(Sender: TObject);
@@ -256,6 +256,8 @@ procedure TSVGPrintPreviewForm.ActionPrinterSelectExecute(Sender: TObject);
 begin
   if FPrintDialog.Execute then
   begin
+    FPrintPreview.Repaint;
+
     EnableActions;
   end;
 end;
