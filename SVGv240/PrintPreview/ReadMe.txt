@@ -1,0 +1,1 @@
+The Print Preview example shows how to use the SVG printing functionality of the library

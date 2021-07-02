@@ -1,8 +1,4 @@
-unit BVE.SVGPrintPreviewVCL;
-
-{$IFDEF FPC}
-  {$MODE Delphi}
-{$ENDIF}
+unit BVE.SVGPrintPreviewFMX;
 
 // ------------------------------------------------------------------------------
 //
@@ -45,49 +41,27 @@ unit BVE.SVGPrintPreviewVCL;
 ///    The SVG Print Preview need at least version v2.40 update 9 of the SVG library
 ///  </remarks>
 
-
 interface
 uses
-  {$IFnDEF FPC}
-  Winapi.Windows,
-  Winapi.Messages,
   System.Types,
   System.SysUtils,
   System.Classes,
   System.Generics.Collections,
   System.Math,
-  Vcl.Graphics,
-  Vcl.Controls,
-  Vcl.ExtCtrls,
-  Vcl.Printers,
-  {$ELSE}
-  Windows,
-  WinUtilPrn,
-  Messages,
-  Types,
-  SysUtils,
-  Classes,
-  Generics.Collections,
-  Math,
-  Graphics,
-  Controls,
-  ExtCtrls,
-  Printers,
-  {$ENDIF}
+  System.UITypes,
+  Fmx.Graphics,
+  Fmx.Controls,
+  Fmx.ExtCtrls,
+  Fmx.Printer,
   BVE.SVG2Types,
   BVE.SVG2Intf,
   BVE.SVG2Elements,
-  {$IFnDEF FPC}
-  BVE.SVG2Elements.VCL
-  {$ELSE}
-  BVE.SVG2Elements.FPC
-  {$ENDIF}
-  ;
+  BVE.SVG2Elements.FMX;
 
 type
   TSVGPrintUnits = (puMm, puCm, puInch, puPixel);
 
-  TSVGPrintPreview = class(TCustomControl)
+  TSVGPrintPreview = class(TControl)
   private
     // Only one SVG can be printed, however, the SVG can be printer
     // over multiple pages
@@ -165,7 +139,7 @@ type
     procedure Print(const aPrintJobName: string);
 
     procedure Paint; override;
-    procedure Repaint; override;
+    procedure Repaint;
     procedure Resize; override;
 
     property AutoViewbox: Boolean read FAutoViewbox write SetAutoViewbox;
@@ -183,6 +157,7 @@ type
     property Units: TSVGPrintUnits read FPrintUnits write SetPrintUnits;
   end;
 
+
 implementation
 uses
   BVE.SVG2GeomUtility,
@@ -190,71 +165,17 @@ uses
 
 { TSVGPrintPreview }
 
-function TSVGPrintPreview.CalcRCUnits(const aValue, aDPI: TSVGFloat): TSVGFloat;
-begin
-  {if  TSVGRenderContextManager.RenderContextType = rcDirect2D then
-  begin
-    // Direct2D coords are in device independent pixels}
-
-    case FPrintUnits of
-      puPixel:
-        begin
-          Result := 96 / aDPI * aValue;
-        end;
-      puMm:
-        begin
-          Result := 96 / 25.4 * aValue;
-        end;
-      puCm:
-        begin
-          Result := 96 / 2.54 * aValue;
-        end;
-      puInch:
-        begin
-           Result := 96 * aValue;
-        end;
-      else
-        Result := aValue;
-    end;
-
-  {end else begin
-    // GDI+ coords are in pixels
-
-    case FPrintUnits of
-      puPixel:
-        begin
-          Result := aDPI / aDPI * aValue;
-        end;
-      puMm:
-        begin
-          Result := aDPI / 25.4 * aValue;
-        end;
-      puCm:
-        begin
-          Result := aDPI / 2.54 * aValue;
-        end;
-      puInch:
-        begin
-           Result := aValue * aDPI;
-        end;
-      else
-        Result := aValue;
-    end;
-  end;}
-end;
-
 procedure TSVGPrintPreview.CalcPrinterDimensions;
+var
+  DPI: TPoint;
 begin
   FPrinterPageWidth := Printer.PageWidth;
   FPrinterPageHeight := Printer.PageHeight;
 
-  {$IFnDEF FPC}
-  FDPIX := GetDeviceCaps(Printer.Handle, LOGPIXELSX);
-  FDPIY := GetDeviceCaps(Printer.Handle, LOGPIXELSY);
-  {$ELSE}
-  FDPIX := Printer.XDPI;
-  FDPIY := Printer.YDPI;
-  {$ENDIF}
+  DPI := Printer.ActivePrinter.DPI[0];
+
+  FDPIX := DPI.X;
+  FDPIY := DPI.Y;
 
   if FDPIX = 0 then
     FDPIX := 96;
@@ -264,17 +185,6 @@ begin
 
   FPxToPt := SVGPoint(FDPIX / 96, FDPIY / 96);
 
-  {if TSVGRenderContextManager.RenderContextType = rcDirect2D then
-  begin
-    // Printer.PageWidth and Printer.PageHeight are in pixels, we need to
-    // convert them to points
-
-    FPrinterPageWidth := FPrinterPageWidth / FPxToPt.X;
-    FPrinterPageHeight := FPrinterPageHeight / FPxToPt.Y;
-
-    FPxToPt := SVGPoint(1.0, 1.0);
-  end;}
-
   // Printer.PageWidth and Printer.PageHeight are in pixels, we need to
   // convert them to points
 
@@ -283,7 +193,30 @@ begin
 
   if TSVGRenderContextManager.RenderContextType = rcDirect2D then
     FPxToPt := SVGPoint(1.0, 1.0);
+end;
 
+function TSVGPrintPreview.CalcRCUnits(const aValue, aDPI: TSVGFloat): TSVGFloat;
+begin
+  case FPrintUnits of
+    puPixel:
+      begin
+        Result := 96 / aDPI * aValue;
+      end;
+    puMm:
+      begin
+        Result := 96 / 25.4 * aValue;
+      end;
+    puCm:
+      begin
+        Result := 96 / 2.54 * aValue;
+      end;
+    puInch:
+      begin
+         Result := 96 * aValue;
+      end;
+    else
+      Result := aValue;
+  end;
 end;
 
 function TSVGPrintPreview.CalcViewport: TSVGRect;
@@ -298,7 +231,7 @@ begin
 end;
 
 function TSVGPrintPreview.CalcViewportMatrix(const aSVGWidth,
-   aSVGHeight: TSVGFloat): TSVGMatrix;
+  aSVGHeight: TSVGFloat): TSVGMatrix;
 var
   Viewport, Viewbox: TSVGRect;
 begin
@@ -327,11 +260,7 @@ begin
       CalcRCUnits(FMarginLeft, FDPIX),
       CalcRCUnits(FMarginTop, FDPIY));
 
-    {Result := TSVGMatrix.Multiply(
-      Result,
-      TSVGMatrix.CreateScaling(FPxToPt.X, FPxToPt.Y));}
   end;
-
 end;
 
 constructor TSVGPrintPreview.Create(AOwner: TComponent);
@@ -339,11 +268,9 @@ begin
   inherited;
 
   FRoot := nil;
-  {$IFnDEF FPC}
+
   FPagePreviewList := TList<TBitmap>.Create;
-  {$ELSE}
-  FPagePreviewList := TList<ISVGIntfBitmap>.Create;
-  {$ENDIF}
+
   FPreviewPageMargin := 10;
 
   FViewportScale := 1.0;
@@ -411,7 +338,7 @@ end;
 procedure TSVGPrintPreview.MarginsChange(aSender: TObject);
 begin
   FNeedRecreatePreview := True;
-  Invalidate;
+  Repaint;
 end;
 
 procedure TSVGPrintPreview.PagePreviewCalcSize;
@@ -429,8 +356,8 @@ begin
 
   Viewport := SVGRect(
     0, 0,
-    Round((ClientWidth - (PagesHorizontal + 1) * FPreviewPageMargin) / PagesHorizontal),
-    Round((ClientHeight - (PagesVertical + 1) * FPreviewPageMargin) / PagesVertical));
+    Round((Width - (PagesHorizontal + 1) * FPreviewPageMargin) / PagesHorizontal),
+    Round((Height - (PagesVertical + 1) * FPreviewPageMargin) / PagesVertical));
 
   // Spcae needed for one page
 
@@ -459,9 +386,7 @@ procedure TSVGPrintPreview.PagePreviewListClear;
 begin
   while FPagePreviewList.Count > 0 do
   begin
-    {$IFnDEF FPC}
     FPagePreviewList[0].Free;
-    {$ENDIF}
     FPagePreviewList.Delete(0);
   end;
 end;
@@ -471,11 +396,7 @@ var
   i, Count: Integer;
   R: TSVGRect;
   Viewport: TSVGRect;
-  {$IFnDEF FPC}
   Bitmap: TBitmap;
-  {$ELSE}
-  Bitmap: ISVGIntfBitmap;
-  {$ENDIF}
   RC: ISVGRenderContext;
   M, MV: TSVGMatrix;
   SVGWidth, SVGHeight: TSVGFloat;
@@ -510,7 +431,8 @@ begin
       TSVGMatrix.CreateTranslation(-R.Left, -R.Top),
       TSVGMatrix.CreateScaling(FViewportScale, FViewportScale));
 
-    Bitmap := TSVGRenderContextManager.CreateCompatibleBitmap(FPreviewPageWidth, FPreviewPageHeight);
+    Bitmap := TBitmap.Create;
+    Bitmap.SetSize(FPreviewPageWidth, FPreviewPageHeight);
 
     FPagePreviewList.Add(Bitmap);
 
@@ -559,26 +481,37 @@ procedure TSVGPrintPreview.Paint;
 var
   i: Integer;
   X, Y: Integer;
+  Srce, Dest: TRectF;
 begin
   inherited;
 
   if FNeedRecreatePreview then
     PagePreviewListCreate;
 
-  Canvas.Brush.Color := clGray;
-  Canvas.Brush.Style := bsSolid;
-  Canvas.FillRect(ClientRect);
+  Canvas.BeginScene;
+  try
+    //Canvas.Clear(TAlphaColorRec.Gray);
 
-  for i := 0 to FPagePreviewList.Count - 1 do
-  begin
-    X := FPreviewPageMargin + (i mod PagesHorizontal) * (FPreviewPageWidth + FPreviewPageMargin);
-    Y := FPreviewPageMargin + (i div PagesHorizontal) * (FPreviewPageHeight + FPreviewPageMargin);
+    Dest := RectF(0, 0, Width, Height);
 
-    {$IFnDEF FPC}
-    Canvas.Draw(X, Y, FPagePreviewList[i]);
-    {$ELSE}
-    FPagePreviewList[i].Draw(X, Y, Canvas);
-    {$ENDIF}
+    Canvas.Fill.Color := TAlphaColorRec.Gray;
+    Canvas.Fill.Kind := TBrushKind.Solid;
+    Canvas.FillRect(Dest, 1.0);
+
+    for i := 0 to FPagePreviewList.Count - 1 do
+    begin
+      X := FPreviewPageMargin + (i mod PagesHorizontal) * (FPreviewPageWidth + FPreviewPageMargin);
+      Y := FPreviewPageMargin + (i div PagesHorizontal) * (FPreviewPageHeight + FPreviewPageMargin);
+
+      Srce := RectF(0, 0, FPagePreviewList[i].Width, FPagePreviewList[i].Height);
+      Dest := Srce;
+      Dest.Offset(X, Y);
+
+      Canvas.DrawBitmap(
+        FPagePreviewList[i], Srce, Dest, 1.0);
+    end;
+  finally
+    Canvas.EndScene;
   end;
 end;
 
@@ -591,10 +524,6 @@ var
   RC: ISVGRenderContext;
   M, MV: TSVGMatrix;
   SVGWidth, SVGHeight: TSVGFloat;
-  {$IFDEF FPC}
-  PDev: TPrinterDevice;
-  DevMode: PDeviceMOdeW;
-  {$ENDIF}
 begin
   CalcPrinterDimensions;
 
@@ -611,20 +540,10 @@ begin
 
   M := CalcViewportMatrix(SVGWidth, SVGHeight);
 
-  {$IFnDEF FPC}
   PrintJob := TSVGRenderContextManager.CreatePrintJob(
     aPrintJobName,
     TSVGBufferQuality.bqHighQuality,
     []);
-  {$ELSE}
-  PDev := TPrinterDevice(Printer.Printers.Objects[Printer.PrinterIndex]);
-
-  PrintJob := TSVGRenderContextManager.CreatePrintJob(
-    aPrintJobName,
-    PDev.DevModeW,
-    TSVGBufferQuality.bqHighQuality,
-    []);
-  {$ENDIF}
 
   for i := 0 to Count - 1 do
   begin
@@ -693,7 +612,7 @@ begin
   begin
     FAspectRatioAlign := Value;
     FNeedRecreatePreview := True;
-    Invalidate;
+    Repaint;
   end;
 end;
 
@@ -704,7 +623,7 @@ begin
   begin
     FAspectRatioMeetOrSlice := Value;
     FNeedRecreatePreview := True;
-    Invalidate;
+    Repaint;
   end;
 end;
 
@@ -714,7 +633,7 @@ begin
   begin
     FAutoViewbox := Value;
     FNeedRecreatePreview := True;
-    Invalidate;
+    Repaint;
   end;
 end;
 
@@ -724,7 +643,7 @@ begin
   begin
     FGlueEdge := Value;
     FNeedRecreatePreview := True;
-    Invalidate;
+    Repaint;
   end;
 end;
 
@@ -734,7 +653,7 @@ begin
   begin
     FMarginBottom := Value;
     FNeedRecreatePreview := True;
-    Invalidate;
+    Repaint;
   end;
 end;
 
@@ -744,7 +663,7 @@ begin
   begin
     FMarginLeft := Value;
     FNeedRecreatePreview := True;
-    Invalidate;
+    Repaint;
   end;
 end;
 
@@ -754,7 +673,7 @@ begin
   begin
     FMarginRight := Value;
     FNeedRecreatePreview := True;
-    Invalidate;
+    Repaint;
   end;
 end;
 
@@ -764,7 +683,7 @@ begin
   begin
     FMarginTop := Value;
     FNeedRecreatePreview := True;
-    Invalidate;
+    Repaint;
   end;
 end;
 
@@ -778,7 +697,7 @@ begin
       FPagesHorizontal := Value;
 
     FNeedRecreatePreview := True;
-    Invalidate;
+    Repaint;
   end;
 end;
 
@@ -792,7 +711,7 @@ begin
       FPagesVertical := Value;
 
     FNeedRecreatePreview := True;
-    Invalidate;
+    Repaint;
   end;
 end;
 
@@ -803,7 +722,7 @@ begin
     FPrintUnits := Value;
 
     FNeedRecreatePreview := True;
-    Invalidate;
+    Repaint;
   end;
 end;
 
@@ -812,7 +731,7 @@ begin
   FRoot := Value;
 
   FNeedRecreatePreview := True;
-  Invalidate;
+  Repaint;
 end;
 
 end.

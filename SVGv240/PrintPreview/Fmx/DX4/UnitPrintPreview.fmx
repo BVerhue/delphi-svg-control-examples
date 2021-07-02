@@ -1,0 +1,400 @@
+object frmPrintPreview: TfrmPrintPreview
+  Left = 0
+  Top = 0
+  Caption = 'Print preview'
+  ClientHeight = 649
+  ClientWidth = 640
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  OnCreate = FormCreate
+  DesignerMasterStyle = 0
+  object Panel1: TPanel
+    Align = Left
+    Size.Width = 249.000000000000000000
+    Size.Height = 649.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 0
+    object GroupBox1: TGroupBox
+      Align = Top
+      Margins.Left = 8.000000000000000000
+      Margins.Right = 8.000000000000000000
+      Position.X = 8.000000000000000000
+      Size.Width = 233.000000000000000000
+      Size.Height = 100.000000000000000000
+      Size.PlatformDefault = False
+      Text = 'Output device'
+      TabOrder = 0
+      object Button3: TButton
+        Action = aPrinterSelect
+        Align = Top
+        Enabled = True
+        ImageIndex = -1
+        Margins.Left = 16.000000000000000000
+        Margins.Top = 8.000000000000000000
+        Margins.Right = 16.000000000000000000
+        Position.X = 16.000000000000000000
+        Position.Y = 49.000000000000000000
+        Size.Width = 201.000000000000000000
+        Size.Height = 22.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 38
+      end
+      object lOutputDevice: TLabel
+        Align = Top
+        Margins.Left = 16.000000000000000000
+        Margins.Top = 24.000000000000000000
+        Margins.Right = 16.000000000000000000
+        Position.X = 16.000000000000000000
+        Position.Y = 24.000000000000000000
+        Size.Width = 201.000000000000000000
+        Size.Height = 17.000000000000000000
+        Size.PlatformDefault = False
+        Text = 'lOutputDevice'
+        TabOrder = 39
+      end
+    end
+    object GroupBox2: TGroupBox
+      Align = Top
+      Margins.Left = 8.000000000000000000
+      Margins.Right = 8.000000000000000000
+      Position.X = 8.000000000000000000
+      Position.Y = 100.000000000000000000
+      Size.Width = 233.000000000000000000
+      Size.Height = 69.000000000000000000
+      Size.PlatformDefault = False
+      Text = 'Orientation'
+      TabOrder = 1
+      object RadioButton1: TRadioButton
+        Action = aOrientationPortait
+        Align = Left
+        Enabled = True
+        Margins.Left = 16.000000000000000000
+        Margins.Top = 16.000000000000000000
+        Position.X = 16.000000000000000000
+        Position.Y = 16.000000000000000000
+        Size.Width = 73.000000000000000000
+        Size.Height = 53.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 38
+      end
+      object RadioButton2: TRadioButton
+        Action = aOrientationLandscape
+        Align = Right
+        Enabled = True
+        Margins.Top = 16.000000000000000000
+        Margins.Right = 16.000000000000000000
+        Position.X = 128.000000000000000000
+        Position.Y = 16.000000000000000000
+        Size.Width = 89.000000000000000000
+        Size.Height = 53.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 39
+      end
+    end
+    object GroupBox3: TGroupBox
+      Align = Top
+      Margins.Left = 8.000000000000000000
+      Margins.Right = 8.000000000000000000
+      Position.X = 8.000000000000000000
+      Position.Y = 169.000000000000000000
+      Size.Width = 233.000000000000000000
+      Size.Height = 200.000000000000000000
+      Size.PlatformDefault = False
+      Text = 'Margins'
+      TabOrder = 2
+      object cbUnits: TComboBox
+        Position.X = 64.000000000000000000
+        Position.Y = 32.000000000000000000
+        TabOrder = 38
+      end
+      object Label1: TLabel
+        Position.X = 24.000000000000000000
+        Position.Y = 35.000000000000000000
+        Size.Width = 41.000000000000000000
+        Size.Height = 17.000000000000000000
+        Size.PlatformDefault = False
+        Text = 'Units:'
+        TabOrder = 39
+      end
+      object eMarginLeft: TEdit
+        Touch.InteractiveGestures = [LongTap, DoubleTap]
+        TabOrder = 40
+        FilterChar = '0123456789.'
+        Text = '0'
+        TextSettings.HorzAlign = Center
+        Position.X = 64.000000000000000000
+        Position.Y = 64.000000000000000000
+        Size.Width = 41.000000000000000000
+        Size.Height = 22.000000000000000000
+        Size.PlatformDefault = False
+      end
+      object eMarginTop: TEdit
+        Touch.InteractiveGestures = [LongTap, DoubleTap]
+        TabOrder = 41
+        FilterChar = '0123456789.'
+        Text = '0'
+        TextSettings.HorzAlign = Center
+        Position.X = 176.000000000000000000
+        Position.Y = 64.000000000000000000
+        Size.Width = 41.000000000000000000
+        Size.Height = 22.000000000000000000
+        Size.PlatformDefault = False
+      end
+      object eMarginRight: TEdit
+        Touch.InteractiveGestures = [LongTap, DoubleTap]
+        TabOrder = 42
+        FilterChar = '0123456789.'
+        Text = '0'
+        TextSettings.HorzAlign = Center
+        Position.X = 64.000000000000000000
+        Position.Y = 96.000000000000000000
+        Size.Width = 41.000000000000000000
+        Size.Height = 22.000000000000000000
+        Size.PlatformDefault = False
+      end
+      object eMarginBottom: TEdit
+        Touch.InteractiveGestures = [LongTap, DoubleTap]
+        TabOrder = 43
+        FilterChar = '0123456789.'
+        Text = '0'
+        TextSettings.HorzAlign = Center
+        Position.X = 176.000000000000000000
+        Position.Y = 96.000000000000000000
+        Size.Width = 41.000000000000000000
+        Size.Height = 22.000000000000000000
+        Size.PlatformDefault = False
+      end
+      object CheckBox1: TCheckBox
+        Action = aIdenticalMargins
+        Enabled = True
+        Position.X = 64.000000000000000000
+        Position.Y = 128.000000000000000000
+        TabOrder = 44
+      end
+      object eGlueEdge: TEdit
+        Touch.InteractiveGestures = [LongTap, DoubleTap]
+        TabOrder = 45
+        FilterChar = '0123456789.'
+        Text = '0'
+        TextSettings.HorzAlign = Center
+        Position.X = 96.000000000000000000
+        Position.Y = 160.000000000000000000
+        Size.Width = 41.000000000000000000
+        Size.Height = 22.000000000000000000
+        Size.PlatformDefault = False
+      end
+      object Label2: TLabel
+        Position.X = 24.000000000000000000
+        Position.Y = 68.000000000000000000
+        Size.Width = 33.000000000000000000
+        Size.Height = 17.000000000000000000
+        Size.PlatformDefault = False
+        Text = 'Left:'
+        TabOrder = 46
+      end
+      object Label3: TLabel
+        Position.X = 118.000000000000000000
+        Position.Y = 67.000000000000000000
+        Size.Width = 25.000000000000000000
+        Size.Height = 17.000000000000000000
+        Size.PlatformDefault = False
+        Text = 'Top:'
+        TabOrder = 47
+      end
+      object Label4: TLabel
+        Position.X = 24.000000000000000000
+        Position.Y = 99.000000000000000000
+        Size.Width = 41.000000000000000000
+        Size.Height = 17.000000000000000000
+        Size.PlatformDefault = False
+        Text = 'Right:'
+        TabOrder = 48
+      end
+      object Label5: TLabel
+        Position.X = 120.000000000000000000
+        Position.Y = 99.000000000000000000
+        Size.Width = 49.000000000000000000
+        Size.Height = 17.000000000000000000
+        Size.PlatformDefault = False
+        Text = 'Bottom:'
+        TabOrder = 49
+      end
+      object Label6: TLabel
+        Position.X = 24.000000000000000000
+        Position.Y = 163.000000000000000000
+        Size.Width = 73.000000000000000000
+        Size.Height = 17.000000000000000000
+        Size.PlatformDefault = False
+        Text = 'Glue edge:'
+        TabOrder = 50
+      end
+    end
+    object GroupBox4: TGroupBox
+      Align = Top
+      Margins.Left = 8.000000000000000000
+      Margins.Right = 8.000000000000000000
+      Position.X = 8.000000000000000000
+      Position.Y = 369.000000000000000000
+      Size.Width = 233.000000000000000000
+      Size.Height = 136.000000000000000000
+      Size.PlatformDefault = False
+      Text = 'Scale / Aspect ratio'
+      TabOrder = 3
+      object cbAutoViewbox: TCheckBox
+        Position.X = 32.000000000000000000
+        Position.Y = 32.000000000000000000
+        TabOrder = 38
+        Text = 'Auto viewbox'
+      end
+      object cbAlign: TComboBox
+        Position.X = 112.000000000000000000
+        Position.Y = 56.000000000000000000
+        TabOrder = 39
+      end
+      object cbMeetOrSlice: TComboBox
+        Position.X = 112.000000000000000000
+        Position.Y = 88.000000000000000000
+        TabOrder = 40
+      end
+      object Label7: TLabel
+        Position.X = 32.000000000000000000
+        Position.Y = 59.000000000000000000
+        Size.Width = 57.000000000000000000
+        Size.Height = 17.000000000000000000
+        Size.PlatformDefault = False
+        Text = 'Align:'
+        TabOrder = 41
+      end
+      object Label8: TLabel
+        Position.X = 32.000000000000000000
+        Position.Y = 91.000000000000000000
+        Size.Width = 81.000000000000000000
+        Size.Height = 17.000000000000000000
+        Size.PlatformDefault = False
+        Text = 'Meet or slice:'
+        TabOrder = 42
+      end
+    end
+    object GroupBox5: TGroupBox
+      Align = Top
+      Margins.Left = 8.000000000000000000
+      Margins.Right = 8.000000000000000000
+      Position.X = 8.000000000000000000
+      Position.Y = 505.000000000000000000
+      Size.Width = 233.000000000000000000
+      Size.Height = 100.000000000000000000
+      Size.PlatformDefault = False
+      Text = 'Pages'
+      TabOrder = 4
+      object ePagesHorizontal: TEdit
+        Touch.InteractiveGestures = [LongTap, DoubleTap]
+        TabOrder = 38
+        FilterChar = '0123456789'
+        Text = '1'
+        TextSettings.HorzAlign = Center
+        Position.X = 112.000000000000000000
+        Position.Y = 32.000000000000000000
+        Size.Width = 41.000000000000000000
+        Size.Height = 22.000000000000000000
+        Size.PlatformDefault = False
+      end
+      object ePagesVertical: TEdit
+        Touch.InteractiveGestures = [LongTap, DoubleTap]
+        TabOrder = 39
+        FilterChar = '0123456789'
+        Text = '1'
+        TextSettings.HorzAlign = Center
+        Position.X = 112.000000000000000000
+        Position.Y = 64.000000000000000000
+        Size.Width = 41.000000000000000000
+        Size.Height = 22.000000000000000000
+        Size.PlatformDefault = False
+      end
+      object Label9: TLabel
+        Position.X = 32.000000000000000000
+        Position.Y = 35.000000000000000000
+        Size.Width = 65.000000000000000000
+        Size.Height = 17.000000000000000000
+        Size.PlatformDefault = False
+        Text = 'Horizontal:'
+        TabOrder = 40
+      end
+      object Label10: TLabel
+        Position.X = 32.000000000000000000
+        Position.Y = 67.000000000000000000
+        Size.Width = 65.000000000000000000
+        Size.Height = 17.000000000000000000
+        Size.PlatformDefault = False
+        Text = 'Vertical:'
+        TabOrder = 41
+      end
+    end
+    object Panel2: TPanel
+      Align = Bottom
+      Position.Y = 613.000000000000000000
+      Size.Width = 249.000000000000000000
+      Size.Height = 36.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 5
+      object Button1: TButton
+        Action = aCancel
+        Align = Right
+        Enabled = True
+        ImageIndex = -1
+        Margins.Left = 4.000000000000000000
+        Margins.Top = 4.000000000000000000
+        Margins.Right = 4.000000000000000000
+        Margins.Bottom = 4.000000000000000000
+        Position.X = 165.000000000000000000
+        Position.Y = 4.000000000000000000
+        Size.Width = 80.000000000000000000
+        Size.Height = 28.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 0
+      end
+      object Button2: TButton
+        Action = aPrint
+        Align = Right
+        Enabled = True
+        ImageIndex = -1
+        Margins.Left = 4.000000000000000000
+        Margins.Top = 4.000000000000000000
+        Margins.Right = 4.000000000000000000
+        Margins.Bottom = 4.000000000000000000
+        Position.X = 77.000000000000000000
+        Position.Y = 4.000000000000000000
+        Size.Width = 80.000000000000000000
+        Size.Height = 28.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 1
+      end
+    end
+  end
+  object ActionList1: TActionList
+    Left = 304
+    Top = 112
+    object aOrientationLandscape: TAction
+      Text = 'Landscape'
+      GroupIndex = 1
+    end
+    object aOrientationPortait: TAction
+      Text = 'Portrait'
+      Checked = True
+      GroupIndex = 1
+    end
+    object aPrint: TAction
+      Text = 'Print'
+    end
+    object aCancel: TAction
+      Text = 'Cancel'
+    end
+    object aPrinterSelect: TAction
+      Text = 'Select printer...'
+    end
+    object aIdenticalMargins: TAction
+      AutoCheck = True
+      Text = 'Identical margins'
+    end
+  end
+end

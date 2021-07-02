@@ -1,21 +1,17 @@
 program Project1;
 
 uses
-  Vcl.Forms,
+  System.StartUpCopy,
+  FMX.Forms,
   Unit1 in 'Unit1.pas' {Form1},
   UnitPrintPreview in 'UnitPrintPreview.pas' {frmPrintPreview},
-  BVE.SVGPrintPreviewFormVCL in '..\Common\BVE.SVGPrintPreviewFormVCL.pas',
-  BVE.SVGPrintPreviewVCL in '..\Common\BVE.SVGPrintPreviewVCL.pas';
+  BVE.SVGPrintPreviewFormFMX in '..\..\Common\BVE.SVGPrintPreviewFormFMX.pas',
+  BVE.SVGPrintPreviewFMX in '..\..\Common\BVE.SVGPrintPreviewFMX.pas';
 
 {$R *.res}
 
 begin
-{$IFDEF DEBUG}
-  ReportMemoryLeaksOnShutdown := True;
-{$ENDIF}
-
   Application.Initialize;
-  Application.MainFormOnTaskbar := True;
   Application.CreateForm(TForm1, Form1);
   Application.CreateForm(TfrmPrintPreview, frmPrintPreview);
   Application.Run;

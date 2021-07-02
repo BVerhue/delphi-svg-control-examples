@@ -1,0 +1,66 @@
+object Form1: TForm1
+  Left = 0
+  Top = 0
+  Caption = 'Form1'
+  ClientHeight = 480
+  ClientWidth = 640
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
+  DesignerMasterStyle = 0
+  object SVG2Image1: TSVG2Image
+    Align = Client
+    Size.Width = 640.000000000000000000
+    Size.Height = 480.000000000000000000
+    Size.PlatformDefault = False
+    OnDragOver = SVG2Image1DragOver
+    OnDragDrop = SVG2Image1DragDrop
+  end
+  object ActionList1: TActionList
+    Left = 56
+    Top = 40
+    object aLoadSVG: TAction
+      Text = 'Load SVG...'
+      OnExecute = aLoadSVGExecute
+    end
+    object aPrintSVG: TAction
+      Text = 'Print SVG...'
+      OnExecute = aPrintSVGExecute
+    end
+    object aQuit: TAction
+      Text = 'Quit'
+      OnExecute = aQuitExecute
+    end
+  end
+  object MainMenu1: TMainMenu
+    Left = 136
+    Top = 40
+    object MenuItem1: TMenuItem
+      Text = 'File'
+      object MenuItem2: TMenuItem
+        Action = aLoadSVG
+        Enabled = True
+        Locked = True
+        ImageIndex = -1
+      end
+      object MenuItem3: TMenuItem
+        Action = aPrintSVG
+        Enabled = True
+        Locked = True
+        ImageIndex = -1
+      end
+      object MenuItem4: TMenuItem
+        Action = aQuit
+        Enabled = True
+        Locked = True
+        ImageIndex = -1
+      end
+    end
+  end
+  object OpenDialog1: TOpenDialog
+    Left = 232
+    Top = 40
+  end
+end
