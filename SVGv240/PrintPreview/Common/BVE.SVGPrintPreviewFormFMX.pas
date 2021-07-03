@@ -77,7 +77,7 @@ type
     FActionOrientationPortait: TAction;
     FActionIdenticalMargins: TAction;
 
-    FEditOutputDevice: TEdit;
+    FLabelOutputDevice: TLabel;
     FEditPagesHorizontal: TEdit;
     FEditPagesVertical: TEdit;
     FEditMarginLeft: TEdit;
@@ -116,7 +116,7 @@ type
     procedure SetComboboxAlign(const Value: TComboBox);
     procedure SetComboboxMeetOrSlice(const Value: TComboBox);
 
-    procedure SetEditOutputDevice(const Value: TEdit);
+    procedure SetLabelOutputDevice(const Value: TLabel);
     procedure SetEditPagesHorizontal(const Value: TEdit);
     procedure SetEditPagesVertical(const Value: TEdit);
     procedure SetEditGlueEdge(const Value: TEdit);
@@ -165,7 +165,7 @@ type
 
     property CheckBoxAutoViewbox: TCheckBox read FCheckBoxAutoViewbox write SetCheckBoxAutoViewbox;
 
-    property EditOutputDevice: TEdit read FEditOutputDevice write SetEditOutputDevice;
+    property LabelOutputDevice: TLabel read FLabelOutputDevice write SetLabelOutputDevice;
     property EditPagesHorizontal: TEdit read FEditPagesHorizontal write SetEditPagesHorizontal;
     property EditPagesVertical: TEdit read FEditPagesVertical write SetEditPagesVertical;
     property EditMarginLeft: TEdit read FEditMarginLeft write SetEditMarginLeft;
@@ -335,7 +335,7 @@ procedure TSVGPrintPreviewForm.EnableActions;
 begin
   Inc(FRecursion);
   try
-    FEditOutputDevice.Text := Printer.ActivePrinter.Device;
+    FLabelOutputDevice.Text := Printer.ActivePrinter.Device;
 
     if Printer.Orientation = TPrinterOrientation.poPortrait then
       ActionOrientationPortait.Checked := True
@@ -598,13 +598,9 @@ begin
   end;
 end;
 
-procedure TSVGPrintPreviewForm.SetEditOutputDevice(const Value: TEdit);
+procedure TSVGPrintPreviewForm.SetLabelOutputDevice(const Value: TLabel);
 begin
-  FEditOutputDevice := Value;
-  if assigned(FEditOutputDevice) then
-  begin
-    FEditOutputDevice.ReadOnly := True;
-  end;
+  FLabelOutputDevice := Value;
 end;
 
 procedure TSVGPrintPreviewForm.SetEditPagesHorizontal(const Value: TEdit);

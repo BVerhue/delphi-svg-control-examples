@@ -134,7 +134,7 @@ begin
   ComboBoxAlign := cbAlign;
   ComboBoxMeetOrSlice := cbMeetOrSlice;
 
-  EditOutputDevice := eOutputDevice;
+  LabelOutputDevice := lOutputDevice;
   EditPagesHorizontal := ePagesHorizontal;
   EditPagesVertical := ePagesVertical;
   EditMarginLeft := eMarginLeft;
