@@ -1973,6 +1973,12 @@ function TSVGViewerForm.CreateSVGSelectControl(
 begin
   Result := TSVGSelectControl.Create(Self, FSelectionList);
   Result.SVG.Text := aSvg;
+
+  {$IFDEF FPC}
+  // Parse the SVG now, so CalcSize is called, because in FPC resizing the
+  // control while it is painted doesn't work.
+  Result.ParseSVG;
+  {$ENDIF}
 end;
 
 destructor TSVGViewerForm.Destroy;
@@ -2195,6 +2201,12 @@ begin
     Result := TSVGSelectControl.Create(Self, FSelectionList);
 
   Result.Filename := aFileName;
+
+  {$IFDEF FPC}
+  // Parse the SVG now, so CalcSize is called, because in FPC resizing the
+  // control while it is painted doesn't work.
+  Result.ParseSVG;
+  {$ENDIF}
 end;
 
 procedure TSVGViewerForm.Paste;
