@@ -61,6 +61,10 @@ uses
   Vcl.ExtCtrls,
   Vcl.Printers,
   {$ELSE}
+  {$IFDEF Windows}
+  Windows,
+  WinUtilPrn,
+  {$ENDIF}
   SysUtils,
   Classes,
   Generics.Collections,
@@ -608,12 +612,16 @@ begin
 
   M := CalcViewportMatrix(SVGWidth, SVGHeight);
 
+  {$IFnDEF FPC}
+
   PrintJob := TSVGRenderContextManager.CreatePrintJob(
     aPrintJobName,
     TSVGBufferQuality.bqHighQuality,
     []);
 
-  {IFDEF Windows
+  {$ELSE}{$IFDEF Windows}
+
+  // We must supply the DevMode
   PDev := TPrinterDevice(Printer.Printers.Objects[Printer.PrinterIndex]);
 
   PrintJob := TSVGRenderContextManager.CreatePrintJob(
@@ -621,7 +629,16 @@ begin
     PDev.DevModeW,
     TSVGBufferQuality.bqHighQuality,
     []);
-  ENDIF}
+
+  {$ELSE}
+
+  PrintJob := TSVGRenderContextManager.CreatePrintJob(
+    aPrintJobName,
+    TSVGBufferQuality.bqHighQuality,
+    []);
+
+  {$ENDIF}
+  {$ENDIF}
 
   for i := 0 to Count - 1 do
   begin

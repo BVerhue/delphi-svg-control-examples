@@ -1,8 +1,6 @@
 unit Unit1;
 
-{$IFDEF FPC}
-  {$MODE Delphi}
-{$ENDIF}
+{$mode objfpc}{$H+}
 
 // ------------------------------------------------------------------------------
 //
@@ -48,46 +46,33 @@ unit Unit1;
 interface
 
 uses
-  SysUtils,
-  Variants,
-  Classes,
-  Graphics,
-  Controls,
-  Forms,
-  Dialogs,
-  ActnList,
-  Menus,
-  ExtDlgs,
-  BVE.SVG2Control.FPC,
-  BVE.SVG2Image.FPC;
+  Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ActnList, Menus,
+  ExtDlgs, BVE.SVG2Image.FPC;
 
 type
 
   { TForm1 }
 
   TForm1 = class(TForm)
-    aLoadSVG: TAction;
-    aPrintSVG: TAction;
     aQuit: TAction;
+    aPrintSVG: TAction;
+    aLoadSVG: TAction;
+    ActionList1: TActionList;
     MainMenu1: TMainMenu;
     MenuItem1: TMenuItem;
     MenuItem2: TMenuItem;
     MenuItem3: TMenuItem;
     MenuItem4: TMenuItem;
-    SVG2Image1: TSVG2Image;
-    ActionList1: TActionList;
     OpenPictureDialog1: TOpenPictureDialog;
+    SVG2Image1: TSVG2Image;
     procedure aLoadSVGExecute(Sender: TObject);
     procedure aPrintSVGExecute(Sender: TObject);
     procedure aQuitExecute(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
+    procedure FormDropFiles(Sender: TObject; const FileNames: array of String);
   private
-    {$IFnDEF FPC}
-    procedure WMDROPFILES(var Msg: TWMDropFiles); message WM_DROPFILES;
-    {$ELSE}
-    procedure OnDropFiles(Sender: TObject; const FileNames: array of String);
-    {$ENDIF}
+
   public
     procedure LoadSVG(const aFilename: string);
   end;
@@ -97,10 +82,9 @@ var
 
 implementation
 uses
-  {$IFnDEF FPC}
-  ShellAPI,
-  {$ENDIF}
   UnitPrintPreview;
+
+{$R *.lfm}
 
 const
   svg_drop =
@@ -111,11 +95,7 @@ const
   + '</g>'
   + '</svg>';
 
-{$IFnDEF FPC}
-  {$R *.dfm}
-{$ELSE}
-  {$R *.lfm}
-{$ENDIF}
+{ TForm1 }
 
 procedure TForm1.aLoadSVGExecute(Sender: TObject);
 begin
@@ -137,50 +117,13 @@ end;
 procedure TForm1.FormCreate(Sender: TObject);
 begin
   SVG2Image1.SVG.Text := svg_drop;
-
-  {$IFnDEF FPC}
-  DragAcceptFiles(Handle, True);
-  {$ELSE}
-  Application.AddOnDropFilesHandler(OnDropFiles);
-  {$ENDIF}
 end;
 
 procedure TForm1.FormDestroy(Sender: TObject);
 begin
-  {$IFDEF FPC}
-  Application.RemoveOnDropFilesHandler(OnDropFiles);
-  {$ENDIF}
 end;
 
-procedure TForm1.LoadSVG(const aFilename: string);
-begin
-  SVG2Image1.SVG.Clear;
-  SVG2Image1.Filename := aFilename;
-  SVG2Image1.Visible := True;
-end;
-
-{$IFnDEF FPC}
-procedure TForm1.WMDROPFILES(var Msg: TWMDropFiles);
-var
-  i, FileCount: integer;
-  l: integer;
-  FileName: string;
-begin
-  FileCount := DragQueryFile(Msg.Drop, $FFFFFFFF, nil, 0);
-
-  for i := 0 to FileCount - 1 do
-  begin
-    l := DragQueryFile(Msg.Drop, i, nil, 0);
-    SetLength(Filename, l);
-    DragQueryFile(Msg.Drop, i, PChar(FileName), l + 1);
-
-    LoadSVG(FileName);
-  end;
-
-  DragFinish(Msg.Drop);
-end;
-{$ELSE}
-procedure TForm1.OnDropFiles(Sender: TObject; const FileNames: array of String);
+procedure TForm1.FormDropFiles(Sender: TObject; const FileNames: array of String);
 var
   i, FileCount: integer;
 begin
@@ -189,6 +132,13 @@ begin
   for i := 0 to FileCount - 1 do
     LoadSVG(FileNames[i]);
 end;
-{$ENDIF}
+
+procedure TForm1.LoadSVG(const aFilename: string);
+begin
+  SVG2Image1.SVG.Clear;
+  SVG2Image1.Filename := aFilename;
+end;
+
 
 end.
+

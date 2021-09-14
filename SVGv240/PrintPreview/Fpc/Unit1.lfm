@@ -1,33 +1,26 @@
 object Form1: TForm1
-  Left = 646
-  Height = 466
-  Top = 417
-  Width = 782
+  Left = 342
+  Height = 404
+  Top = 135
+  Width = 650
   AllowDropFiles = True
   Caption = 'Form1'
-  ClientHeight = 466
-  ClientWidth = 782
-  Color = clBtnFace
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'Tahoma'
+  ClientHeight = 384
+  ClientWidth = 650
   Menu = MainMenu1
   OnCreate = FormCreate
   OnDestroy = FormDestroy
-  LCLVersion = '2.0.12.0'
+  OnDropFiles = FormDropFiles
+  LCLVersion = '2.0.10.0'
   object SVG2Image1: TSVG2Image
-    Left = 192
-    Height = 224
-    Top = 136
-    Width = 411
-  end
-  object OpenPictureDialog1: TOpenPictureDialog
-    Filter = 'Scalable Vector Graphics (*.svg)|*.svg'
-    Left = 256
-    Top = 40
+    Left = 0
+    Height = 384
+    Top = 0
+    Width = 650
+    Align = alClient
   end
   object ActionList1: TActionList
-    Left = 56
+    Left = 72
     Top = 40
     object aLoadSVG: TAction
       Caption = 'Load SVG...'
@@ -43,7 +36,7 @@ object Form1: TForm1
     end
   end
   object MainMenu1: TMainMenu
-    Left = 144
+    Left = 168
     Top = 40
     object MenuItem1: TMenuItem
       Caption = 'File'
@@ -57,5 +50,9 @@ object Form1: TForm1
         Action = aQuit
       end
     end
+  end
+  object OpenPictureDialog1: TOpenPictureDialog
+    Left = 277
+    Top = 40
   end
 end
