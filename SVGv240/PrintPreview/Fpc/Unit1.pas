@@ -69,15 +69,13 @@ type
     aLoadSVG: TAction;
     aPrintSVG: TAction;
     aQuit: TAction;
+    MainMenu1: TMainMenu;
+    MenuItem1: TMenuItem;
+    MenuItem2: TMenuItem;
+    MenuItem3: TMenuItem;
+    MenuItem4: TMenuItem;
     SVG2Image1: TSVG2Image;
     ActionList1: TActionList;
-    MainMenu1: TMainMenu;
-    File1: TMenuItem;
-    LoadSVG1: TMenuItem;
-    N1: TMenuItem;
-    Print1: TMenuItem;
-    N2: TMenuItem;
-    Quit1: TMenuItem;
     OpenPictureDialog1: TOpenPictureDialog;
     procedure aLoadSVGExecute(Sender: TObject);
     procedure aPrintSVGExecute(Sender: TObject);
@@ -158,6 +156,7 @@ procedure TForm1.LoadSVG(const aFilename: string);
 begin
   SVG2Image1.SVG.Clear;
   SVG2Image1.Filename := aFilename;
+  SVG2Image1.Visible := True;
 end;
 
 {$IFnDEF FPC}

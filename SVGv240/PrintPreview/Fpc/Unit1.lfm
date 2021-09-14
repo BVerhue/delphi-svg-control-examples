@@ -1,12 +1,12 @@
 object Form1: TForm1
-  Left = 793
+  Left = 646
   Height = 466
   Top = 417
-  Width = 635
+  Width = 782
   AllowDropFiles = True
   Caption = 'Form1'
-  ClientHeight = 446
-  ClientWidth = 635
+  ClientHeight = 466
+  ClientWidth = 782
   Color = clBtnFace
   Font.Color = clWindowText
   Font.Height = -11
@@ -14,39 +14,16 @@ object Form1: TForm1
   Menu = MainMenu1
   OnCreate = FormCreate
   OnDestroy = FormDestroy
-  LCLVersion = '2.0.10.0'
+  LCLVersion = '2.0.12.0'
   object SVG2Image1: TSVG2Image
-    Left = 0
-    Height = 446
-    Top = 0
-    Width = 635
-    Align = alClient
-  end
-  object MainMenu1: TMainMenu
-    Left = 144
-    Top = 40
-    object File1: TMenuItem
-      Caption = 'File'
-      object LoadSVG1: TMenuItem
-        Action = aLoadSVG
-      end
-      object N1: TMenuItem
-        Caption = '-'
-      end
-      object Print1: TMenuItem
-        Action = aPrintSVG
-      end
-      object N2: TMenuItem
-        Caption = '-'
-      end
-      object Quit1: TMenuItem
-        Action = aQuit
-      end
-    end
+    Left = 192
+    Height = 224
+    Top = 136
+    Width = 411
   end
   object OpenPictureDialog1: TOpenPictureDialog
     Filter = 'Scalable Vector Graphics (*.svg)|*.svg'
-    Left = 239
+    Left = 256
     Top = 40
   end
   object ActionList1: TActionList
@@ -63,6 +40,22 @@ object Form1: TForm1
     object aQuit: TAction
       Caption = 'Quit'
       OnExecute = aQuitExecute
+    end
+  end
+  object MainMenu1: TMainMenu
+    Left = 144
+    Top = 40
+    object MenuItem1: TMenuItem
+      Caption = 'File'
+      object MenuItem2: TMenuItem
+        Action = aLoadSVG
+      end
+      object MenuItem3: TMenuItem
+        Action = aPrintSVG
+      end
+      object MenuItem4: TMenuItem
+        Action = aQuit
+      end
     end
   end
 end

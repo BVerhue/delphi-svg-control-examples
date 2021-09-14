@@ -61,14 +61,9 @@ uses
   Vcl.ExtCtrls,
   Vcl.Printers,
   {$ELSE}
-  Windows,
-  WinUtilPrn,
-  Messages,
-  Types,
   SysUtils,
   Classes,
   Generics.Collections,
-  Math,
   Graphics,
   Controls,
   ExtCtrls,
@@ -592,8 +587,10 @@ var
   M, MV: TSVGMatrix;
   SVGWidth, SVGHeight: TSVGFloat;
   {$IFDEF FPC}
+  {$IFDEF Windows}
   PDev: TPrinterDevice;
   DevMode: PDeviceMOdeW;
+  {$ENDIF}
   {$ENDIF}
 begin
   CalcPrinterDimensions;
@@ -611,12 +608,12 @@ begin
 
   M := CalcViewportMatrix(SVGWidth, SVGHeight);
 
-  {$IFnDEF FPC}
   PrintJob := TSVGRenderContextManager.CreatePrintJob(
     aPrintJobName,
     TSVGBufferQuality.bqHighQuality,
     []);
-  {$ELSE}
+
+  {IFDEF Windows
   PDev := TPrinterDevice(Printer.Printers.Objects[Printer.PrinterIndex]);
 
   PrintJob := TSVGRenderContextManager.CreatePrintJob(
@@ -624,7 +621,7 @@ begin
     PDev.DevModeW,
     TSVGBufferQuality.bqHighQuality,
     []);
-  {$ENDIF}
+  ENDIF}
 
   for i := 0 to Count - 1 do
   begin
