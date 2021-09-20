@@ -8,10 +8,10 @@ object frmPrintPreview: TfrmPrintPreview
   FormFactor.Height = 480
   FormFactor.Devices = [Desktop]
   OnCreate = FormCreate
-  DesignerMasterStyle = 0
+  DesignerMasterStyle = 1
   object Panel1: TPanel
     Align = Left
-    Size.Width = 249.000000000000000000
+    Size.Width = 273.000000000000000000
     Size.Height = 649.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 0
@@ -20,7 +20,7 @@ object frmPrintPreview: TfrmPrintPreview
       Margins.Left = 8.000000000000000000
       Margins.Right = 8.000000000000000000
       Position.X = 8.000000000000000000
-      Size.Width = 233.000000000000000000
+      Size.Width = 257.000000000000000000
       Size.Height = 100.000000000000000000
       Size.PlatformDefault = False
       Text = 'Output device'
@@ -35,10 +35,10 @@ object frmPrintPreview: TfrmPrintPreview
         Margins.Right = 16.000000000000000000
         Position.X = 16.000000000000000000
         Position.Y = 49.000000000000000000
-        Size.Width = 201.000000000000000000
+        Size.Width = 225.000000000000000000
         Size.Height = 22.000000000000000000
         Size.PlatformDefault = False
-        TabOrder = 38
+        TabOrder = 37
       end
       object lOutputDevice: TLabel
         Align = Top
@@ -47,11 +47,11 @@ object frmPrintPreview: TfrmPrintPreview
         Margins.Right = 16.000000000000000000
         Position.X = 16.000000000000000000
         Position.Y = 24.000000000000000000
-        Size.Width = 201.000000000000000000
+        Size.Width = 225.000000000000000000
         Size.Height = 17.000000000000000000
         Size.PlatformDefault = False
         Text = 'lOutputDevice'
-        TabOrder = 39
+        TabOrder = 38
       end
     end
     object GroupBox2: TGroupBox
@@ -60,7 +60,7 @@ object frmPrintPreview: TfrmPrintPreview
       Margins.Right = 8.000000000000000000
       Position.X = 8.000000000000000000
       Position.Y = 100.000000000000000000
-      Size.Width = 233.000000000000000000
+      Size.Width = 257.000000000000000000
       Size.Height = 69.000000000000000000
       Size.PlatformDefault = False
       Text = 'Orientation'
@@ -76,7 +76,7 @@ object frmPrintPreview: TfrmPrintPreview
         Size.Width = 73.000000000000000000
         Size.Height = 53.000000000000000000
         Size.PlatformDefault = False
-        TabOrder = 38
+        TabOrder = 37
       end
       object RadioButton2: TRadioButton
         Action = aOrientationLandscape
@@ -84,12 +84,12 @@ object frmPrintPreview: TfrmPrintPreview
         Enabled = True
         Margins.Top = 16.000000000000000000
         Margins.Right = 16.000000000000000000
-        Position.X = 128.000000000000000000
+        Position.X = 152.000000000000000000
         Position.Y = 16.000000000000000000
         Size.Width = 89.000000000000000000
         Size.Height = 53.000000000000000000
         Size.PlatformDefault = False
-        TabOrder = 39
+        TabOrder = 38
       end
     end
     object GroupBox3: TGroupBox
@@ -98,15 +98,15 @@ object frmPrintPreview: TfrmPrintPreview
       Margins.Right = 8.000000000000000000
       Position.X = 8.000000000000000000
       Position.Y = 169.000000000000000000
-      Size.Width = 233.000000000000000000
+      Size.Width = 257.000000000000000000
       Size.Height = 200.000000000000000000
       Size.PlatformDefault = False
       Text = 'Margins'
       TabOrder = 2
       object cbUnits: TComboBox
-        Position.X = 64.000000000000000000
+        Position.X = 72.000000000000000000
         Position.Y = 32.000000000000000000
-        TabOrder = 38
+        TabOrder = 37
       end
       object Label1: TLabel
         Position.X = 24.000000000000000000
@@ -115,15 +115,15 @@ object frmPrintPreview: TfrmPrintPreview
         Size.Height = 17.000000000000000000
         Size.PlatformDefault = False
         Text = 'Units:'
-        TabOrder = 39
+        TabOrder = 38
       end
       object eMarginLeft: TEdit
         Touch.InteractiveGestures = [LongTap, DoubleTap]
-        TabOrder = 40
+        TabOrder = 39
         FilterChar = '0123456789.'
         Text = '0'
         TextSettings.HorzAlign = Center
-        Position.X = 64.000000000000000000
+        Position.X = 72.000000000000000000
         Position.Y = 64.000000000000000000
         Size.Width = 41.000000000000000000
         Size.Height = 22.000000000000000000
@@ -131,11 +131,11 @@ object frmPrintPreview: TfrmPrintPreview
       end
       object eMarginTop: TEdit
         Touch.InteractiveGestures = [LongTap, DoubleTap]
-        TabOrder = 41
+        TabOrder = 40
         FilterChar = '0123456789.'
         Text = '0'
         TextSettings.HorzAlign = Center
-        Position.X = 176.000000000000000000
+        Position.X = 192.000000000000000000
         Position.Y = 64.000000000000000000
         Size.Width = 41.000000000000000000
         Size.Height = 22.000000000000000000
@@ -147,7 +147,7 @@ object frmPrintPreview: TfrmPrintPreview
         FilterChar = '0123456789.'
         Text = '0'
         TextSettings.HorzAlign = Center
-        Position.X = 64.000000000000000000
+        Position.X = 72.000000000000000000
         Position.Y = 96.000000000000000000
         Size.Width = 41.000000000000000000
         Size.Height = 22.000000000000000000
@@ -159,18 +159,20 @@ object frmPrintPreview: TfrmPrintPreview
         FilterChar = '0123456789.'
         Text = '0'
         TextSettings.HorzAlign = Center
-        Position.X = 176.000000000000000000
+        Position.X = 192.000000000000000000
         Position.Y = 96.000000000000000000
         Size.Width = 41.000000000000000000
         Size.Height = 22.000000000000000000
         Size.PlatformDefault = False
       end
-      object CheckBox1: TCheckBox
-        Action = aIdenticalMargins
-        Enabled = True
-        Position.X = 64.000000000000000000
+      object cbIdenticalMargins: TCheckBox
+        Position.X = 72.000000000000000000
         Position.Y = 128.000000000000000000
+        Size.Width = 137.000000000000000000
+        Size.Height = 19.000000000000000000
+        Size.PlatformDefault = False
         TabOrder = 44
+        Text = 'Identical margins'
       end
       object eGlueEdge: TEdit
         Touch.InteractiveGestures = [LongTap, DoubleTap]
@@ -178,7 +180,7 @@ object frmPrintPreview: TfrmPrintPreview
         FilterChar = '0123456789.'
         Text = '0'
         TextSettings.HorzAlign = Center
-        Position.X = 96.000000000000000000
+        Position.X = 104.000000000000000000
         Position.Y = 160.000000000000000000
         Size.Width = 41.000000000000000000
         Size.Height = 22.000000000000000000
@@ -194,9 +196,9 @@ object frmPrintPreview: TfrmPrintPreview
         TabOrder = 46
       end
       object Label3: TLabel
-        Position.X = 118.000000000000000000
+        Position.X = 126.000000000000000000
         Position.Y = 67.000000000000000000
-        Size.Width = 25.000000000000000000
+        Size.Width = 51.000000000000000000
         Size.Height = 17.000000000000000000
         Size.PlatformDefault = False
         Text = 'Top:'
@@ -212,7 +214,7 @@ object frmPrintPreview: TfrmPrintPreview
         TabOrder = 48
       end
       object Label5: TLabel
-        Position.X = 120.000000000000000000
+        Position.X = 128.000000000000000000
         Position.Y = 99.000000000000000000
         Size.Width = 49.000000000000000000
         Size.Height = 17.000000000000000000
@@ -236,7 +238,7 @@ object frmPrintPreview: TfrmPrintPreview
       Margins.Right = 8.000000000000000000
       Position.X = 8.000000000000000000
       Position.Y = 369.000000000000000000
-      Size.Width = 233.000000000000000000
+      Size.Width = 257.000000000000000000
       Size.Height = 136.000000000000000000
       Size.PlatformDefault = False
       Text = 'Scale / Aspect ratio'
@@ -244,18 +246,24 @@ object frmPrintPreview: TfrmPrintPreview
       object cbAutoViewbox: TCheckBox
         Position.X = 32.000000000000000000
         Position.Y = 32.000000000000000000
-        TabOrder = 38
+        TabOrder = 37
         Text = 'Auto viewbox'
       end
       object cbAlign: TComboBox
-        Position.X = 112.000000000000000000
+        Position.X = 128.000000000000000000
         Position.Y = 56.000000000000000000
-        TabOrder = 39
+        Size.Width = 105.000000000000000000
+        Size.Height = 22.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 38
       end
       object cbMeetOrSlice: TComboBox
-        Position.X = 112.000000000000000000
+        Position.X = 128.000000000000000000
         Position.Y = 88.000000000000000000
-        TabOrder = 40
+        Size.Width = 105.000000000000000000
+        Size.Height = 22.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 39
       end
       object Label7: TLabel
         Position.X = 32.000000000000000000
@@ -264,13 +272,13 @@ object frmPrintPreview: TfrmPrintPreview
         Size.Height = 17.000000000000000000
         Size.PlatformDefault = False
         Text = 'Align:'
-        TabOrder = 41
+        TabOrder = 40
       end
       object Label8: TLabel
         Position.X = 32.000000000000000000
         Position.Y = 91.000000000000000000
-        Size.Width = 81.000000000000000000
-        Size.Height = 17.000000000000000000
+        Size.Width = 89.000000000000000000
+        Size.Height = 18.000000000000000000
         Size.PlatformDefault = False
         Text = 'Meet or slice:'
         TabOrder = 42
@@ -282,18 +290,18 @@ object frmPrintPreview: TfrmPrintPreview
       Margins.Right = 8.000000000000000000
       Position.X = 8.000000000000000000
       Position.Y = 505.000000000000000000
-      Size.Width = 233.000000000000000000
+      Size.Width = 257.000000000000000000
       Size.Height = 100.000000000000000000
       Size.PlatformDefault = False
       Text = 'Pages'
       TabOrder = 4
       object ePagesHorizontal: TEdit
         Touch.InteractiveGestures = [LongTap, DoubleTap]
-        TabOrder = 38
+        TabOrder = 37
         FilterChar = '0123456789'
         Text = '1'
         TextSettings.HorzAlign = Center
-        Position.X = 112.000000000000000000
+        Position.X = 128.000000000000000000
         Position.Y = 32.000000000000000000
         Size.Width = 41.000000000000000000
         Size.Height = 22.000000000000000000
@@ -301,11 +309,11 @@ object frmPrintPreview: TfrmPrintPreview
       end
       object ePagesVertical: TEdit
         Touch.InteractiveGestures = [LongTap, DoubleTap]
-        TabOrder = 39
+        TabOrder = 38
         FilterChar = '0123456789'
         Text = '1'
         TextSettings.HorzAlign = Center
-        Position.X = 112.000000000000000000
+        Position.X = 128.000000000000000000
         Position.Y = 64.000000000000000000
         Size.Width = 41.000000000000000000
         Size.Height = 22.000000000000000000
@@ -314,26 +322,26 @@ object frmPrintPreview: TfrmPrintPreview
       object Label9: TLabel
         Position.X = 32.000000000000000000
         Position.Y = 35.000000000000000000
-        Size.Width = 65.000000000000000000
+        Size.Width = 81.000000000000000000
         Size.Height = 17.000000000000000000
         Size.PlatformDefault = False
         Text = 'Horizontal:'
-        TabOrder = 40
+        TabOrder = 39
       end
       object Label10: TLabel
         Position.X = 32.000000000000000000
         Position.Y = 67.000000000000000000
-        Size.Width = 65.000000000000000000
+        Size.Width = 81.000000000000000000
         Size.Height = 17.000000000000000000
         Size.PlatformDefault = False
         Text = 'Vertical:'
-        TabOrder = 41
+        TabOrder = 40
       end
     end
     object Panel2: TPanel
       Align = Bottom
       Position.Y = 613.000000000000000000
-      Size.Width = 249.000000000000000000
+      Size.Width = 273.000000000000000000
       Size.Height = 36.000000000000000000
       Size.PlatformDefault = False
       TabOrder = 5
@@ -346,7 +354,7 @@ object frmPrintPreview: TfrmPrintPreview
         Margins.Top = 4.000000000000000000
         Margins.Right = 4.000000000000000000
         Margins.Bottom = 4.000000000000000000
-        Position.X = 165.000000000000000000
+        Position.X = 189.000000000000000000
         Position.Y = 4.000000000000000000
         Size.Width = 80.000000000000000000
         Size.Height = 28.000000000000000000
@@ -362,7 +370,7 @@ object frmPrintPreview: TfrmPrintPreview
         Margins.Top = 4.000000000000000000
         Margins.Right = 4.000000000000000000
         Margins.Bottom = 4.000000000000000000
-        Position.X = 77.000000000000000000
+        Position.X = 101.000000000000000000
         Position.Y = 4.000000000000000000
         Size.Width = 80.000000000000000000
         Size.Height = 28.000000000000000000
@@ -391,10 +399,6 @@ object frmPrintPreview: TfrmPrintPreview
     end
     object aPrinterSelect: TAction
       Text = 'Select printer...'
-    end
-    object aIdenticalMargins: TAction
-      AutoCheck = True
-      Text = 'Identical margins'
     end
   end
 end

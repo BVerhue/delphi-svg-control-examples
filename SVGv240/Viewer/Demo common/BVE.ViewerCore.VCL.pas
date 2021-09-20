@@ -2043,7 +2043,7 @@ begin
   LabelTime.Caption := Format(' Time: %5.1f   FPS: %3.0f ',
     [CurrSelectControl.AnimationTime / 1000, CurrSelectControl.AnimationFPS]);
 
-  if CurrSelectControl.AnimationTime > Trackbar.Max then
+  if Integer(CurrSelectControl.AnimationTime) > Trackbar.Max then
     Trackbar.Max := Trackbar.Max + 5000;
 
   if not CurrSelectControl.AnimationIsPaused then

@@ -79,7 +79,6 @@ type
     aPrint: TAction;
     aCancel: TAction;
     aPrinterSelect: TAction;
-    aIdenticalMargins: TAction;
     Button3: TButton;
     RadioButton1: TRadioButton;
     RadioButton2: TRadioButton;
@@ -89,7 +88,7 @@ type
     eMarginTop: TEdit;
     eMarginRight: TEdit;
     eMarginBottom: TEdit;
-    CheckBox1: TCheckBox;
+    cbIdenticalMargins: TCheckBox;
     eGlueEdge: TEdit;
     Label2: TLabel;
     Label3: TLabel;
@@ -127,12 +126,13 @@ begin
   ActionPrint := aPrint;
   ActionCancel := aCancel;
   ActionPrinterSelect := aPrinterSelect;
-  ActionIdenticalMargins := aIdenticalMargins;
 
   ComboBoxUnits := cbUnits;
-  CheckBoxAutoViewbox := cbAutoViewBox;
   ComboBoxAlign := cbAlign;
   ComboBoxMeetOrSlice := cbMeetOrSlice;
+
+  CheckBoxAutoViewbox := cbAutoViewBox;
+  CheckBoxIdenticalMargins := cbIdenticalMargins;
 
   LabelOutputDevice := lOutputDevice;
   EditPagesHorizontal := ePagesHorizontal;

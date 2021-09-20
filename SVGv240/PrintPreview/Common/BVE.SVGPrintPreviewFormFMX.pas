@@ -75,7 +75,6 @@ type
     FActionPrint: TAction;
     FActionPrinterSelect: TAction;
     FActionOrientationPortait: TAction;
-    FActionIdenticalMargins: TAction;
 
     FLabelOutputDevice: TLabel;
     FEditPagesHorizontal: TEdit;
@@ -90,27 +89,28 @@ type
     FComboboxAlign: TComboBox;
     FComboboxMeetOrSlice: TComboBox;
 
+    FCheckBoxIdenticalMargins: TCheckBox;
     FCheckBoxAutoViewbox: TCheckBox;
 
     FPrintDialog: TPrintDialog;
+    FPageSetupDialog: TPageSetupDialog;
     FPrintPreview: TSVGPrintPreview;
 
     FTimerUpdate: TTimer;
 
     FRecursion: Integer;
-
   protected
     function GetRoot: ISVGRoot;
     procedure SetRoot(const Value: ISVGRoot);
 
     procedure SetActionCancel(const Value: TAction);
-    procedure SetActionIdenticalMargins(const Value: TAction);
     procedure SetActionOrientationLandscape(const Value: TAction);
     procedure SetActionOrientationPortait(const Value: TAction);
     procedure SetActionPrint(const Value: TAction);
     procedure SetActionPrinterSelect(const Value: TAction);
 
     procedure SetCheckBoxAutoViewbox(const Value: TCheckBox);
+    procedure SetCheckBoxIdenticalMargins(const Value: TCheckBox);
 
     procedure SetComboBoxUnits(const Value: TComboBox);
     procedure SetComboboxAlign(const Value: TComboBox);
@@ -125,7 +125,6 @@ type
     procedure SetEditMarginRight(const Value: TEdit);
     procedure SetEditMarginTop(const Value: TEdit);
 
-    //procedure EditNumberKeyPress(Sender: TObject; var Key: Char);
     procedure EditNumberKeyDown(Sender: TObject; var Key: Word; var KeyChar: WideChar; Shift: TShiftState);
     procedure EditIntegerKeyPress(Sender: TObject; var Key: Char);
     procedure EditIntegerKeyDown(Sender: TObject; var Key: Word; var KeyChar: WideChar; Shift: TShiftState);
@@ -157,13 +156,13 @@ type
     property ActionPrint: TAction read FActionPrint write SetActionPrint;
     property ActionCancel: TAction read FActionCancel write SetActionCancel;
     property ActionPrinterSelect: TAction read FActionPrinterSelect write SetActionPrinterSelect;
-    property ActionIdenticalMargins: TAction read FActionIdenticalMargins write SetActionIdenticalMargins;
 
     property ComboBoxUnits: TComboBox read FComboBoxUnits write SetComboBoxUnits;
     property ComboboxAlign: TComboBox read FComboboxAlign write SetComboboxAlign;
     property ComboboxMeetOrSlice: TComboBox read FComboboxMeetOrSlice write SetComboboxMeetOrSlice;
 
     property CheckBoxAutoViewbox: TCheckBox read FCheckBoxAutoViewbox write SetCheckBoxAutoViewbox;
+    property CheckBoxIdenticalMargins: TCheckBox read FCheckBoxIdenticalMargins write SetCheckBoxIdenticalMargins;
 
     property LabelOutputDevice: TLabel read FLabelOutputDevice write SetLabelOutputDevice;
     property EditPagesHorizontal: TEdit read FEditPagesHorizontal write SetEditPagesHorizontal;
@@ -213,7 +212,8 @@ end;
 
 procedure TSVGPrintPreviewForm.ActionPrinterSelectExecute(Sender: TObject);
 begin
-  if FPrintDialog.Execute then
+  //if FPrintDialog.Execute then
+  if FPageSetupDialog.Execute then
   begin
     FPrintPreview.Repaint;
 
@@ -233,6 +233,7 @@ begin
   FRecursion := 0;
 
   FPrintDialog := TPrintDialog.Create(Self);
+  FPageSetupDialog := TPageSetupDialog.Create(Self);
 
   FPrintPreview := TSVGPrintPreview.Create(Self);
   FPrintPreview.Parent := Self;
@@ -315,27 +316,11 @@ begin
   (Sender as TEdit).Text := FloatToStr(ValueFloat, USFormatSettings);
 end;
 
-{procedure TSVGPrintPreviewForm.EditNumberKeyPress(Sender: TObject;
-  var Key: Char);
-begin
-  case Key of
-    '0'..'9':;
-    #8, #9:;
-    '.':
-      begin
-        if Pos('.', TEdit(Sender).Text) > 0 then
-          Key := #0;
-      end
-    else
-      Key := #0;
-  end;
-end;}
-
 procedure TSVGPrintPreviewForm.EnableActions;
 begin
   Inc(FRecursion);
   try
-    FLabelOutputDevice.Text := Printer.ActivePrinter.Device;
+    FLabelOutputDevice.Text := Printer.ActivePrinter.Title;
 
     if Printer.Orientation = TPrinterOrientation.poPortrait then
       ActionOrientationPortait.Checked := True
@@ -358,7 +343,22 @@ begin
   if FRecursion > 0 then
     Exit;
 
-  if ActionIdenticalMargins.Checked and (Sender is TEdit) then
+  if (not FCheckBoxIdenticalMargins.IsChecked) and (Sender is TCheckBox) then
+  begin
+    // From False to True
+
+    Inc(FRecursion);
+    try
+      EditMarginTop.Text := EditMarginLeft.Text;
+      EditMarginRight.Text := EditMarginLeft.Text;
+      EditMarginBottom.Text := EditMarginLeft.Text;
+    finally
+      Dec(FRecursion);
+    end;
+
+  end else
+
+  if FCheckBoxIdenticalMargins.IsChecked and (Sender is TEdit) then
   begin
     Edit := Sender as TEdit;
 
@@ -443,16 +443,6 @@ begin
     FActionCancel.OnExecute := ActionCancelExecute;
 end;
 
-procedure TSVGPrintPreviewForm.SetActionIdenticalMargins(const Value: TAction);
-begin
-  FActionIdenticalMargins := Value;
-  if assigned(FActionIdenticalMargins) then
-  begin
-    FActionIdenticalMargins.OnExecute := ActionIdenticalMarginsExecute;
-    FActionIdenticalMargins.AutoCheck := True;
-  end;
-end;
-
 procedure TSVGPrintPreviewForm.SetActionOrientationLandscape(
   const Value: TAction);
 begin
@@ -488,6 +478,14 @@ begin
   FCheckBoxAutoViewbox := Value;
   if assigned(FCheckboxAutoViewBox) then
     FCheckboxAutoViewbox.OnClick := PageSettingsChange;
+end;
+
+procedure TSVGPrintPreviewForm.SetCheckBoxIdenticalMargins(
+  const Value: TCheckBox);
+begin
+  FCheckBoxIdenticalMargins := Value;
+  if assigned(FCheckBoxIdenticalMargins) then
+    FCheckBoxIdenticalMargins.OnClick := MarginChange;
 end;
 
 procedure TSVGPrintPreviewForm.SetComboboxAlign(const Value: TComboBox);
@@ -548,7 +546,6 @@ begin
   FEditGlueEdge := Value;
   if assigned(FEditGlueEdge) then
   begin
-    //FEditGlueEdge.OnKeyPress := EditNumberKeyPress;
     FEditGlueEdge.OnKeyDown := EditNumberKeyDown;
     FEditGlueEdge.OnChange := PageSettingsChange;
   end;
@@ -559,7 +556,6 @@ begin
   FEditMarginBottom := Value;
   if assigned(FEditMarginBottom) then
   begin
-    //FEditMarginBottom.OnKeyPress := EditNumberKeyPress;
     FEditMarginBottom.OnKeyDown := EditNumberKeyDown;
     FEditMarginBottom.OnChange := MarginChange;
   end;
@@ -570,7 +566,6 @@ begin
   FEditMarginLeft := Value;
   if assigned(FEditMarginLeft) then
   begin
-    //FEditMarginLeft.OnKeyPress := EditNumberKeyPress;
     FEditMarginLeft.OnKeyDown := EditNumberKeyDown;
     FEditMarginLeft.OnChange := MarginChange;
   end;
@@ -581,7 +576,6 @@ begin
   FEditMarginRight := Value;
   if assigned(FEditMarginRight) then
   begin
-    //FEditMarginRight.OnKeyPress := EditNumberKeyPress;
     FEditMarginRight.OnKeyDown := EditNumberKeyDown;
     FEditMarginRight.OnChange := MarginChange;
   end;
@@ -592,7 +586,6 @@ begin
   FEditMarginTop := Value;
   if assigned(FEditMarginTop) then
   begin
-    //FEditMarginTop.OnKeyPress := EditNumberKeyPress;
     FEditMarginTop.OnKeyDown := EditNumberKeyDown;
     FEditMarginTop.OnChange := MarginChange;
   end;
@@ -608,7 +601,6 @@ begin
   FEditPagesHorizontal := Value;
   if assigned(FEditPagesHorizontal) then
   begin
-    //FEditPagesHorizontal.OnKeyPress := EditIntegerKeyPress;
     FEditPagesHorizontal.OnKeyDown := EditIntegerKeyDown;
     FEditPagesHorizontal.OnChange := PageSettingsChange;
   end;
@@ -619,7 +611,6 @@ begin
   FEditPagesVertical := Value;
   if assigned(FEditPagesVertical) then
   begin
-    //FEditPagesVertical.OnKeyPress := EditIntegerKeyPress;
     FEditPagesVertical.OnKeyDown := EditIntegerKeyDown;
     FEditPagesVertical.OnChange := PageSettingsChange;
   end;

@@ -454,59 +454,55 @@ var
   Control: TControl;
 begin
   // Calc max size of a parent control
-
   Result.Left := 100000;
   Result.Right := 0;
   Result.Top := 100000;
   Result.Bottom := 0;
-
   for i := 0 to aControl.ChildrenCount - 1 do
   begin
     if aControl.Children[i] is TControl then
     begin
       Control := (aControl.Children[i] as TControl);
-
       if Control.Position.X < Result.Left then
         Result.Left := Control.Position.X;
-
       if Control.Position.Y < Result.Top then
         Result.Top := Control.Position.Y;
-
       if Control.Position.X + Control.Width > Result.Right then
         Result.Right := Control.Position.X + Control.Width;
-
       if Control.Position.Y + Control.Height > Result.Bottom then
         Result.Bottom := Control.Position.Y + Control.Height;
     end;
   end;
 end;
 
-function ChildrenMaxSize(aControl: TFmxObject): TRectF;
-var
-  i: integer;
+
+function ChildrenMaxSize(aControl: TFmxObject): TRectF;
+
+var
+
+  i: integer;
   Control: TControl;
 begin
   // Calc max size of a parent control
-
   Result.Left := 0;
   Result.Right := 0;
   Result.Top := 0;
   Result.Bottom := 0;
-
   for i := 0 to aControl.ChildrenCount - 1 do
   begin
     if aControl.Children[i] is TControl then
     begin
       Control := (aControl.Children[i] as TControl);
-
       if (Control.Width * Control.Height) > (Result.Width * Result.Height) then
         Result := Control.BoundsRect;
     end;
   end;
 end;
 
-function MaxZoom(aControl: TFmxObject): Single;
-var
+
+function MaxZoom(aControl: TFmxObject): Single;
+
+var
   R: TRectF;
   Size, MaxSize: integer;
 begin
@@ -528,7 +524,8 @@ begin
 end;
 
 // -----------------------------------------------------------------------------
-//
+
+//
 //                            TSVGSelection
 //
 // -----------------------------------------------------------------------------
@@ -691,43 +688,32 @@ begin
       BeginUpdate;
       try
         D := (EventInfo.Distance - FLastDistance);
-
         Vpx := EventInfo.Location.X - FLastLocation.X;
         Vpy := EventInfo.Location.Y - FLastLocation.Y;
-
         //Text1.Text := Format('%0:3.1f %1:3.1f %2:3d', [ Vpx, Vpy, EventInfo.Distance]);
-
         R.Left := Position.X;
         R.Top := Position.Y;
         R.Width := Width;
         R.Height := Height;
-
         L := 2 * Sqrt(R.Width * R.Width + R.Height * R.Height);
-
         R.Left := R.Left - (R.Right - Vpx) / L * D;
         R.Top := R.Top - (R.Bottom - Vpy) / L * D;
         R.Right := R.Right + (R.Right - Vpx) / L * D;
         R.Bottom := R.Bottom + (R.Bottom - Vpy) / L * D;
-
         if (R.Width < 10) or (R.Height < 10) then
           Exit;
-
         Position.X := R.Left;
         Position.Y := R.Top;
         Width := R.Width;
         Height := R.Height;
-
         FTimerUpdate.Enabled := False;
       finally
         EndUpdate;
       end;
-
       Repaint;
     end;
-
     FLastLocation := EventInfo.Location;
     FLastDistance := EventInfo.Distance;
-
     if (TInteractiveGestureFlag.gfEnd in EventInfo.Flags) then
     begin
       if assigned(FViewer.Scrollbox) then
@@ -736,7 +722,6 @@ begin
       FTimerUpdate.Enabled := True;
     end;
   end;
-
   if EventInfo.GestureID = igiPan then
   begin
     if (not(TInteractiveGestureFlag.gfBegin in EventInfo.Flags))
@@ -749,13 +734,13 @@ begin
       finally
         EndUpdate;
       end;
-
       Repaint;
     end;
     FLastLocation := EventInfo.Location;
   end;
 end;
-
+
+
 {$IFDEF Ver270Down}
 function TSVGSelection.GetAbsoluteRect: TRectF;
 {$ELSE}
@@ -1282,28 +1267,22 @@ var
   Z: Single;
 begin
   // Calc max size of lZoom layout
-
   CR := ChildrenRect(FLayoutZoom);
   CR.Right := CR.Right * 2;
   CR.Bottom := CR.Bottom * 2;
-
   if FZoom < 0 then
     Z := 1.2 / FZoom
   else
     Z := 1.2;
-
   WR := RectF(
     0.0, 0.0,
     FScrollbox.Width * Z,
     FScrollbox.Height * Z);
-
   R := MaxRect(CR, WR);
-
   FLayoutZoom.Position.X := 0.0;
   FLayoutZoom.Position.Y := 0.0;
   FLayoutZoom.Width := R.Right;
   FLayoutZoom.Height := R.Bottom;
-
   FLayoutSize.Position.X := 0.0;
   FLayoutSize.Position.Y := 0.0;
   FLayoutSize.Width := FLayoutZoom.Width * FZoom;
@@ -1320,17 +1299,13 @@ begin
 
     Mx := (FScrollbox.ViewportPosition.X + FScrollbox.Width / 2) / FLayoutSize.Width;
     My := (FScrollbox.ViewportPosition.Y + FScrollbox.Height / 2) / FLayoutSize.Height;
-
     FZoom := Value;
-
     // Set zoom of lZoom layout
     FScrollbox.BeginUpdate;
     try
       FLayoutZoom.Scale.X := FZoom;
       FLayoutZoom.Scale.Y := FZoom;
-
       CalcLayoutDimensions;
-
       FScrollbox.ViewportPosition := PointF(
         Mx * FLayoutSize.Width - (FScrollbox.Width / 2),
         My * FLayoutSize.Height - (FScrollbox.Height / 2));

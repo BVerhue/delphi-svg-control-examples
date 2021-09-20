@@ -163,6 +163,13 @@ uses
   BVE.SVG2GeomUtility,
   BVE.SVG2Context;
 
+const
+{$IFDEF MacOS}
+  SVGPointsPerInch = 72;
+{$ELSE}
+  SVGPointsPerInch = 96;
+{$ENDIF}
+
 { TSVGPrintPreview }
 
 procedure TSVGPrintPreview.CalcPrinterDimensions;
@@ -172,18 +179,46 @@ begin
   FPrinterPageWidth := Printer.PageWidth;
   FPrinterPageHeight := Printer.PageHeight;
 
+  // Unfortunately there is all kinds of different behaviour depening on the OS
+
+  {$IFDEF MacOS}
+  if Printer.ActivePrinter.ActiveDPIIndex = -1 then
+  begin
+
+    FDPIX := 1;
+    FDPIY := 1;
+
+    FPxToPt := SVGPoint(1.0, 1.0);
+
+  end else begin
+
+    DPI := Printer.ActivePrinter.DPI[0];
+
+    FDPIX := DPI.X;
+    FDPIY := DPI.Y;
+
+    if FDPIX = 0 then
+      FDPIX := SVGPointsPerInch;
+
+    if FDPIY = 0 then
+      FDPIY := SVGPointsPerInch;
+
+    FPxToPt := SVGPoint(FDPIX / SVGPointsPerInch, FDPIY / SVGPointsPerInch);
+  end;
+  {$ELSE}
   DPI := Printer.ActivePrinter.DPI[0];
 
   FDPIX := DPI.X;
   FDPIY := DPI.Y;
 
   if FDPIX = 0 then
-    FDPIX := 96;
+    FDPIX := SVGPointsPerInch;
 
   if FDPIY = 0 then
-    FDPIY := 96;
+    FDPIY := SVGPointsPerInch;
 
-  FPxToPt := SVGPoint(FDPIX / 96, FDPIY / 96);
+  FPxToPt := SVGPoint(FDPIX / SVGPointsPerInch, FDPIY / SVGPointsPerInch);
+  {$ENDIF}
 
   // Printer.PageWidth and Printer.PageHeight are in pixels, we need to
   // convert them to points
@@ -200,19 +235,19 @@ begin
   case FPrintUnits of
     puPixel:
       begin
-        Result := 96 / aDPI * aValue;
+        Result := SVGPointsPerInch / aDPI * aValue;
       end;
     puMm:
       begin
-        Result := 96 / 25.4 * aValue;
+        Result := SVGPointsPerInch / 25.4 * aValue;
       end;
     puCm:
       begin
-        Result := 96 / 2.54 * aValue;
+        Result := SVGPointsPerInch / 2.54 * aValue;
       end;
     puInch:
       begin
-         Result := 96 * aValue;
+         Result := SVGPointsPerInch * aValue;
       end;
     else
       Result := aValue;
@@ -549,8 +584,6 @@ begin
   begin
     R := PageViewbox[i];
 
-    //MV := TSVGMatrix.CreateTranslation(-R.Left, -R.Top);
-
     MV := TSVGMatrix.CreateIdentity;
     MV := TSVGMatrix.Multiply(MV, TSVGMatrix.CreateTranslation(-R.Left, -R.Top));
     MV := TSVGMatrix.Multiply(MV, TSVGMatrix.CreateScaling(FPxToPt.X, FPxToPt.Y));
@@ -559,7 +592,7 @@ begin
     try
       RC.BeginScene;
       try
-        RC.Clear(SVGColorNone);
+        //RC.Clear(SVGColorNone);
 
         RC.PushClipRect(
           TSVGRect.Intersect(
