@@ -187,6 +187,13 @@ uses
   BVE.SVG2GeomUtility,
   BVE.SVG2Context;
 
+const
+{$IFnDEF FPC}
+  SVGPointsPerInch = 96;
+{$ELSE}
+  SVGPointsPerInch = 72;
+{$ENDIF}
+
 { TSVGPrintPreview }
 
 function TSVGPrintPreview.CalcRCUnits(const aValue, aDPI: TSVGFloat): TSVGFloat;
@@ -198,19 +205,19 @@ begin
     case FPrintUnits of
       puPixel:
         begin
-          Result := 96 / aDPI * aValue;
+          Result := SVGPointsPerInch / aDPI * aValue;
         end;
       puMm:
         begin
-          Result := 96 / 25.4 * aValue;
+          Result := SVGPointsPerInch / 25.4 * aValue;
         end;
       puCm:
         begin
-          Result := 96 / 2.54 * aValue;
+          Result := SVGPointsPerInch / 2.54 * aValue;
         end;
       puInch:
         begin
-           Result := 96 * aValue;
+           Result := SVGPointsPerInch * aValue;
         end;
       else
         Result := aValue;
@@ -256,12 +263,12 @@ begin
   {$ENDIF}
 
   if FDPIX = 0 then
-    FDPIX := 96;
+    FDPIX := SVGPointsPerInch;
 
   if FDPIY = 0 then
-    FDPIY := 96;
+    FDPIY := SVGPointsPerInch;
 
-  FPxToPt := SVGPoint(FDPIX / 96, FDPIY / 96);
+  FPxToPt := SVGPoint(FDPIX / SVGPointsPerInch, FDPIY / SVGPointsPerInch);
 
   {if TSVGRenderContextManager.RenderContextType = rcDirect2D then
   begin
@@ -654,7 +661,7 @@ begin
     try
       RC.BeginScene;
       try
-        RC.Clear(SVGColorNone);
+        //RC.Clear(SVGColorNone);
 
         RC.PushClipRect(
           TSVGRect.Intersect(
