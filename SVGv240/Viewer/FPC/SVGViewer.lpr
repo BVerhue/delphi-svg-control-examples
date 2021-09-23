@@ -8,7 +8,8 @@ uses
   cthreads,
   {$ENDIF}{$ENDIF}
   Interfaces, // this includes the LCL widgetset
-  Forms, BVE.SVG2Graphic.FPC, BVE.SVG2Control.FPC, Unit1, unit2, unit3
+  Forms, UnitPrintPreview, printer4lazarus, BVE.SVG2Graphic.FPC,
+  BVE.SVG2Control.FPC, Unit1, unit2, unit3
   { you can add units after this }
   {$IFDEF DEBUG}
   ,SysUtils
@@ -30,6 +31,7 @@ begin
   Application.CreateForm(TForm1, Form1);
   Application.CreateForm(TForm2, Form2);
   Application.CreateForm(TForm3, Form3);
+  Application.CreateForm(TfrmPrintPreview, frmPrintPreview);
   Application.Run;
 end.
 

@@ -86,6 +86,7 @@ type
     aCopyDirect: TAction;
     aAbout: TAction;
     aAutoViewbox: TAction;
+    aPrint: TAction;
     aEnableClippaths: TAction;
     aEnableEvents: TAction;
     aEnablePersistentBuffers: TAction;
@@ -124,6 +125,7 @@ type
     ToolButton12: TToolButton;
     ToolButton13: TToolButton;
     ToolButton14: TToolButton;
+    ToolButton15: TToolButton;
     ToolButton2: TToolButton;
     ToolButton3: TToolButton;
     ToolButton4: TToolButton;
@@ -169,6 +171,7 @@ begin
      aEnableTextToPath,
      aAnimationStart,
      aAnimationPause,
+     aPrint,
      OpenPictureDialog1,
      Scrollbox1,
      Statusbar1,

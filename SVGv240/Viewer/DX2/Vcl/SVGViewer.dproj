@@ -6,7 +6,7 @@
         <MainSource>SVGViewer.dpr</MainSource>
         <Base>True</Base>
         <Config Condition="'$(Config)'==''">Debug</Config>
-        <Platform Condition="'$(Platform)'==''">Win32</Platform>
+        <Platform Condition="'$(Platform)'==''">Win64</Platform>
         <TargetedPlatforms>3</TargetedPlatforms>
         <AppType>Application</AppType>
     </PropertyGroup>
@@ -112,6 +112,11 @@
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win64)'!=''">
         <BT_BuildType>Debug</BT_BuildType>
+        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+        <VerInfo_Locale>1033</VerInfo_Locale>
+        <VerInfo_Keys>CompanyName=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName);FileDescription=$(MSBuildProjectName);ProductName=$(MSBuildProjectName)</VerInfo_Keys>
+        <Icon_MainIcon>..\..\Img\Application icons\SVGViewer\SVGViewer.ico</Icon_MainIcon>
+        <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2)'!=''">
         <DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
@@ -151,6 +156,12 @@
             <Form>Form3</Form>
             <FormType>dfm</FormType>
         </DCCReference>
+        <DCCReference Include="..\..\..\PrintPreview\Vcl\UnitPrintPreview.pas">
+            <Form>frmPrintPreview</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="..\..\..\PrintPreview\Common\BVE.SVGPrintPreviewFormVCL.pas"/>
+        <DCCReference Include="..\..\..\PrintPreview\Common\BVE.SVGPrintPreviewVCL.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
@@ -222,9 +233,6 @@
                     <Source Name="MainSource">SVGViewer.dpr</Source>
                 </Source>
                 <Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Bruno\Downloads\SVGDemoDX2_DX3_230\DX2\Bpl\DclSVG2DemoPackageCommonDX2.bpl">File C:\Users\Bruno\Downloads\SVGDemoDX2_DX3_230\DX2\Bpl\DclSVG2DemoPackageCommonDX2.bpl not found</Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Bruno\Downloads\SVGDemoDX2_DX3_230\DX2\Bpl\DclSVG2DemoPackageFmxDX2.bpl">File C:\Users\Bruno\Downloads\SVGDemoDX2_DX3_230\DX2\Bpl\DclSVG2DemoPackageFmxDX2.bpl not found</Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Bruno\Downloads\SVGDemoDX2_DX3_230\DX2\Bpl\DclSVG2DemoPackageVclDX2.bpl">File C:\Users\Bruno\Downloads\SVGDemoDX2_DX3_230\DX2\Bpl\DclSVG2DemoPackageVclDX2.bpl not found</Excluded_Packages>
                     <Excluded_Packages Name="$(BDSBIN)\dcloffice2k250.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
                     <Excluded_Packages Name="$(BDSBIN)\dclofficexp250.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
                 </Excluded_Packages>

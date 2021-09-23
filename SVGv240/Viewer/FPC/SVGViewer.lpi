@@ -1,13 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CONFIG>
   <ProjectOptions>
-    <Version Value="12"/>
+    <Version Value="11"/>
     <PathDelim Value="\"/>
     <General>
-      <Flags>
-        <CompatibilityMode Value="True"/>
-      </Flags>
       <SessionStorage Value="InProjectDir"/>
+      <MainUnit Value="0"/>
       <Title Value="SVGViewer"/>
       <Scaled Value="True"/>
       <ResourceType Value="res"/>
@@ -28,7 +26,7 @@
           </Target>
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir);..\..\Common\Fpc\inc;..\..\..\..\..\graphics32-master\Source;..\..\..\..\graphics32-master\Source;..\..\..\..\..\bgrabitmap-9.9.4\bgrabitmap;..\..\..\..\..\bgrabitmap-master\bgrabitmap;..\..\Common\Fpc\generics\inc"/>
-            <OtherUnitFiles Value="..\..\Common;..\..\Common\Fpc;..\..\Common\Fpc\generics;..\..\..\..\..\graphics32-master\Source;..\..\Common\Platform;..\..\..\..\graphics32-master\Source;..\..\..\..\..\AggPasMod\Source;..\..\..\..\..\AggPasMod\Source\Platform;..\Demo common;..\..\..\..\..\bgrabitmap-9.9.4\bgrabitmap;..\..\..\..\..\bgrabitmap-master\bgrabitmap;..\..\..\..\bgrabitmap-10.4\bgrabitmap"/>
+            <OtherUnitFiles Value="..\..\Common;..\..\Common\Fpc;..\..\Common\Fpc\generics;..\..\..\..\..\graphics32-master\Source;..\..\Common\Platform;..\..\..\..\graphics32-master\Source;..\..\..\..\..\AggPasMod\Source;..\..\..\..\..\AggPasMod\Source\Platform;..\Demo common;..\..\..\..\..\bgrabitmap-9.9.4\bgrabitmap;..\..\..\..\..\bgrabitmap-master\bgrabitmap;..\..\..\..\bgrabitmap-10.4\bgrabitmap;..\..\PrintPreview\Common;..\..\PrintPreview\Fpc"/>
             <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
           </SearchPaths>
           <Parsing>
@@ -69,7 +67,7 @@
           </Target>
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir);..\..\Common\Fpc\inc;..\..\..\..\..\graphics32-master\Source;..\..\..\..\graphics32-master\Source;..\..\..\..\..\bgrabitmap-9.9.4\bgrabitmap;..\..\..\..\..\bgrabitmap-master\bgrabitmap;..\..\Common\Fpc\generics\inc"/>
-            <OtherUnitFiles Value="..\..\Common;..\..\Common\Fpc;..\..\Common\Fpc\generics;..\..\..\..\..\graphics32-master\Source;..\..\Common\Platform;..\..\..\..\graphics32-master\Source;..\..\..\..\..\AggPasMod\Source;..\..\..\..\..\AggPasMod\Source\Platform;..\Demo common;..\..\..\..\..\bgrabitmap-9.9.4\bgrabitmap;..\..\..\..\..\bgrabitmap-master\bgrabitmap;..\..\..\..\bgrabitmap-10.4\bgrabitmap"/>
+            <OtherUnitFiles Value="..\..\Common;..\..\Common\Fpc;..\..\Common\Fpc\generics;..\..\..\..\..\graphics32-master\Source;..\..\Common\Platform;..\..\..\..\graphics32-master\Source;..\..\..\..\..\AggPasMod\Source;..\..\..\..\..\AggPasMod\Source\Platform;..\Demo common;..\..\..\..\..\bgrabitmap-9.9.4\bgrabitmap;..\..\..\..\..\bgrabitmap-master\bgrabitmap;..\..\..\..\bgrabitmap-10.4\bgrabitmap;..\..\PrintPreview\Common;..\..\PrintPreview\Fpc"/>
             <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
           </SearchPaths>
           <CodeGeneration>
@@ -102,18 +100,21 @@
         <Mode0 Name="default"/>
       </Modes>
     </RunParams>
-    <RequiredPackages Count="3">
+    <RequiredPackages Count="4">
       <Item1>
-        <PackageName Value="LazControlDsgn"/>
+        <PackageName Value="Printer4Lazarus"/>
       </Item1>
       <Item2>
-        <PackageName Value="SVG2Package"/>
+        <PackageName Value="LazControlDsgn"/>
       </Item2>
       <Item3>
-        <PackageName Value="LCL"/>
+        <PackageName Value="SVG2Package"/>
       </Item3>
+      <Item4>
+        <PackageName Value="LCL"/>
+      </Item4>
     </RequiredPackages>
-    <Units Count="23">
+    <Units Count="8">
       <Unit0>
         <Filename Value="SVGViewer.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -127,97 +128,38 @@
         <UnitName Value="Unit1"/>
       </Unit1>
       <Unit2>
-        <Filename Value="..\..\Common\BVE.SVG2Attributes.pas"/>
+        <Filename Value="..\Demo common\BVE.ViewerCore.VCL.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit2>
       <Unit3>
-        <Filename Value="..\..\Common\BVE.SVG2Bidi.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit3>
-      <Unit4>
-        <Filename Value="..\..\Common\BVE.SVG2Context.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit4>
-      <Unit5>
-        <Filename Value="..\..\Common\BVE.SVG2CSSUtility.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit5>
-      <Unit6>
-        <Filename Value="..\..\Common\BVE.SVG2Elements.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit6>
-      <Unit7>
-        <Filename Value="..\..\Common\BVE.SVG2FilterUtility.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit7>
-      <Unit8>
-        <Filename Value="..\..\Common\BVE.SVG2GeomUtility.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit8>
-      <Unit9>
-        <Filename Value="..\..\Common\BVE.SVG2Intf.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit9>
-      <Unit10>
-        <Filename Value="..\..\Common\BVE.SVG2ParseUtility.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit10>
-      <Unit11>
-        <Filename Value="..\..\Common\BVE.SVG2PathData.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit11>
-      <Unit12>
-        <Filename Value="..\..\Common\BVE.SVG2SaxParser.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit12>
-      <Unit13>
-        <Filename Value="..\..\Common\BVE.SVG2Types.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit13>
-      <Unit14>
-        <Filename Value="..\..\Common\BVE.SVG2XMLReader.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit14>
-      <Unit15>
-        <Filename Value="..\..\Common\Fpc\BVE.SVG2Elements.FPC.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit15>
-      <Unit16>
-        <Filename Value="..\..\Common\Fpc\BVE.SVG2Graphic.FPC.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit16>
-      <Unit17>
-        <Filename Value="..\..\Common\Fpc\BVE.SVG2Control.FPC.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit17>
-      <Unit18>
-        <Filename Value="..\..\Common\Fpc\BVE.SVG2ImageList.FPC.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit18>
-      <Unit19>
-        <Filename Value="..\..\Common\Fpc\BVE.SVG2Image.FPC.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit19>
-      <Unit20>
-        <Filename Value="..\Demo common\BVE.ViewerCore.VCL.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit20>
-      <Unit21>
         <Filename Value="unit2.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="Form2"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="Unit2"/>
-      </Unit21>
-      <Unit22>
+      </Unit3>
+      <Unit4>
         <Filename Value="unit3.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="Form3"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="Unit3"/>
-      </Unit22>
+      </Unit4>
+      <Unit5>
+        <Filename Value="..\..\PrintPreview\Fpc\UnitPrintPreview.pas"/>
+        <IsPartOfProject Value="True"/>
+        <HasResources Value="True"/>
+      </Unit5>
+      <Unit6>
+        <Filename Value="..\..\PrintPreview\Common\BVE.SVGPrintPreviewFormVCL.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit6>
+      <Unit7>
+        <Filename Value="..\..\PrintPreview\Common\BVE.SVGPrintPreviewVCL.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit7>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
@@ -228,7 +170,7 @@
     </Target>
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir);..\..\..\..\..\graphics32-master\Source;..\..\..\..\..\bgrabitmap-master\bgrabitmap;..\..\..\..\delphi-svg-control\SVGv230\Common;..\..\..\..\delphi-svg-control\SVGv230\Common\FPC"/>
-      <OtherUnitFiles Value="..\Demo common"/>
+      <OtherUnitFiles Value="..\Demo common;..\..\PrintPreview\Common;..\..\PrintPreview\Fpc"/>
       <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
     <Linking>

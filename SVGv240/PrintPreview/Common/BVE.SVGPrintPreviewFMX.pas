@@ -73,7 +73,8 @@ type
     FDPIX, FDPIY: Integer;
     FPrinterPageWidth: TSVGFLoat;
     FPrinterPageHeight: TSVGFLoat;
-    FPxToPt: TSVGPoint;
+    FPrinterPointsPerInch: Integer;
+    FPrinterScale: TSVGPoint;
 
     FPagesVertical: Integer;
     FPagesHorizontal: Integer;
@@ -104,6 +105,7 @@ type
     {$ENDIF}
 
     procedure CalcPrinterDimensions;
+    function CalcSVGSize(const aViewport: TSVGRect): TSVGRect;
     function CalcRCUnits(const aValue, aDPI: TSVGFloat): TSVGFloat;
     function CalcViewport: TSVGRect;
     function CalcViewportMatrix(const aSVGWidth, aSVGHeight: TSVGFloat): TSVGMatrix;
@@ -163,32 +165,32 @@ uses
   BVE.SVG2GeomUtility,
   BVE.SVG2Context;
 
-const
-{$IFDEF MacOS}
-  SVGPointsPerInch = 72;
-{$ELSE}
-  SVGPointsPerInch = 96;
-{$ENDIF}
-
 { TSVGPrintPreview }
 
 procedure TSVGPrintPreview.CalcPrinterDimensions;
 var
   DPI: TPoint;
 begin
+  // See comments on ActiveDPI in FMX.Printer
+
+  if (Printer.ActivePrinter.ActiveDPIIndex = -1)
+  and (Printer.ActivePrinter.DPICount > 0) then
+    Printer.ActivePrinter.ActiveDPIIndex := 0;
+
   FPrinterPageWidth := Printer.PageWidth;
   FPrinterPageHeight := Printer.PageHeight;
 
-  // Unfortunately there is all kinds of different behaviour depening on the OS
+{$IFDEF MacOS}
+    FPrinterPointsPerInch := 72;
+{$ELSE}
+    FPrinterPointsPerInch := 96;
+{$ENDIF}
 
-  {$IFDEF MacOS}
   if Printer.ActivePrinter.ActiveDPIIndex = -1 then
   begin
 
-    FDPIX := 1;
-    FDPIY := 1;
-
-    FPxToPt := SVGPoint(1.0, 1.0);
+    FDPIX := SVG_StdDPI;
+    FDPIY := SVG_StdDPI;
 
   end else begin
 
@@ -198,60 +200,56 @@ begin
     FDPIY := DPI.Y;
 
     if FDPIX = 0 then
-      FDPIX := SVGPointsPerInch;
+      FDPIX := SVG_StdDPI;
 
     if FDPIY = 0 then
-      FDPIY := SVGPointsPerInch;
+      FDPIY := SVG_StdDPI;
 
-    FPxToPt := SVGPoint(FDPIX / SVGPointsPerInch, FDPIY / SVGPointsPerInch);
+    // Convert to screen points (96)
+    FPrinterPageWidth := FPrinterPageWidth * SVG_StdDPI / FDPIX;
+    FPrinterPageHeight := FPrinterPageHeight * SVG_StdDPI / FDPIY;
   end;
-  {$ELSE}
-  DPI := Printer.ActivePrinter.DPI[0];
 
-  FDPIX := DPI.X;
-  FDPIY := DPI.Y;
-
-  if FDPIX = 0 then
-    FDPIX := SVGPointsPerInch;
-
-  if FDPIY = 0 then
-    FDPIY := SVGPointsPerInch;
-
-  FPxToPt := SVGPoint(FDPIX / SVGPointsPerInch, FDPIY / SVGPointsPerInch);
-  {$ENDIF}
-
-  // Printer.PageWidth and Printer.PageHeight are in pixels, we need to
-  // convert them to points
-
-  FPrinterPageWidth := FPrinterPageWidth / FPxToPt.X;
-  FPrinterPageHeight := FPrinterPageHeight / FPxToPt.Y;
-
-  if TSVGRenderContextManager.RenderContextType = rcDirect2D then
-    FPxToPt := SVGPoint(1.0, 1.0);
+  if TSVGRenderContextManager.RenderContextType = rcFMXCanvas then
+    FPrinterScale := SVGPoint(FDPIX / SVG_StdDPI, FDPIY / SVG_StdDPI)
+  else
+    FPrinterScale := SVGPoint(FPrinterPointsPerInch / SVG_StdDPI, FPrinterPointsPerInch / SVG_StdDPI);
 end;
 
 function TSVGPrintPreview.CalcRCUnits(const aValue, aDPI: TSVGFloat): TSVGFloat;
 begin
+  // Return the value in points
+
   case FPrintUnits of
     puPixel:
       begin
-        Result := SVGPointsPerInch / aDPI * aValue;
+        Result := SVG_StdDPI / aDPI * aValue;
       end;
     puMm:
       begin
-        Result := SVGPointsPerInch / 25.4 * aValue;
+        Result := SVG_StdDPI / 25.4 * aValue;
       end;
     puCm:
       begin
-        Result := SVGPointsPerInch / 2.54 * aValue;
+        Result := SVG_StdDPI / 2.54 * aValue;
       end;
     puInch:
       begin
-         Result := SVGPointsPerInch * aValue;
+         Result := SVG_StdDPI * aValue;
       end;
     else
       Result := aValue;
   end;
+end;
+
+function TSVGPrintPreview.CalcSVGSize(const aViewport: TSVGRect): TSVGRect;
+begin
+  // Return the size of the SVG in points
+
+  // Internally the SVG library works with a DPI of 96
+  // (see SVG_StdDPI in BVE.SVG2Types)
+
+  Result := FRoot.CalcIntrinsicSize(aViewPort);
 end;
 
 function TSVGPrintPreview.CalcViewport: TSVGRect;
@@ -309,6 +307,8 @@ begin
   FPreviewPageMargin := 10;
 
   FViewportScale := 1.0;
+
+  FPrinterPointsPerInch := SVG_StdDPI;
 
   FPagesHorizontal := 1;
   FPagesVertical := 1;
@@ -447,7 +447,7 @@ begin
 
   ViewPort := CalcViewport;
 
-  R := FRoot.CalcIntrinsicSize(ViewPort);
+  R := CalcSVGSize(ViewPort);
 
   SVGWidth := R.Width;
   SVGHeight := R.Height;
@@ -566,7 +566,7 @@ begin
     Exit;
 
   ViewPort := CalcViewport;
-  R := FRoot.CalcIntrinsicSize(ViewPort);
+  R := CalcSVGSize(ViewPort);
 
   SVGWidth := R.Width;
   SVGHeight := R.Height;
@@ -586,12 +586,15 @@ begin
 
     MV := TSVGMatrix.CreateIdentity;
     MV := TSVGMatrix.Multiply(MV, TSVGMatrix.CreateTranslation(-R.Left, -R.Top));
-    MV := TSVGMatrix.Multiply(MV, TSVGMatrix.CreateScaling(FPxToPt.X, FPxToPt.Y));
+    MV := TSVGMatrix.Multiply(MV, TSVGMatrix.CreateScaling(FPrinterScale.X, FPrinterScale.Y));
 
-    RC := PrintJob.BeginPage(FPrinterPageWidth, FPrinterPageHeight);
+    RC := PrintJob.BeginPage(
+      FPrinterPageWidth * FPrinterScale.X,
+      FPrinterPageHeight * FPrinterScale.Y);
     try
       RC.BeginScene;
       try
+        // This will result in a black page
         //RC.Clear(SVGColorNone);
 
         RC.PushClipRect(

@@ -343,6 +343,7 @@ type
     FActionRemove: TAction;
     FActionAutoViewBox: TAction;
     FActionExport: TAction;
+    FActionPrint: TAction;
 
     FActionEnableFilters: TAction;
     FActionEnableClippaths: TAction;
@@ -415,6 +416,7 @@ type
     procedure SetActionNew(const Value: TAction);
     procedure SetActionOpen(const Value: TAction);
     procedure SetActionPaste(const Value: TAction);
+    procedure SetActionPrint(const Value: TAction);
     procedure SetActionRemove(const Value: TAction);
     procedure SetActionEnableClippaths(const Value: TAction);
     procedure SetActionEnableEvents(const Value: TAction);
@@ -458,6 +460,7 @@ type
     procedure ActionNewExecute(Sender: TObject);
     procedure ActionAnimationStartExecute(Sender: TObject);
     procedure ActionAnimationPauseExecute(Sender: TObject);
+    procedure ActionPrintExecute(Sender: TObject);
 
     procedure SetCurrSelectControl(const Value: TSVGSelectControl); virtual;
     function GetCurrSelectControl: TSVGSelectControl; virtual;
@@ -483,6 +486,7 @@ type
       aActionEnableTextToPath: TAction;
       aActionAnimationStart: TAction;
       aActionAnimationPause: TAction;
+      aActionPrint: TAction;
       aOpenDialog: TOpenDialog;
       aScrollBox: TScrollBox;
       aStatusBar: TStatusBar;
@@ -500,6 +504,7 @@ type
     procedure LoadSVG(const aFileName: string);
     procedure NewControl;
     procedure Paste;
+    procedure Print;
     procedure RemoveSVGControl;
 
     procedure UpdateControls;
@@ -514,6 +519,7 @@ type
     property ActionRemove: TAction read FActionRemove write SetActionRemove;
     property ActionAutoViewBox: TAction read FActionAutoViewBox write SetActionAutoViewBox;
     property ActionExport: TAction read FActionExport write SetActionExport;
+    property ActionPrint: TAction read FActionPrint write SetActionPrint;
 
     property ActionEnableFilters: TAction read FActionEnableFilters write SetActionEnableFilters;
     property ActionEnableClippaths: TAction read FActionEnableClippaths write SetActionEnableClippaths;
@@ -675,7 +681,8 @@ uses
   {$ENDIF}
   BVE.SVG2FilterUtility,
   BVE.SVG2SaxParser,
-  BVE.SVG2Elements;
+  BVE.SVG2Elements,
+  UnitPrintPreview;
 
 //------------------------------------------------------------------------------
 //
@@ -1779,6 +1786,11 @@ begin
   Paste;
 end;
 
+procedure TSVGViewerForm.ActionPrintExecute(Sender: TObject);
+begin
+  Print;
+end;
+
 procedure TSVGViewerForm.ActionRemoveExecute(Sender: TObject);
 begin
   RemoveSVGControl;
@@ -1894,6 +1906,7 @@ procedure TSVGViewerForm.ConnectControls(
   aActionEnableTextToPath: TAction;
   aActionAnimationStart: TAction;
   aActionAnimationPause: TAction;
+  aActionPrint: TAction;
   aOpenDialog: TOpenDialog;
   aScrollBox: TScrollBox;
   aStatusBar: TStatusBar;
@@ -1918,6 +1931,7 @@ begin
   ActionEnableTextToPath := aActionEnableTextToPath;
   ActionAnimationStart := aActionAnimationStart;
   ActionAnimationPause := aActionAnimationPause;
+  ActionPrint := aActionPrint;
   TrackBar := aTrackBar;
   OpenDialog := aOpenDialog;
   ScrollBox := aScrollbox;
@@ -2216,6 +2230,15 @@ begin
   AddSVGControl(CreateSVGSelectControl(Clipboard.AsText));
 end;
 
+procedure TSVGViewerForm.Print;
+begin
+  if not assigned(CurrSelectControl) then
+    Exit;
+
+  frmPrintPreview.Root := CurrSelectControl.SVGRoot;
+  frmPrintPreview.Show;
+end;
+
 procedure TSVGViewerForm.RegisterImageList(aImageList: TSVG2BaseImageList);
 begin
   if assigned(aImageList) then
@@ -2449,6 +2472,13 @@ begin
     FActionPaste.OnExecute := ActionPasteExecute;
 end;
 
+procedure TSVGViewerForm.SetActionPrint(const Value: TAction);
+begin
+  FActionPrint := Value;
+  if assigned(FActionPrint) then
+    FActionPrint.OnExecute := ActionPrintExecute;
+end;
+
 procedure TSVGViewerForm.SetActionRemove(const Value: TAction);
 begin
   FActionRemove := Value;
@@ -2604,6 +2634,7 @@ begin
   ActionRemove.Enabled := True;
   ActionAnimationStart.Enabled := True;
   ActionAnimationPause.Enabled := True;
+  ActionPrint.Enabled := True;
   Trackbar.Enabled := True;
 
   if assigned(CurrSelectControl) then
@@ -2646,6 +2677,7 @@ begin
     ActionEnableTextToPath.Enabled := False;
     ActionAutoViewbox.Enabled := False;
     ActionRemove.Enabled := False;
+    ActionPrint.Enabled := False;
   end;
 
   ActionAnimationStart.Enabled := HasAnimations;

@@ -184,6 +184,7 @@ type
     procedure SetSelected(const Value: boolean);
     procedure SetRenderOptions(const Value: TSVGRenderOptions);
     function GetHasAnimations: Boolean;
+    function GetSVGRoot: ISVGRoot;
   protected
     function GetSVG: string;
     procedure SetSVG(const Value: string);
@@ -227,6 +228,7 @@ type
     property RenderOptions: TSVGRenderOptions read GetRenderOptions write SetRenderOptions;
     property Selected: boolean read FSelected write SetSelected;
     property SVG: string read GetSVG write SetSVG;
+    property SVGRoot: ISVGRoot read GetSVGRoot;
 
     property OnAnimationSample: TNotifyEvent read GetOnAnimationSample write SetOnAnimationSample;
     property OnSVGEvent: TSVGEvent read GetOnSVGEvent write SetOnSVGEvent;
@@ -260,6 +262,7 @@ type
     FActionZoomReset: TAction;
     FActionZoomDec: TAction;
     FActionZoomInc: TAction;
+    FActionPrint: TAction;
 
     FActionAnimationPause: TButton;
     FActionAnimationStart: TButton;
@@ -309,6 +312,7 @@ type
     procedure ActionInfoExecute(Sender: TObject);
     procedure ActionLoadExecute(Sender: TObject);
     procedure ActionPasteExecute(Sender: TObject);
+    procedure ActionPrintExecute(Sender: TObject);
     procedure ActionRemoveExecute(Sender: TObject);
     procedure ActionZoomResetExecute(Sender: TObject);
     procedure ActionZoomDecExecute(Sender: TObject);
@@ -370,6 +374,7 @@ type
       aActionZoomReset: TAction;
       aActionZoomDec: TAction;
       aActionZoomInc: TAction;
+      aActionPrint: TAction;
       aActionAnimationStart: TButton;
       aActionAnimationPause: TButton;
       aCheckboxAutoViewbox: TCheckBox;
@@ -446,7 +451,8 @@ uses
   iOSapi.Foundation,
   FMX.helpers.iOS,
 {$ENDIF}
-  BVE.SVG2GeomUtility;
+  BVE.SVG2GeomUtility,
+  UnitPrintPreview;
 
 function ChildrenRect(aControl: TFmxObject): TRectF;
 var
@@ -971,6 +977,19 @@ begin
     end;
 end;
 
+function TSVGSelection.GetSVGRoot: ISVGRoot;
+begin
+{$IFDEF SVGLINKEDIMAGE}
+  Result := FSVGLinkedImage.SVGRoot;
+{$ELSE}
+{$IFDEF SVGIMAGE}
+  Result := FSVGImage.SVGRoot;
+{$ELSE}
+  Result := FSVGControl.SVGRoot;
+{$ENDIF}
+{$ENDIF}
+end;
+
 procedure TSVGSelection.MouseDown(Button: TMouseButton; Shift: TShiftState; X,
   Y: Single);
 begin
@@ -1452,6 +1471,15 @@ begin
   end;
 end;
 
+procedure TSVGViewerForm.ActionPrintExecute(Sender: TObject);
+begin
+  if assigned(Selection) then
+  begin
+    frmPrintPreview.Root := Selection.SVGRoot;
+    frmPrintPreview.Show;
+  end;
+end;
+
 procedure TSVGViewerForm.ActionRemoveExecute(Sender: TObject);
 begin
   if assigned(Selection) then
@@ -1624,7 +1652,8 @@ procedure TSVGViewerForm.ConnectControls(
   aActionRemove,
   aActionZoomReset,
   aActionZoomDec,
-  aActionZoomInc: TAction;
+  aActionZoomInc,
+  aActionPrint: TAction;
   aActionAnimationStart,
   aActionAnimationPause: TButton;
   aCheckboxAutoViewbox,
@@ -1655,6 +1684,7 @@ begin
   FActionInfo := aActionInfo;
   FActionLoad := aActionLoad;
   FActionPaste := aActionPaste;
+  FActionPrint := aActionPrint;
   FActionRemove := aActionRemove;
   FActionZoomReset := aActionZoomReset;
   FActionZoomDec := aActionZoomDec;
@@ -1710,6 +1740,7 @@ begin
   FActionInfo.OnExecute := ActionInfoExecute;
   FActionLoad.OnExecute := ActionLoadExecute;
   FActionPaste.OnExecute := ActionPasteExecute;
+  FActionPrint.OnExecute := ActionPrintExecute;
   FActionRemove.OnExecute := ActionRemoveExecute;
   FActionZoomReset.OnExecute := ActionZoomResetExecute;
   FActionZoomDec.OnExecute := ActionZoomDecExecute;
@@ -2012,6 +2043,7 @@ begin
   FActionAnimationStart.Enabled := True;
   FActionAnimationPause.Enabled := True;
   FAnimationTrackbar.Enabled := True;
+  FActionPrint.Enabled := True;
 
   if assigned(FSelection) then
   begin
@@ -2046,6 +2078,7 @@ begin
     FCheckboxMouseEvents.Enabled := False;
     FCheckboxAutoViewbox.Enabled := False;
     FActionRemove.Enabled := False;
+    FActionPrint.Enabled := False;
   end;
 
   FActionAnimationStart.Enabled := HasAnimations;

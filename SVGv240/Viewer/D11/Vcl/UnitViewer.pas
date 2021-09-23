@@ -59,6 +59,7 @@ uses
   System.Variants,
   System.Classes,
   System.Actions,
+  System.ImageList,
   Vcl.Graphics,
   Vcl.Controls,
   Vcl.Forms,
@@ -75,7 +76,7 @@ uses
   Vcl.Clipbrd,
   Vcl.ExtDlgs,
   BVE.ViewerCore.Vcl,
-  BVE.SVG2ImageList.Vcl, System.ImageList;
+  BVE.SVG2ImageList.Vcl;
 
 type
   TForm1 = class(TSVGViewerForm)

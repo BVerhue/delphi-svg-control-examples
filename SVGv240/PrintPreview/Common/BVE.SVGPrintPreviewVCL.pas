@@ -98,7 +98,7 @@ type
     FDPIX, FDPIY: Integer;
     FPrinterPageWidth: TSVGFLoat;
     FPrinterPageHeight: TSVGFLoat;
-    FPxToPt: TSVGPoint;
+    FPrinterScale: TSVGPoint;
 
     FPagesVertical: Integer;
     FPagesHorizontal: Integer;
@@ -189,64 +189,39 @@ uses
 
 const
 {$IFnDEF FPC}
-  SVGPointsPerInch = 96;
+  SVGPrinterPointsPerInch = 96;
 {$ELSE}
-  SVGPointsPerInch = 72;
+  {$IFDEF Darwin}
+  SVGPrinterPointsPerInch = 72;
+  {$ELSE}
+  SVGPrinterPointsPerInch = 96;
+  {$ENDIF}
 {$ENDIF}
 
 { TSVGPrintPreview }
 
 function TSVGPrintPreview.CalcRCUnits(const aValue, aDPI: TSVGFloat): TSVGFloat;
 begin
-  {if  TSVGRenderContextManager.RenderContextType = rcDirect2D then
-  begin
-    // Direct2D coords are in device independent pixels}
-
-    case FPrintUnits of
-      puPixel:
-        begin
-          Result := SVGPointsPerInch / aDPI * aValue;
-        end;
-      puMm:
-        begin
-          Result := SVGPointsPerInch / 25.4 * aValue;
-        end;
-      puCm:
-        begin
-          Result := SVGPointsPerInch / 2.54 * aValue;
-        end;
-      puInch:
-        begin
-           Result := SVGPointsPerInch * aValue;
-        end;
-      else
-        Result := aValue;
-    end;
-
-  {end else begin
-    // GDI+ coords are in pixels
-
-    case FPrintUnits of
-      puPixel:
-        begin
-          Result := aDPI / aDPI * aValue;
-        end;
-      puMm:
-        begin
-          Result := aDPI / 25.4 * aValue;
-        end;
-      puCm:
-        begin
-          Result := aDPI / 2.54 * aValue;
-        end;
-      puInch:
-        begin
-           Result := aValue * aDPI;
-        end;
-      else
-        Result := aValue;
-    end;
-  end;}
+  case FPrintUnits of
+    puPixel:
+      begin
+        Result := SVG_StdDPI / aDPI * aValue;
+      end;
+    puMm:
+      begin
+        Result := SVG_StdDPI / 25.4 * aValue;
+      end;
+    puCm:
+      begin
+        Result := SVG_StdDPI / 2.54 * aValue;
+      end;
+    puInch:
+      begin
+         Result := SVG_StdDPI * aValue;
+      end;
+    else
+      Result := aValue;
+  end;
 end;
 
 procedure TSVGPrintPreview.CalcPrinterDimensions;
@@ -263,33 +238,32 @@ begin
   {$ENDIF}
 
   if FDPIX = 0 then
-    FDPIX := SVGPointsPerInch;
+    FDPIX := SVG_StdDPI;
 
   if FDPIY = 0 then
-    FDPIY := SVGPointsPerInch;
+    FDPIY := SVG_StdDPI;
 
-  FPxToPt := SVGPoint(FDPIX / SVGPointsPerInch, FDPIY / SVGPointsPerInch);
+  // Convert to screen points (96)
+  FPrinterPageWidth := FPrinterPageWidth * SVG_StdDPI / FDPIX;
+  FPrinterPageHeight := FPrinterPageHeight * SVG_StdDPI / FDPIY;
 
-  {if TSVGRenderContextManager.RenderContextType = rcDirect2D then
-  begin
-    // Printer.PageWidth and Printer.PageHeight are in pixels, we need to
-    // convert them to points
+  {$IFnDEF FPC}
+  FPrinterScale := SVGPoint(SVGPrinterPointsPerInch / SVG_StdDPI, SVGPrinterPointsPerInch / SVG_StdDPI);
+  {$ELSE}
+  //FPrinterScale := SVGPoint(FDPIX / SVG_StdDPI, FDPIY / SVG_StdDPI)
+  FPrinterScale := SVGPoint(SVGPrinterPointsPerInch / SVG_StdDPI, SVGPrinterPointsPerInch / SVG_StdDPI);
+  {$ENDIF}
 
-    FPrinterPageWidth := FPrinterPageWidth / FPxToPt.X;
-    FPrinterPageHeight := FPrinterPageHeight / FPxToPt.Y;
-
-    FPxToPt := SVGPoint(1.0, 1.0);
-  end;}
+  {FPrinterScale := SVGPoint(FDPIX / SVGPrinterPointsPerInch, FDPIY / SVGPrinterPointsPerInch);
 
   // Printer.PageWidth and Printer.PageHeight are in pixels, we need to
   // convert them to points
 
-  FPrinterPageWidth := FPrinterPageWidth / FPxToPt.X;
-  FPrinterPageHeight := FPrinterPageHeight / FPxToPt.Y;
+  FPrinterPageWidth := FPrinterPageWidth / FPrinterScale.X;
+  FPrinterPageHeight := FPrinterPageHeight / FPrinterScale.Y;
 
   if TSVGRenderContextManager.RenderContextType = rcDirect2D then
-    FPxToPt := SVGPoint(1.0, 1.0);
-
+    FPrinterScale := SVGPoint(1.0, 1.0);}
 end;
 
 function TSVGPrintPreview.CalcViewport: TSVGRect;
@@ -333,9 +307,6 @@ begin
       CalcRCUnits(FMarginLeft, FDPIX),
       CalcRCUnits(FMarginTop, FDPIY));
 
-    {Result := TSVGMatrix.Multiply(
-      Result,
-      TSVGMatrix.CreateScaling(FPxToPt.X, FPxToPt.Y));}
   end;
 
 end;
@@ -651,11 +622,9 @@ begin
   begin
     R := PageViewbox[i];
 
-    //MV := TSVGMatrix.CreateTranslation(-R.Left, -R.Top);
-
     MV := TSVGMatrix.CreateIdentity;
     MV := TSVGMatrix.Multiply(MV, TSVGMatrix.CreateTranslation(-R.Left, -R.Top));
-    MV := TSVGMatrix.Multiply(MV, TSVGMatrix.CreateScaling(FPxToPt.X, FPxToPt.Y));
+    MV := TSVGMatrix.Multiply(MV, TSVGMatrix.CreateScaling(FPrinterScale.X, FPrinterScale.Y));
 
     RC := PrintJob.BeginPage(FPrinterPageWidth, FPrinterPageHeight);
     try
