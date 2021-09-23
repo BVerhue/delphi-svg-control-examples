@@ -250,20 +250,8 @@ begin
   {$IFnDEF FPC}
   FPrinterScale := SVGPoint(SVGPrinterPointsPerInch / SVG_StdDPI, SVGPrinterPointsPerInch / SVG_StdDPI);
   {$ELSE}
-  //FPrinterScale := SVGPoint(FDPIX / SVG_StdDPI, FDPIY / SVG_StdDPI)
   FPrinterScale := SVGPoint(SVGPrinterPointsPerInch / SVG_StdDPI, SVGPrinterPointsPerInch / SVG_StdDPI);
   {$ENDIF}
-
-  {FPrinterScale := SVGPoint(FDPIX / SVGPrinterPointsPerInch, FDPIY / SVGPrinterPointsPerInch);
-
-  // Printer.PageWidth and Printer.PageHeight are in pixels, we need to
-  // convert them to points
-
-  FPrinterPageWidth := FPrinterPageWidth / FPrinterScale.X;
-  FPrinterPageHeight := FPrinterPageHeight / FPrinterScale.Y;
-
-  if TSVGRenderContextManager.RenderContextType = rcDirect2D then
-    FPrinterScale := SVGPoint(1.0, 1.0);}
 end;
 
 function TSVGPrintPreview.CalcViewport: TSVGRect;
@@ -626,7 +614,9 @@ begin
     MV := TSVGMatrix.Multiply(MV, TSVGMatrix.CreateTranslation(-R.Left, -R.Top));
     MV := TSVGMatrix.Multiply(MV, TSVGMatrix.CreateScaling(FPrinterScale.X, FPrinterScale.Y));
 
-    RC := PrintJob.BeginPage(FPrinterPageWidth, FPrinterPageHeight);
+    RC := PrintJob.BeginPage(
+      FPrinterPageWidth * FPrinterScale.X,
+      FPrinterPageHeight * FPrinterScale.Y);
     try
       RC.BeginScene;
       try
