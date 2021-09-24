@@ -34,13 +34,12 @@ object frmPrintPreview: TfrmPrintPreview
       AlignWithMargins = True
       Left = 16
       Top = 12
-      Width = 230
+      Width = 68
       Height = 13
       Margins.Left = 16
       Margins.Top = 12
       Align = alTop
       Caption = 'Output device'
-      ExplicitWidth = 68
     end
     object eOutputDevice: TEdit
       AlignWithMargins = True

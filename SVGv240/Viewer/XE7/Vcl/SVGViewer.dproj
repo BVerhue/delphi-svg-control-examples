@@ -1,7 +1,7 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
         <ProjectGuid>{162A55BA-F1ED-4817-A393-E127166CC056}</ProjectGuid>
-        <ProjectVersion>16.0</ProjectVersion>
+        <ProjectVersion>16.1</ProjectVersion>
         <FrameworkType>VCL</FrameworkType>
         <MainSource>SVGViewer.dpr</MainSource>
         <Base>True</Base>
@@ -107,6 +107,12 @@
         <DCCReference Include="..\..\Demo common\BVE.XMLTreeView.VCL.pas"/>
         <DCCReference Include="UnitAbout.pas">
             <Form>Form3</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="..\..\..\PrintPreview\Common\BVE.SVGPrintPreviewFormVCL.pas"/>
+        <DCCReference Include="..\..\..\PrintPreview\Common\BVE.SVGPrintPreviewVCL.pas"/>
+        <DCCReference Include="..\..\..\PrintPreview\Vcl\UnitPrintPreview.pas">
+            <Form>frmPrintPreview</Form>
             <FormType>dfm</FormType>
         </DCCReference>
         <BuildConfiguration Include="Release">
@@ -274,7 +280,7 @@
                 </DeployClass>
                 <DeployClass Name="ProjectOSXEntitlements">
                     <Platform Name="OSX32">
-                        <RemoteDir>Contents</RemoteDir>
+                        <RemoteDir>../</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
                 </DeployClass>
@@ -360,6 +366,7 @@
                 </DeployClass>
                 <DeployClass Name="ProjectiOSEntitlements">
                     <Platform Name="iOSDevice">
+                        <RemoteDir>../</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
                 </DeployClass>

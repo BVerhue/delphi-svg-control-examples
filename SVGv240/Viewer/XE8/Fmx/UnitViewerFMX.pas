@@ -131,6 +131,8 @@ type
     LabelTime: TLabel;
     bAnimationStart: TButton;
     bAnimationPause: TButton;
+    aPrint: TAction;
+    Button13: TButton;
     procedure FormCreate(Sender: TObject);
   end;
 
@@ -156,6 +158,7 @@ begin
     aZoomReset,
     aZoomDec,
     aZoomInc,
+    aPrint,
     bAnimationStart,
     bAnimationPause,
     cbAutoViewbox,

@@ -60,7 +60,9 @@ uses
   System.Types,
   System.Classes,
   System.Generics.Collections,
+  {$IF CompilerVersion >= 24}
   System.Actions,
+  {$IFEND}
   System.Math,
   Vcl.Graphics,
   Vcl.Controls,

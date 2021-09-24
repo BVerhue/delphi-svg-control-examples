@@ -59,6 +59,7 @@ uses
   System.Variants,
   System.Classes,
   System.Actions,
+  System.ImageList,
   Vcl.Graphics,
   Vcl.Controls,
   Vcl.Forms,
@@ -75,7 +76,7 @@ uses
   Vcl.Clipbrd,
   Vcl.ExtDlgs,
   BVE.ViewerCore.Vcl,
-  BVE.SVG2ImageList.Vcl, System.ImageList;
+  BVE.SVG2ImageList.Vcl;
 
 type
   TForm1 = class(TSVGViewerForm)
@@ -120,6 +121,7 @@ type
     CheckBox3: TCheckBox;
     CheckBox4: TCheckBox;
     CheckBox5: TCheckBox;
+    aPrint: TAction;
     procedure FormCreate(Sender: TObject);
   end;
 
@@ -150,6 +152,7 @@ begin
     aEnableTextToPath,
     aAnimationStart,
     aAnimationPause,
+    aPrint,
     OpenPictureDialog1,
     Scrollbox1,
     Statusbar1,

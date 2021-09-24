@@ -531,7 +531,7 @@ begin
 
     Canvas.Fill.Color := TAlphaColorRec.Gray;
     Canvas.Fill.Kind := TBrushKind.Solid;
-    Canvas.FillRect(Dest, 1.0);
+    Canvas.FillRect(Dest, 0, 0, [], 1.0);
 
     for i := 0 to FPagePreviewList.Count - 1 do
     begin

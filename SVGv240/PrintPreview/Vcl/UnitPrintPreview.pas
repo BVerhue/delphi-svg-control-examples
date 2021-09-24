@@ -48,7 +48,9 @@ uses
   System.SysUtils,
   System.Variants,
   System.Classes,
+  {$IF CompilerVersion >= 24}
   System.Actions,
+  {$IFEND}
   Vcl.Graphics,
   Vcl.Controls,
   Vcl.Forms,

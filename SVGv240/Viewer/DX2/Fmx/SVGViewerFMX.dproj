@@ -9,7 +9,6 @@
         <FrameworkType>FMX</FrameworkType>
         <ProjectVersion>18.4</ProjectVersion>
         <Platform Condition="'$(Platform)'==''">Win32</Platform>
-        <Profile Condition="'$(Platform)'=='iOSDevice64'">IOS symulator 19-2</Profile>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
         <Base>true</Base>
@@ -325,6 +324,12 @@
         <DCCReference Include="UnitInfo.pas">
             <Form>frmInfo</Form>
         </DCCReference>
+        <DCCReference Include="..\..\..\PrintPreview\Common\BVE.SVGPrintPreviewFMX.pas"/>
+        <DCCReference Include="..\..\..\PrintPreview\Common\BVE.SVGPrintPreviewFormFMX.pas"/>
+        <DCCReference Include="..\..\..\PrintPreview\Fmx\DX2\UnitPrintPreview.pas">
+            <Form>frmPrintPreview</Form>
+            <FormType>fmx</FormType>
+        </DCCReference>
         <BuildConfiguration Include="Debug">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
@@ -356,7 +361,7 @@
             <Platforms>
                 <Platform value="Android">False</Platform>
                 <Platform value="iOSDevice32">False</Platform>
-                <Platform value="iOSDevice64" Profile="IOS symulator 19-2">True</Platform>
+                <Platform value="iOSDevice64">True</Platform>
                 <Platform value="iOSSimulator">True</Platform>
                 <Platform value="Linux64">True</Platform>
                 <Platform value="OSX32">True</Platform>
