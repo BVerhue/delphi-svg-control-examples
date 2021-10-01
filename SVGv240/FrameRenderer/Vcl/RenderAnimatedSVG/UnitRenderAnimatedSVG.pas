@@ -38,6 +38,7 @@ unit UnitRenderAnimatedSVG;
 ///    User interface for converting animated SVG
 ///  </summary>
 
+{$DEFINE SVG_TO_APNG}
 {$DEFINE SVG_TO_AVI}
 {$DEFINE SVG_TO_GIF}
 
@@ -71,6 +72,15 @@ uses
   AviFromBitmaps,
   Vfw,
   {$ENDIF}
+  {$IFDEF SVG_TO_APNG}
+  ImagingTypes,
+  Imaging,
+  ImagingClasses,
+  ImagingComponents,
+  ImagingCanvases,
+  ImagingBinary,
+  ImagingUtility,
+  {$ENDIF}
   BVE.SVG2Types,
   BVE.SVG2Intf,
   BVE.SVG2Graphic.VCL,
@@ -97,6 +107,19 @@ type
     property Filename: string read GetFilename write SetFilename;
     property FileExt: string read GetFileExt;
   end;
+
+  {$IFDEF SVG_TO_APNG}
+  TSVGConvTargetApng = class(TSVGConvTarget)
+  protected
+    function GetFileExt: string; override;
+    procedure SetParent(AParent: TWinControl); override;
+  public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+
+    procedure Convert(aFrameRenderer: TSVGFrameRenderer); override;
+  end;
+  {$ENDIF}
 
   {$IFDEF SVG_TO_AVI}
   TSVGConvTargetAvi = class(TSVGConvTarget)
@@ -359,6 +382,9 @@ begin
   {$IFDEF SVG_TO_AVI}
   TargetAdd(TSVGConvTargetAvi.Create(Self), 'AVI');
   {$ENDIF}
+  {$IFDEF SVG_TO_APNG}
+  TargetAdd(TSVGConvTargetAPng.Create(Self), 'APNG');
+  {$ENDIF}
 end;
 
 procedure TForm1.FormDestroy(Sender: TObject);
@@ -540,8 +566,11 @@ begin
 end;
 
 {$IFDEF SVG_TO_AVI}
-
-{ TSVGConvTargetAvi }
+// -----------------------------------------------------------------------------
+//
+// TSVGConvTargetAvi
+//
+// -----------------------------------------------------------------------------
 
 procedure TSVGConvTargetAvi.Convert(aFrameRenderer: TSVGFrameRenderer);
 var
@@ -617,8 +646,11 @@ end;
 {$ENDIF}
 
 {$IFDEF SVG_TO_GIF}
-
-{ TSVGConvTargetGif }
+// -----------------------------------------------------------------------------
+//
+// TSVGConvTargetGif
+//
+// -----------------------------------------------------------------------------
 
 procedure TSVGConvTargetGif.Convert(aFrameRenderer: TSVGFrameRenderer);
 var
@@ -769,6 +801,81 @@ end;
 procedure TSVGConvTargetGif.SetTransparent(const Value: Boolean);
 begin
   FTransparent.Checked := Value;
+end;
+{$ENDIF}
+
+{$IFDEF SVG_TO_APNG}
+// -----------------------------------------------------------------------------
+//
+// TSVGConvTargetApng
+//
+// -----------------------------------------------------------------------------
+
+procedure TSVGConvTargetApng.Convert(aFrameRenderer: TSVGFrameRenderer);
+var
+  MultiImage: TMultiImage;
+  ImageData: TImageData;
+  DataArray: TDynImageDataArray;
+begin
+  MultiImage := TMultiImage.CreateFromParams(
+    aFrameRenderer.Width,
+    aFrameRenderer.Height,
+    ifA8R8G8B8,
+    aFrameRenderer.Duration * aFrameRenderer.FPS div 1000);
+  try
+    if aFrameRenderer.RenderFirst then
+    begin
+      SetLength(DataArray, aFrameRenderer.StepCount +1);
+      try
+        repeat
+          // Add the bitmap to the avi
+
+          ConvertBitmapToData(aFrameRenderer.Bitmap, ImageData);
+          try
+            DataArray[aFrameRenderer.Step] := ImageData;
+            //MultiImage.AddImage(ImageData);
+          finally
+            //ImageData.Free;
+          end;
+
+        until not aFrameRenderer.RenderNext;
+
+      finally
+        aFrameRenderer.RenderClose;
+      end;
+    end;
+
+    //MultiImage.ActiveImage := 0;
+    MultiImage.AssignFromArray(DataArray);
+
+    MultiImage.SaveToFile(FFilename);
+
+  finally
+    MultiImage.Free;
+  end;
+end;
+
+constructor TSVGConvTargetApng.Create(AOwner: TComponent);
+begin
+  inherited;
+end;
+
+destructor TSVGConvTargetApng.Destroy;
+begin
+
+
+  inherited;
+end;
+
+function TSVGConvTargetApng.GetFileExt: string;
+begin
+  Result := '.png';
+end;
+
+procedure TSVGConvTargetApng.SetParent(AParent: TWinControl);
+begin
+  inherited;
+
 end;
 {$ENDIF}
 

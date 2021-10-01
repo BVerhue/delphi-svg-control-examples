@@ -101,6 +101,8 @@ type
     property Height: Integer read FHeight write FHeight;
     property RenderOptions: TSVGRenderOptions read FRenderOptions
       write FRenderOptions;
+    property Step: Integer read FStep;
+    property StepCount: Integer read FStepCount;
     property SVGRoot: ISVGRoot read FRoot write FRoot;
     property Width: Integer read FWidth write FWidth;
 
@@ -266,7 +268,7 @@ begin
   if not assigned(FTarget) then
     raise Exception.Create('RenderFirst was not called.');
 
-  if FStep < FSTepCount then
+  if FStep < FStepCount then
   begin
     FTarget.DoAnimationAdvanceFrame(FDelay);
 
