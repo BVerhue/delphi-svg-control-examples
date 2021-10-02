@@ -249,7 +249,6 @@ object Form1: TForm1
     Height = 652
     Align = alClient
     BevelOuter = bvNone
-    Color = clWindow
     ParentBackground = False
     TabOrder = 1
     object Image1: TImage

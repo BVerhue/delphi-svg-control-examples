@@ -73,13 +73,9 @@ uses
   Vfw,
   {$ENDIF}
   {$IFDEF SVG_TO_APNG}
-  ImagingTypes,
   Imaging,
-  ImagingClasses,
   ImagingComponents,
-  ImagingCanvases,
-  ImagingBinary,
-  ImagingUtility,
+  ImagingNetworkGraphics,
   {$ENDIF}
   BVE.SVG2Types,
   BVE.SVG2Intf,
@@ -400,7 +396,7 @@ begin
 
   eTime.Text := Format('%6d', [FFrameRenderer.AnimationTime]);
 
-  if assigned(Image1.Picture.Graphic)
+  {if assigned(Image1.Picture.Graphic)
   and (Image1.Picture.Graphic is TBitmap)
   and (BackgroundColor = clNone) then
   begin
@@ -411,7 +407,7 @@ begin
     Image1.Canvas.Brush.Color := clWindow;
     Image1.Canvas.FillRect(Rect(0, 0, Image1.ClientWidth, Image1.ClientHeight));
     Image1.Repaint;
-  end;
+  end;}
 
   Image1.Picture.Assign(FFrameRenderer.Bitmap);
   Image1.Repaint;
@@ -813,30 +809,20 @@ end;
 
 procedure TSVGConvTargetApng.Convert(aFrameRenderer: TSVGFrameRenderer);
 var
-  MultiImage: TMultiImage;
-  ImageData: TImageData;
   DataArray: TDynImageDataArray;
+  Meta: TMetadata;
+  Format: TPNGFileFormat;
+  Index: Integer;
 begin
-  MultiImage := TMultiImage.CreateFromParams(
-    aFrameRenderer.Width,
-    aFrameRenderer.Height,
-    ifA8R8G8B8,
-    aFrameRenderer.Duration * aFrameRenderer.FPS div 1000);
+  SetLength(DataArray, 0);
   try
     if aFrameRenderer.RenderFirst then
     begin
-      SetLength(DataArray, aFrameRenderer.StepCount +1);
+      SetLength(DataArray, aFrameRenderer.StepCount + 1);
       try
         repeat
-          // Add the bitmap to the avi
 
-          ConvertBitmapToData(aFrameRenderer.Bitmap, ImageData);
-          try
-            DataArray[aFrameRenderer.Step] := ImageData;
-            //MultiImage.AddImage(ImageData);
-          finally
-            //ImageData.Free;
-          end;
+          ConvertBitmapToData(aFrameRenderer.Bitmap, DataArray[aFrameRenderer.Step]);
 
         until not aFrameRenderer.RenderNext;
 
@@ -845,13 +831,25 @@ begin
       end;
     end;
 
-    //MultiImage.ActiveImage := 0;
-    MultiImage.AssignFromArray(DataArray);
+    Meta := TMetadata.Create;
+    try
+      Meta.SetMetaItemForSaving(SMetaAnimationLoops, 0);
+      for Index := 0 to Length(DataArray) - 1 do
+        Meta.SetMetaItemForSaving(SMetaFrameDelay, 1000 / aFrameRenderer.FPS, Index);
 
-    MultiImage.SaveToFile(FFilename);
+      Format := TPNGFileFormat.Create(Meta);
+      try
+        Format.SaveToFile(FileName, DataArray);
+      finally
+        Format.Free;
+      end;
+
+    finally
+      Meta.Free;
+    end;
 
   finally
-    MultiImage.Free;
+    FreeImagesInArray(DataArray);
   end;
 end;
 
@@ -862,8 +860,6 @@ end;
 
 destructor TSVGConvTargetApng.Destroy;
 begin
-
-
   inherited;
 end;
 
@@ -875,7 +871,6 @@ end;
 procedure TSVGConvTargetApng.SetParent(AParent: TWinControl);
 begin
   inherited;
-
 end;
 {$ENDIF}
 
