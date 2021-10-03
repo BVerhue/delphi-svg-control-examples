@@ -2,7 +2,7 @@ program RenderAnimatedSVG;
 
 uses
   Vcl.Forms,
-  UnitRenderAnimatedSVG in 'UnitRenderAnimatedSVG.pas' {Form1},
+  UnitRenderAnimatedSVG in 'UnitRenderAnimatedSVG.pas' {frmRenderAnimatedSVG},
   BVE.SVGFrameRendererVCL in '..\..\Common\BVE.SVGFrameRendererVCL.pas';
 
 {$R *.res}
@@ -14,6 +14,6 @@ begin
 
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
-  Application.CreateForm(TForm1, Form1);
+  Application.CreateForm(TfrmRenderAnimatedSVG, frmRenderAnimatedSVG);
   Application.Run;
 end.

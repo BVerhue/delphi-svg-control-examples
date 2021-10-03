@@ -224,7 +224,7 @@ begin
   FDelay :=  MulDiv(1, 1000, FFPS);
   FAnimationTime := 0;
   FStepCount := FDuration * FFPS div 1000;
-  FSTep := 0;
+  FStep := 0;
 
   // Create a bitmap
 
@@ -268,14 +268,14 @@ begin
   if not assigned(FTarget) then
     raise Exception.Create('RenderFirst was not called.');
 
+  Inc(FStep);
+  Inc(FAnimationTime, FDelay);
+
   if FStep < FStepCount then
   begin
     FTarget.DoAnimationAdvanceFrame(FDelay);
 
     RenderFrame(False);
-
-    Inc(FStep);
-    Inc(FAnimationTime, FDelay);
 
     Result := True;
   end else

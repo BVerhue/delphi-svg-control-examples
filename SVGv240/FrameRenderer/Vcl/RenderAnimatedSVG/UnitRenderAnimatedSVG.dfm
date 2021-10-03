@@ -1,9 +1,9 @@
-object Form1: TForm1
+object frmRenderAnimatedSVG: TfrmRenderAnimatedSVG
   Left = 0
   Top = 0
   Caption = 'Render animated SVG'
-  ClientHeight = 652
-  ClientWidth = 960
+  ClientHeight = 500
+  ClientWidth = 811
   Color = clBtnFace
   DoubleBuffered = True
   Font.Charset = DEFAULT_CHARSET
@@ -19,7 +19,7 @@ object Form1: TForm1
   object Splitter1: TSplitter
     Left = 249
     Top = 0
-    Height = 652
+    Height = 500
     ExplicitLeft = 488
     ExplicitTop = 272
     ExplicitHeight = 100
@@ -28,245 +28,76 @@ object Form1: TForm1
     Left = 0
     Top = 0
     Width = 249
-    Height = 652
+    Height = 500
     Align = alLeft
     BevelOuter = bvNone
     TabOrder = 0
-    object GroupBox1: TGroupBox
-      AlignWithMargins = True
-      Left = 3
-      Top = 3
-      Width = 243
-      Height = 454
-      Align = alTop
-      Caption = 'SVG settings'
+    object TabControl1: TTabControl
+      Left = 0
+      Top = 217
+      Width = 249
+      Height = 283
+      Align = alClient
       TabOrder = 0
-      object GroupBox4: TGroupBox
-        AlignWithMargins = True
-        Left = 5
-        Top = 295
-        Width = 233
-        Height = 76
-        Align = alTop
-        Caption = 'Render options'
+      OnChange = TabControl1Change
+      ExplicitLeft = -16
+      ExplicitTop = 152
+      ExplicitWidth = 289
+      ExplicitHeight = 193
+      object vleTarget: TValueListEditor
+        Left = 4
+        Top = 6
+        Width = 241
+        Height = 273
+        Align = alClient
         TabOrder = 0
-        object cbClippaths: TCheckBox
-          Left = 94
-          Top = 24
-          Width = 87
-          Height = 17
-          Caption = 'Clippaths'
-          Checked = True
-          State = cbChecked
-          TabOrder = 0
-          OnClick = cbClippathsClick
-        end
-        object cbFilters: TCheckBox
-          Left = 94
-          Top = 47
-          Width = 87
-          Height = 17
-          Caption = 'Filters'
-          Checked = True
-          State = cbChecked
-          TabOrder = 1
-          OnClick = cbFiltersClick
-        end
-      end
-      object GroupBox5: TGroupBox
-        AlignWithMargins = True
-        Left = 5
-        Top = 183
-        Width = 233
-        Height = 106
-        Align = alTop
-        Caption = 'Aspect ratio'
-        TabOrder = 1
-        object Label12: TLabel
-          Left = 15
-          Top = 43
-          Width = 28
-          Height = 15
-          Caption = 'Align'
-        end
-        object Label13: TLabel
-          Left = 15
-          Top = 72
-          Width = 67
-          Height = 15
-          Caption = 'Meet or slice'
-        end
-        object cbAutoViewbox: TCheckBox
-          Left = 96
-          Top = 17
-          Width = 97
-          Height = 17
-          Caption = 'Auto viewbox'
-          TabOrder = 0
-          OnClick = cbAutoViewboxClick
-        end
-        object cbAspectRatioAlign: TComboBox
-          Left = 96
-          Top = 40
-          Width = 103
-          Height = 23
-          ItemIndex = 5
-          TabOrder = 1
-          Text = 'X-Mid Y-Mid'
-          OnChange = cbAspectRatioAlignChange
-          Items.Strings = (
-            'None'
-            'X-Min Y-Min'
-            'X-Mid Y-Min'
-            'X-Max Y-Min'
-            'X-Min Y-Mid'
-            'X-Mid Y-Mid'
-            'X-Max Y-Mid'
-            'X-Min Y-Max'
-            'X-Mid Y-Max'
-            'X-Max Y-Max')
-        end
-        object cbAspectRatioMeetOrSlice: TComboBox
-          Left = 96
-          Top = 69
-          Width = 103
-          Height = 23
-          ItemIndex = 0
-          TabOrder = 2
-          Text = 'Meet'
-          OnChange = cbAspectRatioMeetOrSliceChange
-          Items.Strings = (
-            'Meet'
-            'Slice')
-        end
-      end
-      object GroupBox6: TGroupBox
-        AlignWithMargins = True
-        Left = 5
-        Top = 377
-        Width = 233
-        Height = 56
-        Align = alTop
-        Caption = 'Background color'
-        TabOrder = 2
-        object cbBackgroundColor: TColorBox
-          Left = 95
-          Top = 19
-          Width = 103
-          Height = 22
-          DefaultColorColor = clNone
-          NoneColorColor = clNone
-          Selected = clNone
-          Style = [cbStandardColors, cbExtendedColors, cbSystemColors, cbIncludeNone]
-          TabOrder = 0
-          OnClick = cbBackgroundColorClick
-        end
-      end
-      object GroupBox7: TGroupBox
-        AlignWithMargins = True
-        Left = 5
-        Top = 95
-        Width = 233
-        Height = 82
-        Align = alTop
-        Caption = 'Size'
-        TabOrder = 3
-        object Label5: TLabel
-          Left = 15
-          Top = 22
-          Width = 32
-          Height = 15
-          Caption = 'Width'
-        end
-        object Label7: TLabel
-          Left = 15
-          Top = 51
-          Width = 36
-          Height = 15
-          Caption = 'Height'
-        end
-        object eWidth: TEdit
-          Left = 96
-          Top = 19
-          Width = 103
-          Height = 23
-          NumbersOnly = True
-          TabOrder = 0
-          Text = '480'
-          OnExit = eWidthExit
-        end
-        object eHeight: TEdit
-          Left = 96
-          Top = 48
-          Width = 103
-          Height = 23
-          NumbersOnly = True
-          TabOrder = 1
-          Text = '360'
-          OnExit = eHeightExit
-        end
-      end
-      object GroupBox2: TGroupBox
-        AlignWithMargins = True
-        Left = 5
-        Top = 20
-        Width = 233
-        Height = 69
-        Align = alTop
-        Caption = 'File'
-        TabOrder = 4
-        object lblFilenameIn: TLabel
-          Left = 95
-          Top = 31
-          Width = 9
-          Height = 15
-          Caption = '...'
-        end
-        object Button1: TButton
-          Left = 21
-          Top = 27
-          Width = 68
-          Height = 25
-          Action = aOpenSVG
-          TabOrder = 0
-        end
+        OnEditButtonClick = vleTargetEditButtonClick
+        OnValidate = vleTargetValidate
+        ExplicitHeight = 225
+        ColWidths = (
+          111
+          124)
       end
     end
-    object PageControl1: TPageControl
-      AlignWithMargins = True
-      Left = 3
-      Top = 463
-      Width = 243
-      Height = 186
-      Align = alClient
+    object vleSVG: TValueListEditor
+      Left = 0
+      Top = 0
+      Width = 249
+      Height = 217
+      Align = alTop
       TabOrder = 1
+      OnEditButtonClick = vleSVGEditButtonClick
+      OnValidate = vleSVGValidate
+      ColWidths = (
+        119
+        124)
     end
   end
   object Panel3: TPanel
     Left = 252
     Top = 0
-    Width = 708
-    Height = 652
+    Width = 559
+    Height = 500
     Align = alClient
     BevelOuter = bvNone
     ParentBackground = False
     TabOrder = 1
-    object Image1: TImage
+    object PaintBox1: TPaintBox
       Left = 0
       Top = 64
-      Width = 708
-      Height = 547
+      Width = 559
+      Height = 395
       Align = alClient
-      Center = True
-      ExplicitLeft = 280
-      ExplicitTop = 192
+      OnPaint = PaintBox1Paint
+      ExplicitLeft = 352
+      ExplicitTop = 256
       ExplicitWidth = 105
       ExplicitHeight = 105
     end
     object Panel2: TPanel
       Left = 0
-      Top = 611
-      Width = 708
+      Top = 459
+      Width = 559
       Height = 41
       Align = alBottom
       BevelOuter = bvNone
@@ -294,7 +125,7 @@ object Form1: TForm1
       AlignWithMargins = True
       Left = 3
       Top = 3
-      Width = 702
+      Width = 553
       Height = 58
       Align = alTop
       Caption = 'Recording'
@@ -356,8 +187,8 @@ object Form1: TForm1
             Caption = '&Record'
           end>
       end>
-    Left = 472
-    Top = 144
+    Left = 376
+    Top = 96
     StyleName = 'Platform Default'
     object aRecord: TAction
       Caption = 'Record'
@@ -365,11 +196,14 @@ object Form1: TForm1
     end
     object aOpenSVG: TAction
       Caption = 'Open...'
-      OnExecute = aOpenSVGExecute
     end
   end
   object OpenDialog1: TOpenDialog
     Left = 376
     Top = 144
+  end
+  object ColorDialog1: TColorDialog
+    Left = 372
+    Top = 200
   end
 end

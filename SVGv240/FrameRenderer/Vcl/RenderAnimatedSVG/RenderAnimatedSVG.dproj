@@ -101,7 +101,7 @@
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
         <DCCReference Include="UnitRenderAnimatedSVG.pas">
-            <Form>Form1</Form>
+            <Form>frmRenderAnimatedSVG</Form>
             <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="..\..\Common\BVE.SVGFrameRendererVCL.pas"/>
