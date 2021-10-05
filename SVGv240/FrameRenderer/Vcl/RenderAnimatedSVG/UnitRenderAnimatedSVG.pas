@@ -968,7 +968,7 @@ begin
   CompressionTag := MKFOURCC('D', 'I', 'B', ' ');
 
   case Compression of
-    acXVID: CompressionTag := MKFOURCC('D', 'I', 'B', ' ');
+    acXVID: CompressionTag := MKFOURCC('x', 'v', 'i', 'd');
   end;
 
 

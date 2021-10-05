@@ -40,10 +40,6 @@ object frmRenderAnimatedSVG: TfrmRenderAnimatedSVG
       Align = alClient
       TabOrder = 0
       OnChange = TabControl1Change
-      ExplicitLeft = -16
-      ExplicitTop = 152
-      ExplicitWidth = 289
-      ExplicitHeight = 193
       object vleTarget: TValueListEditor
         Left = 4
         Top = 6
@@ -53,7 +49,6 @@ object frmRenderAnimatedSVG: TfrmRenderAnimatedSVG
         TabOrder = 0
         OnEditButtonClick = vleTargetEditButtonClick
         OnValidate = vleTargetValidate
-        ExplicitHeight = 225
         ColWidths = (
           111
           124)
