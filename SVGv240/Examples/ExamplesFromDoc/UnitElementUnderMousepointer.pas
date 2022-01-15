@@ -66,7 +66,7 @@ procedure TfrmElementUnderMousepointer.SVG2Image1MouseDown(Sender: TObject;
 var
   SVGObject: ISVGObject;
 begin
-  SVGObject := SVG2Image1.SVGRoot.ObjectAtPt(SVGPoint(X, Y), FALSE);
+  SVGObject := SVG2Image1.ObjectAtPt(SVGPoint(X, Y), FALSE);
   if assigned(SVGObject) then
     Caption := SVGObject.LocalName + ' id:' + SVGObject.ID
   else

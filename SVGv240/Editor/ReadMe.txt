@@ -1,1 +1,0 @@
-The SVG editor is a work in progress.
