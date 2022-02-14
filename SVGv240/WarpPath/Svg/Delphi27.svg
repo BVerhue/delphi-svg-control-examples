@@ -1,0 +1,30 @@
+<?xml version="1.0" standalone="no"?>
+
+<svg width="10cm" height="10cm" viewBox="0 0 1000 1000"
+     xmlns="http://www.w3.org/2000/svg" version="1.1">
+  <desc>Example tspan01 - using tspan to change visual attributes</desc>
+  
+  <style type="text/css"><![CDATA[
+
+    @font-face {
+		font-family: "Ranchers";
+		src: url("Ranchers-Regular.ttf") format("ttf");
+	}		
+	
+  ]]></style>
+
+  <g id="warp">
+  
+  
+    <text font-family="Ranchers">
+	  <tspan font-size="260" text-anchor="middle" x="500" y="400">27</tspan>
+	  <tspan font-size="120" text-anchor="middle" x="500" y="510">years of</tspan>
+	  <tspan font-size="260" text-anchor="middle" x="500" y="770">Delphi</tspan>
+	</text>	
+  	
+	<path d="M100,100 L900,100 L900,900 L100,900 Z" fill="none" stroke="green"/>
+  </g>
+  
+  <rect x="0" y="0" width="1000" height="1000" fill="none" stroke="black" />
+
+</svg>
