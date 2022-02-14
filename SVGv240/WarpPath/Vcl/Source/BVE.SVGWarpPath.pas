@@ -26,6 +26,7 @@ type
     aWarpProc: TProcWarp);
 
   function Clamp(const aValue, aMin, aMax: TSVGFloat): TSVGFloat;
+  function DeNormalize(const aPt: TSVGPoint; aBounds: TSVGRect): TSVGPoint;
   function Normalize(const aPt: TSVGPoint; aBounds: TSVGRect): TSVGPoint;
 
 
@@ -103,6 +104,13 @@ begin
   Result := SVGPoint(
     (aPt.X - aBounds.Left) / aBounds.Width,
     (aPt.Y - aBounds.Top) / aBounds.Height);
+end;
+
+function DeNormalize(const aPt: TSVGPoint; aBounds: TSVGRect): TSVGPoint;
+begin
+  Result := SVGPoint(
+    aBounds.Left + aBounds.Width * aPt.X,
+    aBounds.Top + aBounds.Height * aPt.Y);
 end;
 
 function Clamp(const aValue, aMin, aMax: TSVGFloat): TSVGFloat;

@@ -32,23 +32,27 @@ object Form1: TForm1
     Align = alTop
     BevelOuter = bvNone
     TabOrder = 0
-    object bLoad: TButton
-      Left = 24
-      Top = 9
-      Width = 75
-      Height = 25
-      Caption = 'Load SVG'
-      TabOrder = 0
-      OnClick = bLoadClick
-    end
     object bWarp: TButton
-      Left = 112
+      Left = 116
       Top = 9
       Width = 75
       Height = 25
       Caption = 'Warp'
-      TabOrder = 1
+      TabOrder = 0
       OnClick = bWarpClick
+    end
+    object cbWarpFunction: TComboBox
+      Left = 9
+      Top = 10
+      Width = 96
+      Height = 23
+      ItemIndex = 2
+      TabOrder = 1
+      Text = 'Arcs'
+      Items.Strings = (
+        'Taper'
+        'Perspective'
+        'Arcs')
     end
   end
 end

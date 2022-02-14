@@ -39,9 +39,8 @@ type
   TForm1 = class(TForm)
     SVG2Image1: TSVG2Image;
     Panel1: TPanel;
-    bLoad: TButton;
     bWarp: TButton;
-    procedure bLoadClick(Sender: TObject);
+    cbWarpFunction: TComboBox;
     procedure FormCreate(Sender: TObject);
     procedure bWarpClick(Sender: TObject);
   public const
@@ -64,11 +63,6 @@ uses
 
 { TForm1 }
 
-procedure TForm1.bLoadClick(Sender: TObject);
-begin
-  LoadSVG(FSvgPath + FSvgFilename);
-end;
-
 procedure TForm1.bWarpClick(Sender: TObject);
 begin
   Warp;
@@ -83,6 +77,8 @@ begin
   // path elements. This happens on rendering.
 
   SVG2Image1.RenderOptions := [sroFilters, sroClippath, sroTextToPath];
+
+  LoadSVG(FSvgPath + FSvgFilename);
 end;
 
 procedure TForm1.LoadSVG(const aFilename: string);
@@ -111,6 +107,7 @@ var
   Doc: IXMLDocument;
   Group: ISVGGroup;
   Bounds: TSVGRect;
+  WarpFunctionID: Integer;
 begin
   Doc := SVG2Image1.SVGRoot.Doc;
 
@@ -129,13 +126,15 @@ begin
   // The procedure "WarpPaths" will traverse the DOM and all the paths that are
   // encountered will be warped with the provided warp function
 
+  WarpFunctionID := cbWarpFunction.ItemIndex;
+
   WarpPaths(Doc.DocumentElement,
 
     // Warp function
 
     function (const aPt: TSVGPoint): TSVGPoint
     var
-      NP: TSVGPoint;
+      N: TSVGPoint;
       Radius: TSVGFloat;
       RadiusTop: TSVGFloat;
       RadiusBottom: TSVGFloat;
@@ -145,48 +144,78 @@ begin
     begin
       // Normalize the point within the bounds
 
-      NP := Normalize(aPt, Bounds);
+      N := Normalize(aPt, Bounds);
 
-      // The top will be an arc
+      case WarpFunctionID of
+        0:
+          begin
+            // Tapering from left to right
 
-      RadiusTop := 1;
+            Scale := 1.0 + (0.3 - 1.0) * N.X;
 
-      // The bottom will be an arc with a larger radius
+            Result := SVGPoint(
+              N.X,
+              N.Y * Scale + (1.0 - Scale) / 2);
+          end;
 
-      RadiusBottom := 8;
+        1:
+          begin
+            // Perspective
 
-      // We interpolate between the top and bottom radius using the normalized
-      // Y coord (from 0 to 1).
+            Scale := 0.5 * (1.5 + N.X);
 
-      Radius := RadiusTop + (RadiusBottom - RadiusTop) * NP.Y;
-      if Radius = 0 then
-      begin
-        Result := aPt;
-        Exit;
+            if Scale = 0 then
+            begin
+              Result := aPt;
+              Exit;
+            end;
+
+            Result := SVGPoint(
+              0.5 + (N.X - 0.5) / Scale,
+              0.5 + (N.Y - 0.5) / Scale);
+          end;
+
+        2:
+          begin
+            // The top will be an arc
+
+            RadiusTop := 1;
+
+            // The bottom will be an arc with a larger radius
+
+            RadiusBottom := 8;
+
+            // We interpolate between the top and bottom radius using the normalized
+            // Y coord (from 0 to 1).
+
+            Radius := RadiusTop + (RadiusBottom - RadiusTop) * N.Y;
+            if Radius = 0 then
+            begin
+              Result := aPt;
+              Exit;
+            end;
+
+            // We will also taper the image, top width is 60% of bottom with.
+
+            Scale := 0.6 + (1.0 - 0.6) * N.Y;
+
+            // Here we calculate the angle and start angle of the arc.
+
+            AngleStart := ArcCos(Clamp(-0.5 / Radius, -1.0, 1.0));
+            Angle := ArcCos(Clamp((-0.5 + N.X) / Radius, -1.0, 1.0));
+
+            // Calculate the warped point
+
+            Result := SVGPoint(
+              Radius * (Cos(Angle) - Cos(AngleStart)) * Scale + (1.0 - Scale) / 2,
+              N.Y - Radius * (Sin(Angle) - Sin(AngleStart))
+              );
+          end;
       end;
 
-      // We will also taper the image, top width is 60% of bottom with.
+      // De-normalize the point
 
-      Scale := 0.6 + (1.0 - 0.6) * NP.Y;
-
-      // Here we calculate the angle and start angle of the arc.
-
-      AngleStart := ArcCos(Clamp(-0.5 / Radius, -1.0, 1.0));
-      Angle := ArcCos(Clamp((-0.5 + NP.X) / Radius, -1.0, 1.0));
-
-      // Calculate the warped point
-
-      Result := SVGPoint(
-        Radius * (Cos(Angle) - Cos(AngleStart)) * Scale + (1.0 - Scale) / 2,
-        NP.Y - Radius * (Sin(Angle) - Sin(AngleStart))
-        );
-
-     // De-normalize the point
-
-     Result := SVGPoint(
-        Bounds.Left + Bounds.Width * Result.X,
-        Bounds.Top  + Bounds.Height * Result.Y
-        );
+      Result := DeNormalize(Result, Bounds);
     end
   );
 
