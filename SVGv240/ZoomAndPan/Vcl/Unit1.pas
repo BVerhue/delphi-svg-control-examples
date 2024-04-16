@@ -86,8 +86,8 @@ begin
 
   // Convert mousepoint to viewboxpoint
 
-  Result.X := (aMousePt.X - ViewPort.Width/2) * Zoom + (FViewBox.Left + FViewBox.Width/2);
-  Result.Y := (aMousePt.Y - ViewPort.Height/2) * Zoom + (FViewBox.Top + FViewBox.Height/2);
+  Result.X := FViewBox.Left + FViewBox.Width/2 + (aMousePt.X - ViewPort.Width/2 ) * Zoom;
+  Result.Y := FViewBox.Top + FViewBox.Height/2 + (aMousePt.Y - ViewPort.Height/2) * Zoom;
 end;
 
 function TForm1.CalcZoomFactor: TSVGFloat;
@@ -150,7 +150,7 @@ procedure TForm1.FormMouseWheel(Sender: TObject; Shift: TShiftState;
   WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
 var
   P: TPoint;
-  DeltaZoom: TSVGFloat;
+  F: TSVGFloat;
   Sign: TSVGFloat;
   ViewPort: TRect;
   ViewBoxOriginal: TSVGRect;
@@ -164,7 +164,7 @@ begin
   // Zoom with arbitrary factor
 
   Sign := WheelDelta / abs(WheelDelta);
-  DeltaZoom := -Sign * 0.05;
+  F := -Sign * 0.05;
 
   ViewBoxOriginal := FViewBox;
 
@@ -172,48 +172,17 @@ begin
   begin
     // Optional:
 
-    // If we want to zoom into the center of the viewport, the delta must be
-    // applied equally in each direction
+    // Focus zoom onto the center of the viewport
 
-    FViewBox.Left := ViewBoxOriginal.Left - ViewBoxOriginal.Width * DeltaZoom;
-    FViewBox.Top := ViewBoxOriginal.Top - ViewBoxOriginal.Height * DeltaZoom;
-    FViewBox.Right := ViewBoxOriginal.Right + ViewBoxOriginal.Width * DeltaZoom;
-    FViewBox.Bottom := ViewBoxOriginal.Bottom + ViewBoxOriginal.Height * DeltaZoom;
+    FViewBox.Left := ViewBoxOriginal.Left - ViewBoxOriginal.Width * F;
+    FViewBox.Top := ViewBoxOriginal.Top - ViewBoxOriginal.Height * F;
+    FViewBox.Right := ViewBoxOriginal.Right + ViewBoxOriginal.Width * F;
+    FViewBox.Bottom := ViewBoxOriginal.Bottom + ViewBoxOriginal.Height * F;
 
 
   end else begin
 
-    // If we want to zoom into the current mouse position, we have to apply
-    // more complex calculations:
-
-    // X, Y       : Point in ViewBox that has to remain the same
-    // VPW, VPH   : ViewPort Width and Height
-    // Zoom:      : The current Zoom factor
-    // DeltaZoom  : The factor that Zoom is increased or decreased
-    // VBL, VBT   : ViewBox Left and ViewBox Top value
-    // VBW, VBH   : ViewBox Width and Height
-    // VBL?, VBT? : The new viewBox Left and Top value that we want to calculate
-
-    // The viewBox width and height is increased/decreased with DeltaZoom.
-
-    // VBW = VBW * (1 - DeltaZoom)
-    // VBH = VBH * (1 - DeltaZoom)
-
-    // The mousepoint converted to viewBox coords before increasing the zoom
-    // is calculated as:
-
-    // X = (MousePt.X - VPW/2) * Zoom + VBL + VBW/2;
-    // Y = (MousePt.Y - VPH/2) * Zoom + VBT + VBH/2;
-
-    // And after increasing zoom as:
-
-    // X = (MousePt.X - VPW/2) * Zoom * (1 - DeltaZoom) + VBL? + VBW/2 * (1 - DeltaZoom)
-    // X = (MousePt.Y - VPH/2) * Zoom * (1 - DeltaZoom) + VBT? + VBH/2 * (1 - DeltaZoom)
-
-    // So the new viewBox left and Top values are calculated as:
-
-    // VBL? = (MousePt.X - VPW/2) * Zoom * DeltaZoom + VBL + VBW/2 * DeltaZoom
-    // VBT? = (MousePt.Y - VPH/2) * Zoom * DeltaZoom + VBT + VBH/2 * DeltaZoom
+    // Focus zoom onto the current mouse position
 
     ViewPort := SVG2Image1.ClientRect;
 
@@ -221,11 +190,11 @@ begin
 
     P := SVG2Image1.ScreenToClient(MousePos);
 
-    FViewBox.Left := ((P.X - ViewPort.Width/2) * Zoom * DeltaZoom + ViewBoxOriginal.Left + ViewBoxOriginal.Width/2 * DeltaZoom);
-    FViewBox.Top := ((P.Y - ViewPort.Height/2) * Zoom * DeltaZoom + ViewBoxOriginal.Top + ViewBoxOriginal.Height/2 * DeltaZoom);
+    FViewBox.Left := ViewBoxOriginal.Left - ViewBoxOriginal.Width/2 * F - (P.X - ViewPort.Width/2) * Zoom * F;
+    FViewBox.Top := ViewBoxOriginal.Top - ViewBoxOriginal.Height/2 * F - (P.Y - ViewPort.Height/2) * Zoom * F;
 
-    FViewBox.Right := FViewBox.Left + ViewBoxOriginal.Width * (1 - DeltaZoom);
-    FViewBox.Bottom := FViewBox.Top + ViewBoxOriginal.Height * (1 - DeltaZoom);
+    FViewBox.Right := FViewBox.Left + ViewBoxOriginal.Width * (1 + F);
+    FViewBox.Bottom := FViewBox.Top + ViewBoxOriginal.Height * (1 + F);
 
   end;
 
@@ -246,7 +215,6 @@ begin
 
   // AspectRatioAlign = arXMidYMid
   //  That is uniform scaling aligned to the middle of the viewPort
-
 
   // Get the Outer SVG element
 
