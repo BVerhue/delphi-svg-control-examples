@@ -57,7 +57,7 @@
         <VerInfo_Locale>1043</VerInfo_Locale>
         <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
         <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;Vcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;$(DCC_Namespace)</DCC_Namespace>
-        <DCC_UnitSearchPath>..\delphi-svg-control\SVGv240\Common;..\delphi-svg-control\SVGv240\Common\Vcl;..\delphi-svg-control\SVGv240\Common\Platform;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+        <DCC_UnitSearchPath>..\..\..\delphi-svg-control\SVGv240\Common;..\..\..\delphi-svg-control\SVGv240\Common\Vcl;..\..\..\delphi-svg-control\SVGv240\Common\Platform;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
         <Icon_MainIcon>$(BDS)\bin\delphi_PROJECTICON.ico</Icon_MainIcon>
         <DCC_DcuOutput>.\$(Platform)\$(Config)</DCC_DcuOutput>
         <DCC_ExeOutput>.\$(Platform)\$(Config)</DCC_ExeOutput>
