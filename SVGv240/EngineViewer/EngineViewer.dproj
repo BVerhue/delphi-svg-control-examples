@@ -1,15 +1,15 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
-        <ProjectGuid>{E4CD0647-6BD1-425B-85C7-FE611EB769B3}</ProjectGuid>
-        <ProjectVersion>20.3</ProjectVersion>
+        <ProjectGuid>{7C4E1A62-9D3B-4F58-B0A1-6E2F9C41D883}</ProjectGuid>
+        <ProjectVersion>20.5</ProjectVersion>
         <FrameworkType>VCL</FrameworkType>
-        <MainSource>RenderToEMF.dpr</MainSource>
+        <MainSource>EngineViewer.dpr</MainSource>
         <Base>True</Base>
         <Config Condition="'$(Config)'==''">Debug</Config>
-        <Platform Condition="'$(Platform)'==''">Win32</Platform>
-        <TargetedPlatforms>1</TargetedPlatforms>
+        <Platform Condition="'$(Platform)'==''">Win64</Platform>
+        <TargetedPlatforms>3</TargetedPlatforms>
         <AppType>Application</AppType>
-        <ProjectName Condition="'$(ProjectName)'==''">RenderToEMF</ProjectName>
+        <ProjectName Condition="'$(ProjectName)'==''">EngineViewer</ProjectName>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
         <Base>true</Base>
@@ -35,17 +35,29 @@
         <Cfg_1>true</Cfg_1>
         <Base>true</Base>
     </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win64' and '$(Cfg_1)'=='true') or '$(Cfg_1_Win64)'!=''">
+        <Cfg_1_Win64>true</Cfg_1_Win64>
+        <CfgParent>Cfg_1</CfgParent>
+        <Cfg_1>true</Cfg_1>
+        <Base>true</Base>
+    </PropertyGroup>
     <PropertyGroup Condition="'$(Config)'=='Release' or '$(Cfg_2)'!=''">
         <Cfg_2>true</Cfg_2>
         <CfgParent>Base</CfgParent>
         <Base>true</Base>
     </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win64' and '$(Cfg_2)'=='true') or '$(Cfg_2_Win64)'!=''">
+        <Cfg_2_Win64>true</Cfg_2_Win64>
+        <CfgParent>Cfg_2</CfgParent>
+        <Cfg_2>true</Cfg_2>
+        <Base>true</Base>
+    </PropertyGroup>
     <PropertyGroup Condition="'$(Base)'!=''">
         <VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
-        <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
         <VerInfo_Locale>1043</VerInfo_Locale>
-        <DCC_UnitSearchPath>..\..\Common;..\..\Common\Vcl;..\..\Common\Platform;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+        <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
         <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;Vcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;$(DCC_Namespace)</DCC_Namespace>
+        <DCC_UnitSearchPath>..\delphi-svg-control\SVGv240\Common;..\delphi-svg-control\SVGv240\Common\Vcl;..\delphi-svg-control\SVGv240\Common\Platform;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
         <Icon_MainIcon>$(BDS)\bin\delphi_PROJECTICON.ico</Icon_MainIcon>
         <DCC_DcuOutput>.\$(Platform)\$(Config)</DCC_DcuOutput>
         <DCC_ExeOutput>.\$(Platform)\$(Config)</DCC_ExeOutput>
@@ -54,22 +66,27 @@
         <DCC_S>false</DCC_S>
         <DCC_F>false</DCC_F>
         <DCC_K>false</DCC_K>
-        <SanitizedProjectName>RenderToEMF</SanitizedProjectName>
+        <SanitizedProjectName>EngineViewer</SanitizedProjectName>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win32)'!=''">
-        <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName)</VerInfo_Keys>
         <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
-        <DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
         <VerInfo_Locale>1033</VerInfo_Locale>
+        <DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
-        <DCC_UsePackage>RVDBPkgDXE5;RW_BDE_DXE5;SRVPkgDXE5;RW_DBX_DXE5;FireDACASADriver;RVPkgDXE5;FireDACSqliteDriver;SRVControlsDXE5;bindcompfmx;vcldbx;FireDACPgDriver;FireDACODBCDriver;SVG2PackageCommonXE5;fmx;rtl;dbrtl;IndySystem;FireDACCommon;bindcomp;RichViewActionsDXE5;MidiComponentsXE5;inetdbbde;DBXInterBaseDriver;ReportWorkshopDXE5;DataSnapCommon;DclNMG2FMXPackage;vclFireDAC;xmlrtl;svnui;SVG2PackageVclXE5;DbxCommonDriver;SVG2PackageFmxXE5;vclimg;DBSRVPkgDXE5;IndyProtocols;dbxcds;FireDACCommonDriver;MetropolisUILiveTile;bindengine;vclactnband;vcldb;soaprtl;bindcompdbx;vcldsnap;bindcompvcl;RvHtmlDXE5;vclie;fmxFireDAC;FireDACADSDriver;vcltouch;CustomIPTransport;RVHunSpellPkgDXE5;vclribbon;VclSmp;FireDACMSSQLDriver;FireDAC;dsnap;IndyIPServer;fmxase;vcl;IndyCore;FireDACDataSnapDriver;VCLRESTComponents;IndyIPCommon;RVASpellPkgDXE5;RvXmlDXE5;FireDACIBDriver;inet;fmxobj;FireDACDBXDriver;FireDACMySQLDriver;vclx;RW_FD_DXE5;inetdbxpress;AggPasRun;svn;FireDACOracleDriver;fmxdae;FireDACDb2Driver;RESTComponents;RVIndyDXE5;bdertl;FireDACMSAccDriver;adortl;dbexpress;IndyIPClient;$(DCC_UsePackage)</DCC_UsePackage>
+        <DCC_UsePackage>RVDBPkgDXE5;RW_BDE_DXE5;SRVPkgDXE5;RW_DBX_DXE5;FireDACASADriver;RVPkgDXE5;FireDACSqliteDriver;SRVControlsDXE5;bindcompfmx;vcldbx;FireDACPgDriver;FireDACODBCDriver;SVG2PackageCommonXE5;fmx;rtl;dbrtl;IndySystem;FireDACCommon;bindcomp;RichViewActionsDXE5;MidiComponentsXE5;GR32_R;inetdbbde;DBXInterBaseDriver;ReportWorkshopDXE5;DataSnapCommon;DclNMG2FMXPackage;vclFireDAC;xmlrtl;svnui;SVG2PackageVclXE5;DbxCommonDriver;SVG2PackageFmxXE5;vclimg;DBSRVPkgDXE5;IndyProtocols;dbxcds;FireDACCommonDriver;MetropolisUILiveTile;bindengine;vclactnband;vcldb;soaprtl;bindcompdbx;vcldsnap;bindcompvcl;RvHtmlDXE5;vclie;fmxFireDAC;FireDACADSDriver;vcltouch;CustomIPTransport;RVHunSpellPkgDXE5;vclribbon;VclSmp;FireDACMSSQLDriver;FireDAC;dsnap;IndyIPServer;fmxase;vcl;IndyCore;FireDACDataSnapDriver;VCLRESTComponents;IndyIPCommon;RVASpellPkgDXE5;RvXmlDXE5;GR32_D;FireDACIBDriver;inet;fmxobj;FireDACDBXDriver;FireDACMySQLDriver;vclx;RW_FD_DXE5;inetdbxpress;AggPasRun;svn;FireDACOracleDriver;fmxdae;FireDACDb2Driver;RESTComponents;RVIndyDXE5;bdertl;VirtualTreesR;FireDACMSAccDriver;adortl;dbexpress;IndyIPClient;$(DCC_UsePackage)</DCC_UsePackage>
+        <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName)</VerInfo_Keys>
         <UWP_DelphiLogo44>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_44.png</UWP_DelphiLogo44>
         <UWP_DelphiLogo150>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_150.png</UWP_DelphiLogo150>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win64)'!=''">
-        <DCC_UsePackage>FireDACASADriver;FireDACSqliteDriver;bindcompfmx;FireDACPgDriver;FireDACODBCDriver;SVG2PackageCommonXE5;fmx;rtl;dbrtl;IndySystem;FireDACCommon;bindcomp;DBXInterBaseDriver;DataSnapCommon;vclFireDAC;xmlrtl;SVG2PackageVclXE5;DbxCommonDriver;vclimg;IndyProtocols;dbxcds;FireDACCommonDriver;MetropolisUILiveTile;bindengine;vclactnband;vcldb;soaprtl;bindcompdbx;vcldsnap;bindcompvcl;vclie;fmxFireDAC;FireDACADSDriver;vcltouch;CustomIPTransport;vclribbon;VclSmp;FireDACMSSQLDriver;FireDAC;dsnap;IndyIPServer;fmxase;vcl;IndyCore;FireDACDataSnapDriver;VCLRESTComponents;IndyIPCommon;FireDACIBDriver;inet;fmxobj;FireDACDBXDriver;FireDACMySQLDriver;vclx;inetdbxpress;FireDACOracleDriver;fmxdae;FireDACDb2Driver;RESTComponents;FireDACMSAccDriver;adortl;dbexpress;IndyIPClient;$(DCC_UsePackage)</DCC_UsePackage>
+        <DCC_UsePackage>FireDACASADriver;FireDACSqliteDriver;bindcompfmx;FireDACPgDriver;FireDACODBCDriver;SVG2PackageCommonXE5;fmx;rtl;dbrtl;IndySystem;FireDACCommon;bindcomp;DBXInterBaseDriver;DataSnapCommon;vclFireDAC;xmlrtl;SVG2PackageVclXE5;DbxCommonDriver;vclimg;IndyProtocols;dbxcds;FireDACCommonDriver;MetropolisUILiveTile;bindengine;vclactnband;vcldb;soaprtl;bindcompdbx;vcldsnap;bindcompvcl;vclie;fmxFireDAC;FireDACADSDriver;vcltouch;CustomIPTransport;vclribbon;VclSmp;FireDACMSSQLDriver;FireDAC;dsnap;IndyIPServer;fmxase;vcl;IndyCore;FireDACDataSnapDriver;VCLRESTComponents;IndyIPCommon;FireDACIBDriver;inet;fmxobj;FireDACDBXDriver;FireDACMySQLDriver;vclx;inetdbxpress;FireDACOracleDriver;fmxdae;FireDACDb2Driver;RESTComponents;VirtualTreesR;FireDACMSAccDriver;adortl;dbexpress;IndyIPClient;$(DCC_UsePackage)</DCC_UsePackage>
         <UWP_DelphiLogo44>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_44.png</UWP_DelphiLogo44>
         <UWP_DelphiLogo150>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_150.png</UWP_DelphiLogo150>
+        <DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;$(DCC_Namespace)</DCC_Namespace>
+        <BT_BuildType>Debug</BT_BuildType>
+        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+        <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
+        <VerInfo_Locale>1033</VerInfo_Locale>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1)'!=''">
         <DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
@@ -80,11 +97,15 @@
         <DCC_RemoteDebug>true</DCC_RemoteDebug>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
-        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
-        <VerInfo_Locale>1033</VerInfo_Locale>
+        <DCC_IntegerOverflowCheck>true</DCC_IntegerOverflowCheck>
+        <DCC_RangeChecking>true</DCC_RangeChecking>
         <DCC_DebugDCUs>false</DCC_DebugDCUs>
+        <VerInfo_Locale>1033</VerInfo_Locale>
+        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <DCC_RemoteDebug>false</DCC_RemoteDebug>
-        <BT_BuildType>Debug</BT_BuildType>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_1_Win64)'!=''">
+        <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2)'!=''">
         <DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
@@ -92,12 +113,15 @@
         <DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
         <DCC_DebugInformation>0</DCC_DebugInformation>
     </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_2_Win64)'!=''">
+        <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
+    </PropertyGroup>
     <ItemGroup>
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
-        <DCCReference Include="Unit1.pas">
-            <Form>Form1</Form>
+        <DCCReference Include="UnitMain.pas">
+            <Form>frmMain</Form>
             <FormType>dfm</FormType>
         </DCCReference>
         <BuildConfiguration Include="Base">
@@ -168,7 +192,7 @@
                     <VersionInfoKeys Name="theme"/>
                 </VersionInfoKeys>
                 <Source>
-                    <Source Name="MainSource">RenderToEMF.dpr</Source>
+                    <Source Name="MainSource">EngineViewer.dpr</Source>
                 </Source>
                 <Excluded_Packages>
                     <Excluded_Packages Name="$(BDSBIN)\dcloffice2k190.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
@@ -178,7 +202,7 @@
             <Deployment Version="5"/>
             <Platforms>
                 <Platform value="Win32">True</Platform>
-                <Platform value="Win64">False</Platform>
+                <Platform value="Win64">True</Platform>
             </Platforms>
         </BorlandProject>
         <ProjectFileVersion>12</ProjectFileVersion>

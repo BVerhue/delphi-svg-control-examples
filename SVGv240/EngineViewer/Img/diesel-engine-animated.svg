@@ -1,0 +1,243 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 720" width="720" height="720">
+  <title>Single cylinder demonstration engine</title>
+  <desc>Animated schematic. The crank gear drives two idler gears and the two cam
+gears; the cams lift the spring loaded pushrods either side of the finned cylinder.</desc>
+
+  <defs>
+    <linearGradient id="alu" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0"    stop-color="#959b9f"/>
+      <stop offset="0.16" stop-color="#eaeeef"/>
+      <stop offset="0.45" stop-color="#c6cccf"/>
+      <stop offset="0.78" stop-color="#eef1f2"/>
+      <stop offset="1"    stop-color="#8f9599"/>
+    </linearGradient>
+    <linearGradient id="finEdge" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0"    stop-color="#8a9094"/>
+      <stop offset="0.14" stop-color="#e6eaec"/>
+      <stop offset="0.5"  stop-color="#bfc5c8"/>
+      <stop offset="0.86" stop-color="#eaeef0"/>
+      <stop offset="1"    stop-color="#868c90"/>
+    </linearGradient>
+    <linearGradient id="finTop" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0"   stop-color="#a2a8ac"/>
+      <stop offset="0.5" stop-color="#eff2f3"/>
+      <stop offset="1"   stop-color="#9da3a7"/>
+    </linearGradient>
+    <linearGradient id="castIron" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0"    stop-color="#888e89"/>
+      <stop offset="0.2"  stop-color="#c9cdc7"/>
+      <stop offset="0.55" stop-color="#a9aea8"/>
+      <stop offset="0.86" stop-color="#c6cac4"/>
+      <stop offset="1"    stop-color="#828883"/>
+    </linearGradient>
+    <linearGradient id="steel" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0"   stop-color="#6d7477"/>
+      <stop offset="0.4" stop-color="#b6bcbf"/>
+      <stop offset="1"   stop-color="#71787b"/>
+    </linearGradient>
+    <linearGradient id="gearFace" x1="0" y1="0" x2="0.6" y2="1">
+      <stop offset="0"   stop-color="#fcfbf5"/>
+      <stop offset="0.6" stop-color="#efede2"/>
+      <stop offset="1"   stop-color="#dbd8ca"/>
+    </linearGradient>
+    <linearGradient id="wood" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0"   stop-color="#ead5a8"/>
+      <stop offset="0.5" stop-color="#ddc28d"/>
+      <stop offset="1"   stop-color="#c8a76e"/>
+    </linearGradient>
+    <linearGradient id="brass" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0"   stop-color="#e2ac61"/>
+      <stop offset="0.5" stop-color="#c07f2c"/>
+      <stop offset="1"   stop-color="#95611f"/>
+    </linearGradient>
+    <radialGradient id="shadow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#000000" stop-opacity="0.20"/>
+      <stop offset="1" stop-color="#000000" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="720" height="720" fill="#f8f8f6"/>
+  <ellipse cx="360" cy="668" rx="250" ry="20" fill="url(#shadow)"/>
+
+  <!-- =============================== base =============================== -->
+  <ellipse cx="360" cy="502" rx="92" ry="56" fill="url(#castIron)" stroke="#7b817c" stroke-width="1.4"/>
+
+  <path d="M 302 530 L 332 530 L 272 592 L 238 592 Z" fill="url(#castIron)" stroke="#7b817c" stroke-width="1.4"/>
+  <path d="M 418 530 L 388 530 L 448 592 L 482 592 Z" fill="url(#castIron)" stroke="#7b817c" stroke-width="1.4"/>
+  <rect x="224" y="588" width="62" height="12" rx="3" fill="url(#castIron)" stroke="#7b817c" stroke-width="1.2"/>
+  <rect x="434" y="588" width="62" height="12" rx="3" fill="url(#castIron)" stroke="#7b817c" stroke-width="1.2"/>
+  <circle cx="238" cy="594" r="3.0" fill="#7d8286"/>
+  <circle cx="272" cy="594" r="3.0" fill="#7d8286"/>
+  <circle cx="448" cy="594" r="3.0" fill="#7d8286"/>
+  <circle cx="482" cy="594" r="3.0" fill="#7d8286"/>
+
+  <path d="M 366 542 Q 373 572 362 596" fill="none" stroke="#eeeeea" stroke-width="2.4"/>
+
+  <rect x="128" y="598" width="464" height="44" rx="5" fill="url(#wood)" stroke="#b8965f" stroke-width="1.4"/>
+  <path d="M 140 609 H 580 M 140 620 H 580 M 140 631 H 580" fill="none" stroke="#cbab74"
+        stroke-width="1" opacity="0.65"/>
+  <rect x="330" y="617" width="66" height="16" rx="2" fill="#2f6fa8" stroke="#1e4d78" stroke-width="1"/>
+  <rect x="334" y="620" width="58" height="10" rx="1" fill="#3f83bd" opacity="0.7"/>
+  <ellipse cx="512" cy="592" rx="9" ry="6" fill="#7fa9a2" opacity="0.85"/>
+  <ellipse cx="160" cy="646" rx="10" ry="5" fill="#3a3a3a"/>
+  <ellipse cx="560" cy="646" rx="10" ry="5" fill="#3a3a3a"/>
+
+  <!-- =========================== gear housing =========================== -->
+  <path d="M 190 356 L 530 356 L 508 470 Q 474 526 360 534 Q 246 526 212 470 Z"
+        fill="url(#castIron)" stroke="#7b817c" stroke-width="1.6"/>
+  <path d="M 202 370 L 514 370 L 496 460 Q 464 507 360 514 Q 256 507 224 460 Z"
+        fill="#262b2d"/>
+
+  <!-- gear train -->
+  <g>
+    <g transform="translate(267.0,423.0)">
+      <g>
+        <animateTransform attributeName="transform" attributeType="XML" type="rotate"
+          values="0 0 0;360 0 0" dur="2.0s" repeatCount="indefinite"/>
+        <path d="M 37.38 -2.94 L 47.95 -2.14 L 47.95 2.14 L 37.38 2.94 A 37.50 37.50 0 0 1 36.87 6.83 L 46.87 10.35 L 45.77 14.47 L 35.35 12.52 A 37.50 37.50 0 0 1 33.85 16.14 L 42.60 22.13 L 40.46 25.83 L 30.90 21.24 A 37.50 37.50 0 0 1 28.52 24.35 L 35.42 32.40 L 32.40 35.42 L 24.35 28.52 A 37.50 37.50 0 0 1 21.24 30.90 L 25.83 40.46 L 22.13 42.60 L 16.14 33.85 A 37.50 37.50 0 0 1 12.52 35.35 L 14.47 45.77 L 10.35 46.87 L 6.83 36.87 A 37.50 37.50 0 0 1 2.94 37.38 L 2.14 47.95 L -2.14 47.95 L -2.94 37.38 A 37.50 37.50 0 0 1 -6.83 36.87 L -10.35 46.87 L -14.47 45.77 L -12.52 35.35 A 37.50 37.50 0 0 1 -16.14 33.85 L -22.13 42.60 L -25.83 40.46 L -21.24 30.90 A 37.50 37.50 0 0 1 -24.35 28.52 L -32.40 35.42 L -35.42 32.40 L -28.52 24.35 A 37.50 37.50 0 0 1 -30.90 21.24 L -40.46 25.83 L -42.60 22.13 L -33.85 16.14 A 37.50 37.50 0 0 1 -35.35 12.52 L -45.77 14.47 L -46.87 10.35 L -36.87 6.83 A 37.50 37.50 0 0 1 -37.38 2.94 L -47.95 2.14 L -47.95 -2.14 L -37.38 -2.94 A 37.50 37.50 0 0 1 -36.87 -6.83 L -46.87 -10.35 L -45.77 -14.47 L -35.35 -12.52 A 37.50 37.50 0 0 1 -33.85 -16.14 L -42.60 -22.13 L -40.46 -25.83 L -30.90 -21.24 A 37.50 37.50 0 0 1 -28.52 -24.35 L -35.42 -32.40 L -32.40 -35.42 L -24.35 -28.52 A 37.50 37.50 0 0 1 -21.24 -30.90 L -25.83 -40.46 L -22.13 -42.60 L -16.14 -33.85 A 37.50 37.50 0 0 1 -12.52 -35.35 L -14.47 -45.77 L -10.35 -46.87 L -6.83 -36.87 A 37.50 37.50 0 0 1 -2.94 -37.38 L -2.14 -47.95 L 2.14 -47.95 L 2.94 -37.38 A 37.50 37.50 0 0 1 6.83 -36.87 L 10.35 -46.87 L 14.47 -45.77 L 12.52 -35.35 A 37.50 37.50 0 0 1 16.14 -33.85 L 22.13 -42.60 L 25.83 -40.46 L 21.24 -30.90 A 37.50 37.50 0 0 1 24.35 -28.52 L 32.40 -35.42 L 35.42 -32.40 L 28.52 -24.35 A 37.50 37.50 0 0 1 30.90 -21.24 L 40.46 -25.83 L 42.60 -22.13 L 33.85 -16.14 A 37.50 37.50 0 0 1 35.35 -12.52 L 45.77 -14.47 L 46.87 -10.35 L 36.87 -6.83 Z" fill="url(#gearFace)" stroke="#b0ada1" stroke-width="1.2"/>
+        <circle r="17.6" fill="#e8e5d9" stroke="#b0ada1" stroke-width="1.2"/>
+        <circle r="9.2" fill="#8f9296" stroke="#6d7073" stroke-width="1.2"/>
+        <circle r="4.6" fill="#3f4448"/>
+      </g>
+    </g>
+    <g transform="translate(453.0,423.0)">
+      <g>
+        <animateTransform attributeName="transform" attributeType="XML" type="rotate"
+          values="0 0 0;360 0 0" dur="2.0s" repeatCount="indefinite"/>
+        <path d="M 37.38 -2.94 L 47.95 -2.14 L 47.95 2.14 L 37.38 2.94 A 37.50 37.50 0 0 1 36.87 6.83 L 46.87 10.35 L 45.77 14.47 L 35.35 12.52 A 37.50 37.50 0 0 1 33.85 16.14 L 42.60 22.13 L 40.46 25.83 L 30.90 21.24 A 37.50 37.50 0 0 1 28.52 24.35 L 35.42 32.40 L 32.40 35.42 L 24.35 28.52 A 37.50 37.50 0 0 1 21.24 30.90 L 25.83 40.46 L 22.13 42.60 L 16.14 33.85 A 37.50 37.50 0 0 1 12.52 35.35 L 14.47 45.77 L 10.35 46.87 L 6.83 36.87 A 37.50 37.50 0 0 1 2.94 37.38 L 2.14 47.95 L -2.14 47.95 L -2.94 37.38 A 37.50 37.50 0 0 1 -6.83 36.87 L -10.35 46.87 L -14.47 45.77 L -12.52 35.35 A 37.50 37.50 0 0 1 -16.14 33.85 L -22.13 42.60 L -25.83 40.46 L -21.24 30.90 A 37.50 37.50 0 0 1 -24.35 28.52 L -32.40 35.42 L -35.42 32.40 L -28.52 24.35 A 37.50 37.50 0 0 1 -30.90 21.24 L -40.46 25.83 L -42.60 22.13 L -33.85 16.14 A 37.50 37.50 0 0 1 -35.35 12.52 L -45.77 14.47 L -46.87 10.35 L -36.87 6.83 A 37.50 37.50 0 0 1 -37.38 2.94 L -47.95 2.14 L -47.95 -2.14 L -37.38 -2.94 A 37.50 37.50 0 0 1 -36.87 -6.83 L -46.87 -10.35 L -45.77 -14.47 L -35.35 -12.52 A 37.50 37.50 0 0 1 -33.85 -16.14 L -42.60 -22.13 L -40.46 -25.83 L -30.90 -21.24 A 37.50 37.50 0 0 1 -28.52 -24.35 L -35.42 -32.40 L -32.40 -35.42 L -24.35 -28.52 A 37.50 37.50 0 0 1 -21.24 -30.90 L -25.83 -40.46 L -22.13 -42.60 L -16.14 -33.85 A 37.50 37.50 0 0 1 -12.52 -35.35 L -14.47 -45.77 L -10.35 -46.87 L -6.83 -36.87 A 37.50 37.50 0 0 1 -2.94 -37.38 L -2.14 -47.95 L 2.14 -47.95 L 2.94 -37.38 A 37.50 37.50 0 0 1 6.83 -36.87 L 10.35 -46.87 L 14.47 -45.77 L 12.52 -35.35 A 37.50 37.50 0 0 1 16.14 -33.85 L 22.13 -42.60 L 25.83 -40.46 L 21.24 -30.90 A 37.50 37.50 0 0 1 24.35 -28.52 L 32.40 -35.42 L 35.42 -32.40 L 28.52 -24.35 A 37.50 37.50 0 0 1 30.90 -21.24 L 40.46 -25.83 L 42.60 -22.13 L 33.85 -16.14 A 37.50 37.50 0 0 1 35.35 -12.52 L 45.77 -14.47 L 46.87 -10.35 L 36.87 -6.83 Z" fill="url(#gearFace)" stroke="#b0ada1" stroke-width="1.2"/>
+        <circle r="17.6" fill="#e8e5d9" stroke="#b0ada1" stroke-width="1.2"/>
+        <circle r="9.2" fill="#8f9296" stroke="#6d7073" stroke-width="1.2"/>
+        <circle r="4.6" fill="#3f4448"/>
+      </g>
+    </g>
+    <g transform="translate(317.0,469.0)">
+      <g>
+        <animateTransform attributeName="transform" attributeType="XML" type="rotate"
+          values="0 0 0;-360 0 0" dur="1.2380952380952381s" repeatCount="indefinite"/>
+        <path d="M 21.31 -2.89 L 31.91 -2.44 L 31.91 2.44 L 21.31 2.89 A 21.50 21.50 0 0 1 20.45 6.64 L 29.81 11.65 L 27.69 16.04 L 17.94 11.84 A 21.50 21.50 0 0 1 15.54 14.86 L 21.80 23.43 L 17.99 26.47 L 11.03 18.46 A 21.50 21.50 0 0 1 7.55 20.13 L 9.48 30.56 L 4.72 31.65 L 1.93 21.41 A 21.50 21.50 0 0 1 -1.93 21.41 L -4.72 31.65 L -9.48 30.56 L -7.55 20.13 A 21.50 21.50 0 0 1 -11.03 18.46 L -17.99 26.47 L -21.80 23.43 L -15.54 14.86 A 21.50 21.50 0 0 1 -17.94 11.84 L -27.69 16.04 L -29.81 11.65 L -20.45 6.64 A 21.50 21.50 0 0 1 -21.31 2.89 L -31.91 2.44 L -31.91 -2.44 L -21.31 -2.89 A 21.50 21.50 0 0 1 -20.45 -6.64 L -29.81 -11.65 L -27.69 -16.04 L -17.94 -11.84 A 21.50 21.50 0 0 1 -15.54 -14.86 L -21.80 -23.43 L -17.99 -26.47 L -11.03 -18.46 A 21.50 21.50 0 0 1 -7.55 -20.13 L -9.48 -30.56 L -4.72 -31.65 L -1.93 -21.41 A 21.50 21.50 0 0 1 1.93 -21.41 L 4.72 -31.65 L 9.48 -30.56 L 7.55 -20.13 A 21.50 21.50 0 0 1 11.03 -18.46 L 17.99 -26.47 L 21.80 -23.43 L 15.54 -14.86 A 21.50 21.50 0 0 1 17.94 -11.84 L 27.69 -16.04 L 29.81 -11.65 L 20.45 -6.64 Z" fill="url(#gearFace)" stroke="#b0ada1" stroke-width="1.2"/>
+        <circle r="10.9" fill="#e8e5d9" stroke="#b0ada1" stroke-width="1.2"/>
+        <circle r="5.7" fill="#8f9296" stroke="#6d7073" stroke-width="1.2"/>
+        <circle r="2.9" fill="#3f4448"/>
+      </g>
+    </g>
+    <g transform="translate(403.0,469.0)">
+      <g>
+        <animateTransform attributeName="transform" attributeType="XML" type="rotate"
+          values="0 0 0;-360 0 0" dur="1.2380952380952381s" repeatCount="indefinite"/>
+        <path d="M 21.31 -2.89 L 31.91 -2.44 L 31.91 2.44 L 21.31 2.89 A 21.50 21.50 0 0 1 20.45 6.64 L 29.81 11.65 L 27.69 16.04 L 17.94 11.84 A 21.50 21.50 0 0 1 15.54 14.86 L 21.80 23.43 L 17.99 26.47 L 11.03 18.46 A 21.50 21.50 0 0 1 7.55 20.13 L 9.48 30.56 L 4.72 31.65 L 1.93 21.41 A 21.50 21.50 0 0 1 -1.93 21.41 L -4.72 31.65 L -9.48 30.56 L -7.55 20.13 A 21.50 21.50 0 0 1 -11.03 18.46 L -17.99 26.47 L -21.80 23.43 L -15.54 14.86 A 21.50 21.50 0 0 1 -17.94 11.84 L -27.69 16.04 L -29.81 11.65 L -20.45 6.64 A 21.50 21.50 0 0 1 -21.31 2.89 L -31.91 2.44 L -31.91 -2.44 L -21.31 -2.89 A 21.50 21.50 0 0 1 -20.45 -6.64 L -29.81 -11.65 L -27.69 -16.04 L -17.94 -11.84 A 21.50 21.50 0 0 1 -15.54 -14.86 L -21.80 -23.43 L -17.99 -26.47 L -11.03 -18.46 A 21.50 21.50 0 0 1 -7.55 -20.13 L -9.48 -30.56 L -4.72 -31.65 L -1.93 -21.41 A 21.50 21.50 0 0 1 1.93 -21.41 L 4.72 -31.65 L 9.48 -30.56 L 7.55 -20.13 A 21.50 21.50 0 0 1 11.03 -18.46 L 17.99 -26.47 L 21.80 -23.43 L 15.54 -14.86 A 21.50 21.50 0 0 1 17.94 -11.84 L 27.69 -16.04 L 29.81 -11.65 L 20.45 -6.64 Z" fill="url(#gearFace)" stroke="#b0ada1" stroke-width="1.2"/>
+        <circle r="10.9" fill="#e8e5d9" stroke="#b0ada1" stroke-width="1.2"/>
+        <circle r="5.7" fill="#8f9296" stroke="#6d7073" stroke-width="1.2"/>
+        <circle r="2.9" fill="#3f4448"/>
+      </g>
+    </g>
+    <g transform="translate(360.0,488.0)">
+      <g>
+        <animateTransform attributeName="transform" attributeType="XML" type="rotate"
+          values="0 0 0;360 0 0" dur="1.0s" repeatCount="indefinite"/>
+        <path d="M 16.30 -2.58 L 26.89 -2.40 L 26.89 2.40 L 16.30 2.58 A 16.50 16.50 0 0 1 15.40 5.91 L 24.49 11.37 L 22.09 15.53 L 12.82 10.38 A 16.50 16.50 0 0 1 10.38 12.82 L 15.53 22.09 L 11.37 24.49 L 5.91 15.40 A 16.50 16.50 0 0 1 2.58 16.30 L 2.40 26.89 L -2.40 26.89 L -2.58 16.30 A 16.50 16.50 0 0 1 -5.91 15.40 L -11.37 24.49 L -15.53 22.09 L -10.38 12.82 A 16.50 16.50 0 0 1 -12.82 10.38 L -22.09 15.53 L -24.49 11.37 L -15.40 5.91 A 16.50 16.50 0 0 1 -16.30 2.58 L -26.89 2.40 L -26.89 -2.40 L -16.30 -2.58 A 16.50 16.50 0 0 1 -15.40 -5.91 L -24.49 -11.37 L -22.09 -15.53 L -12.82 -10.38 A 16.50 16.50 0 0 1 -10.38 -12.82 L -15.53 -22.09 L -11.37 -24.49 L -5.91 -15.40 A 16.50 16.50 0 0 1 -2.58 -16.30 L -2.40 -26.89 L 2.40 -26.89 L 2.58 -16.30 A 16.50 16.50 0 0 1 5.91 -15.40 L 11.37 -24.49 L 15.53 -22.09 L 10.38 -12.82 A 16.50 16.50 0 0 1 12.82 -10.38 L 22.09 -15.53 L 24.49 -11.37 L 15.40 -5.91 Z" fill="url(#gearFace)" stroke="#b0ada1" stroke-width="1.2"/>
+        <circle r="8.8" fill="#e8e5d9" stroke="#b0ada1" stroke-width="1.2"/>
+        <circle r="4.6" fill="#8f9296" stroke="#6d7073" stroke-width="1.2"/>
+        <circle r="2.3" fill="#3f4448"/>
+        <rect x="2" y="-10" width="36" height="20" rx="10" fill="url(#brass)" stroke="#8a5a1e" stroke-width="1.2"/>
+        <rect x="-8" y="-4.5" width="22" height="9" rx="4.5" fill="#a4aaae" stroke="#71787b" stroke-width="1"/>
+      </g>
+    </g>
+  </g>
+
+  <path d="M 202 370 L 514 370 L 496 460 Q 464 507 360 514 Q 256 507 224 460 Z"
+        fill="none" stroke="#6f756f" stroke-width="2"/>
+
+  <!-- ========================= cylinder and head ======================== -->
+  <rect x="246" y="336" width="228" height="28" rx="5" fill="url(#castIron)" stroke="#7b817c" stroke-width="1.4"/>
+  <circle cx="262" cy="350" r="3.4" fill="#7d8286"/>
+  <circle cx="306" cy="350" r="3.4" fill="#7d8286"/>
+  <circle cx="414" cy="350" r="3.4" fill="#7d8286"/>
+  <circle cx="458" cy="350" r="3.4" fill="#7d8286"/>
+
+  <rect x="302" y="182" width="116" height="158" fill="url(#alu)"/>
+  <rect x="284" y="190.0" width="152" height="10" rx="5" fill="url(#finEdge)" stroke="#878d91" stroke-width="0.7"/>
+  <rect x="284" y="206.0" width="152" height="10" rx="5" fill="url(#finEdge)" stroke="#878d91" stroke-width="0.7"/>
+  <rect x="284" y="222.0" width="152" height="10" rx="5" fill="url(#finEdge)" stroke="#878d91" stroke-width="0.7"/>
+  <rect x="284" y="238.0" width="152" height="10" rx="5" fill="url(#finEdge)" stroke="#878d91" stroke-width="0.7"/>
+  <rect x="284" y="254.0" width="152" height="10" rx="5" fill="url(#finEdge)" stroke="#878d91" stroke-width="0.7"/>
+  <rect x="284" y="270.0" width="152" height="10" rx="5" fill="url(#finEdge)" stroke="#878d91" stroke-width="0.7"/>
+  <rect x="284" y="286.0" width="152" height="10" rx="5" fill="url(#finEdge)" stroke="#878d91" stroke-width="0.7"/>
+  <rect x="284" y="302.0" width="152" height="10" rx="5" fill="url(#finEdge)" stroke="#878d91" stroke-width="0.7"/>
+  <rect x="284" y="318.0" width="152" height="10" rx="5" fill="url(#finEdge)" stroke="#878d91" stroke-width="0.7"/>
+
+  <path d="M 262 156 L 458 156 L 420 186 L 300 186 Z" fill="url(#alu)" stroke="#878d91" stroke-width="1"/>
+
+  <!-- side ports -->
+  <g transform="rotate(-11 214 128)">
+    <rect x="158" y="106" width="86" height="44" rx="22" fill="url(#alu)" stroke="#878d91" stroke-width="1.2"/>
+    <ellipse cx="162" cy="128" rx="10" ry="22" fill="#b6bcbf" stroke="#878d91" stroke-width="1.2"/>
+  </g>
+  <g transform="rotate(11 506 128)">
+    <rect x="476" y="106" width="86" height="44" rx="22" fill="url(#alu)" stroke="#878d91" stroke-width="1.2"/>
+    <ellipse cx="558" cy="128" rx="10" ry="22" fill="#b6bcbf" stroke="#878d91" stroke-width="1.2"/>
+  </g>
+
+  <rect x="208" y="108" width="304" height="50" rx="10" fill="url(#alu)" stroke="#878d91" stroke-width="1.2"/>
+  <rect x="196" y="58" width="328" height="52" rx="8" fill="url(#alu)" stroke="#878d91" stroke-width="1.2"/>
+  <path d="M 204 96 H 516" fill="none" stroke="#8f9599" stroke-width="1" opacity="0.6"/>
+  <rect x="204.0" y="16" width="8" height="46" rx="3.5" fill="url(#finTop)" stroke="#878d91" stroke-width="0.6"/>
+  <rect x="221.5" y="16" width="8" height="46" rx="3.5" fill="url(#finTop)" stroke="#878d91" stroke-width="0.6"/>
+  <rect x="239.0" y="16" width="8" height="46" rx="3.5" fill="url(#finTop)" stroke="#878d91" stroke-width="0.6"/>
+  <rect x="256.5" y="16" width="8" height="46" rx="3.5" fill="url(#finTop)" stroke="#878d91" stroke-width="0.6"/>
+  <rect x="274.0" y="16" width="8" height="46" rx="3.5" fill="url(#finTop)" stroke="#878d91" stroke-width="0.6"/>
+  <rect x="291.5" y="16" width="8" height="46" rx="3.5" fill="url(#finTop)" stroke="#878d91" stroke-width="0.6"/>
+  <rect x="309.0" y="16" width="8" height="46" rx="3.5" fill="url(#finTop)" stroke="#878d91" stroke-width="0.6"/>
+  <rect x="326.5" y="16" width="8" height="46" rx="3.5" fill="url(#finTop)" stroke="#878d91" stroke-width="0.6"/>
+  <rect x="344.0" y="16" width="8" height="46" rx="3.5" fill="url(#finTop)" stroke="#878d91" stroke-width="0.6"/>
+  <rect x="361.5" y="16" width="8" height="46" rx="3.5" fill="url(#finTop)" stroke="#878d91" stroke-width="0.6"/>
+  <rect x="379.0" y="16" width="8" height="46" rx="3.5" fill="url(#finTop)" stroke="#878d91" stroke-width="0.6"/>
+  <rect x="396.5" y="16" width="8" height="46" rx="3.5" fill="url(#finTop)" stroke="#878d91" stroke-width="0.6"/>
+  <rect x="414.0" y="16" width="8" height="46" rx="3.5" fill="url(#finTop)" stroke="#878d91" stroke-width="0.6"/>
+  <rect x="431.5" y="16" width="8" height="46" rx="3.5" fill="url(#finTop)" stroke="#878d91" stroke-width="0.6"/>
+  <rect x="449.0" y="16" width="8" height="46" rx="3.5" fill="url(#finTop)" stroke="#878d91" stroke-width="0.6"/>
+  <rect x="466.5" y="16" width="8" height="46" rx="3.5" fill="url(#finTop)" stroke="#878d91" stroke-width="0.6"/>
+  <rect x="484.0" y="16" width="8" height="46" rx="3.5" fill="url(#finTop)" stroke="#878d91" stroke-width="0.6"/>
+  <rect x="501.5" y="16" width="8" height="46" rx="3.5" fill="url(#finTop)" stroke="#878d91" stroke-width="0.6"/>
+  <rect x="330" y="4" width="60" height="24" rx="4" fill="url(#alu)" stroke="#878d91" stroke-width="1.2"/>
+
+  <!-- ============================ valve gear =========================== -->
+  <!-- pushrod, spring and cam follower -->
+  <rect x="245" y="154" width="26" height="14" rx="4" fill="url(#steel)" stroke="#5c6266" stroke-width="1"/>
+  <g transform="translate(258,168.0)">
+    <g>
+      <animateTransform attributeName="transform" attributeType="XML" type="scale"
+        values="1 1;1 1;1 0.833;1 1;1 1" keyTimes="0;0.08;0.25;0.42;1" dur="2.0s" repeatCount="indefinite"/>
+      <path d="M -8.0 0 L 8.0 4.7 L -8.0 9.3 L 8.0 14.0 L -8.0 18.7 L 8.0 23.3 L -8.0 28.0 L 8.0 32.7 L -8.0 37.3 L 8.0 42.0 L -8.0 46.7 L 8.0 51.3 L -8.0 56.0 L 8.0 60.7 L -8.0 65.3 L 8.0 70.0 L -8.0 74.7 L 8.0 79.3 L -8.0 84.0" fill="none" stroke="#474c4f" stroke-width="4.8"
+        stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+  </g>
+  <g>
+    <animateTransform attributeName="transform" attributeType="XML" type="translate"
+      values="0 0;0 0;0 -14.0;0 0;0 0" keyTimes="0;0.08;0.25;0.42;1" dur="2.0s" repeatCount="indefinite"/>
+    <rect x="245" y="252.0" width="26" height="11" rx="4" fill="url(#steel)" stroke="#5c6266" stroke-width="1"/>
+    <rect x="255.25" y="261.0" width="5.5" height="122" fill="#6b7276"/>
+    <circle cx="258" cy="382" r="8" fill="#9aa0a4" stroke="#6d7073" stroke-width="1.3"/>
+  </g>
+  <rect x="244" y="328" width="28" height="42" rx="5" fill="url(#castIron)" stroke="#7b817c" stroke-width="1.3"/>
+  <circle cx="258" cy="336" r="3" fill="#7d8286"/>
+  <!-- pushrod, spring and cam follower -->
+  <rect x="449" y="154" width="26" height="14" rx="4" fill="url(#steel)" stroke="#5c6266" stroke-width="1"/>
+  <g transform="translate(462,168.0)">
+    <g>
+      <animateTransform attributeName="transform" attributeType="XML" type="scale"
+        values="1 1;1 1;1 0.833;1 1;1 1" keyTimes="0;0.58;0.75;0.92;1" dur="2.0s" repeatCount="indefinite"/>
+      <path d="M -8.0 0 L 8.0 4.7 L -8.0 9.3 L 8.0 14.0 L -8.0 18.7 L 8.0 23.3 L -8.0 28.0 L 8.0 32.7 L -8.0 37.3 L 8.0 42.0 L -8.0 46.7 L 8.0 51.3 L -8.0 56.0 L 8.0 60.7 L -8.0 65.3 L 8.0 70.0 L -8.0 74.7 L 8.0 79.3 L -8.0 84.0" fill="none" stroke="#474c4f" stroke-width="4.8"
+        stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+  </g>
+  <g>
+    <animateTransform attributeName="transform" attributeType="XML" type="translate"
+      values="0 0;0 0;0 -14.0;0 0;0 0" keyTimes="0;0.58;0.75;0.92;1" dur="2.0s" repeatCount="indefinite"/>
+    <rect x="449" y="252.0" width="26" height="11" rx="4" fill="url(#steel)" stroke="#5c6266" stroke-width="1"/>
+    <rect x="459.25" y="261.0" width="5.5" height="122" fill="#6b7276"/>
+    <circle cx="462" cy="382" r="8" fill="#9aa0a4" stroke="#6d7073" stroke-width="1.3"/>
+  </g>
+  <rect x="448" y="328" width="28" height="42" rx="5" fill="url(#castIron)" stroke="#7b817c" stroke-width="1.3"/>
+  <circle cx="462" cy="336" r="3" fill="#7d8286"/>
+
+</svg>

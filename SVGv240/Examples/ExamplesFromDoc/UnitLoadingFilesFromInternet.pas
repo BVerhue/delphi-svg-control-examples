@@ -19,7 +19,7 @@ uses
   Vcl.Dialogs,
   Vcl.StdCtrls,
   Vcl.ExtCtrls,
-  BVE.SVG2Image.VCL;
+  BVE.SVG2Image.VCL, BVE.SVG2Control.VCL;
 {$ELSE}
   SysUtils,
   Variants,
@@ -89,39 +89,43 @@ begin
   if FStep < Fsl.Count then
   begin
     FileName := Fsl[FStep];
-    Caption := FileName;
+    if FileName <> '' then
+    begin
 
-    try
-      // Load the SVG file
+      Caption := FileName;
 
-      SVG2Image1.FileName := FPath + 'svg/' + FileName;
-
-      // Load the corresponding Png file
-
-      MemStream := TMemoryStream.Create;
       try
-        p := Pos('.', FileName);
-{$IFnDEF FPC}
-        Png := TPngImage.Create;
-{$ELSE}
-        Png := TPortableNetworkGraphic.Create;
-{$ENDIF}
+        // Load the SVG file
+
+        SVG2Image1.FileName := FPath + 'svg/' + FileName;
+
+        // Load the corresponding Png file
+
+        MemStream := TMemoryStream.Create;
         try
-          TSVGSaxParser.LoadFromInternet(FPath + 'png/' + copy(FileName, 1, p - 1) + '.png', MemStream);
-          MemStream.Position := 0;
-          Png.LoadFromStream(MemStream);
-          Image1.Picture.Graphic := Png;
+          p := Pos('.', FileName);
+  {$IFnDEF FPC}
+          Png := TPngImage.Create;
+  {$ELSE}
+          Png := TPortableNetworkGraphic.Create;
+  {$ENDIF}
+          try
+            TSVGSaxParser.LoadFromInternet(FPath + 'png/' + copy(FileName, 1, p - 1) + '.png', MemStream);
+            MemStream.Position := 0;
+            Png.LoadFromStream(MemStream);
+            Image1.Picture.Graphic := Png;
+          finally
+            Png.Free;
+          end;
+
         finally
-          Png.Free;
+          MemStream.Free;
         end;
 
-      finally
-        MemStream.Free;
-      end;
-
-      except on E:Exception do
-      begin
-        Caption := Caption + ' Error: ' + E.Message;
+        except on E:Exception do
+        begin
+          Caption := Caption + ' Error: ' + E.Message;
+        end;
       end;
     end;
   end;

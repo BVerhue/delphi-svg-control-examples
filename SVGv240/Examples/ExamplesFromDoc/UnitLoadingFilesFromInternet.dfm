@@ -10,17 +10,13 @@ object frmLoadingFilesFromInternet: TfrmLoadingFilesFromInternet
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
-  OldCreateOrder = False
   OnCreate = FormCreate
-  PixelsPerInch = 96
   TextHeight = 13
   object SVG2Image1: TSVG2Image
     Left = 8
     Top = 78
     Width = 480
     Height = 360
-    BufferQuality = bqHighQuality
-    AutoViewBox = True
   end
   object Image1: TImage
     Left = 494
@@ -58,12 +54,10 @@ object frmLoadingFilesFromInternet: TfrmLoadingFilesFromInternet
       Alignment = taCenter
       Caption = 
         'Requirements for downloading files directly from the internet: D' +
-        'efine InternetAccess must be enabeld in CompilerSettings.inc. Fo' +
-        'r SSL (https) libeay32.dll and ssleay32.dll must  be available o' +
-        'n the system. Download from https://indy.fulgan.com/SSL/'
+        'efine InternetAccess must be enabeld in CompilerSettings.inc.'
       WordWrap = True
-      ExplicitWidth = 981
-      ExplicitHeight = 26
+      ExplicitWidth = 602
+      ExplicitHeight = 13
     end
   end
   object Button1: TButton
