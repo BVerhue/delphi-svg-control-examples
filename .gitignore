@@ -98,3 +98,6 @@ lib/
 
 # Application bundle for Mac OS
 *.app/
+
+# Packaged example archives (e.g. ZoomAndPan.zip) - built for distribution, not source
+*.zip
