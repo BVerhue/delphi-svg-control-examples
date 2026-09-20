@@ -2,7 +2,7 @@ object Form1: TForm1
   Left = 0
   Top = 0
   Caption = 'SVG data binding - chemical process'
-  ClientHeight = 741
+  ClientHeight = 800
   ClientWidth = 1288
   Color = clBtnFace
   DoubleBuffered = True
@@ -18,7 +18,7 @@ object Form1: TForm1
     Left = 988
     Top = 0
     Width = 300
-    Height = 741
+    Height = 800
     Align = alRight
     BevelOuter = bvNone
     Padding.Left = 16
@@ -74,11 +74,19 @@ object Form1: TForm1
       AutoSize = False
       Caption = 'Product tank T-102'
     end
+    object lblPerf: TLabel
+      Left = 34
+      Top = 562
+      Width = 250
+      Height = 15
+      AutoSize = False
+      Caption = 'Painting ...'
+    end
     object lblHint: TLabel
       Left = 16
-      Top = 546
+      Top = 596
       Width = 268
-      Height = 186
+      Height = 190
       AutoSize = False
       Caption =
         'Every control on this panel writes to the drawing through the SVG' +
@@ -87,7 +95,11 @@ object Form1: TForm1
         'e the text content of an element.'#13#10#13#10'The pipes are driven by cl' +
         'ass and the instrument bubbles by their data-tag attribute. The a' +
         'larm lamps are selected both ways: each vessel lights its own lam' +
-        'p above 90%, and the lamp test lights all of them at once.'
+        'p above 90%, and the lamp test lights all of them at once.'#13#10#13#10 +
+        'Persistent buffers keep the rendered result of everything that d' +
+        'oes not change - the vessels, the pipework, the gauge faces - an' +
+        'd redraw only what the application writes to. Turn it off to see' +
+        ' what that is worth here. Animation gains the same way.'
       WordWrap = True
     end
     object tbTemp: TTrackBar
@@ -213,14 +225,26 @@ object Form1: TForm1
       TabOrder = 10
       OnClick = ControlChanged
     end
+    object cbBuffers: TCheckBox
+      Left = 16
+      Top = 538
+      Width = 268
+      Height = 21
+      Caption = 'Persistent buffers (sroPersistentBuffers)'
+      Checked = True
+      State = cbChecked
+      TabOrder = 11
+      OnClick = ControlChanged
+    end
   end
   object SVG2Image1: TSVG2Image
     Left = 0
     Top = 0
     Width = 988
-    Height = 741
+    Height = 800
     Align = alClient
     AutoViewbox = True
+    RenderOptions = [sroClippath, sroFilters, sroPersistentBuffers]
     Padding.Left = 8
     Padding.Top = 8
     Padding.Right = 8

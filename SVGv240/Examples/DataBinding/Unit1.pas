@@ -19,6 +19,14 @@
 // raise its own high level alarm, and all of them share a class, so the lamp
 // test lights the lot with one assignment.
 //
+// The drawing renders with sroPersistentBuffers. The option keeps the rendered
+// result of a subtree and re-applies it instead of drawing it again, and the
+// parts an application writes to are left out of it, so a drawing like this one
+// - mostly fixed pipework and vessels, with a few values moving on a timer -
+// only redraws what actually moved. The checkbox turns it off so the reading
+// next to it shows what it is worth. It matters as much for animation, where
+// the library leaves the animated subtrees out for the same reason.
+//
 //   attributes    positions, sizes, colours and transforms
 //   text          the numbers under the gauges and the plant status
 //
@@ -59,6 +67,8 @@ type
     cbValve: TCheckBox;
     cbAlarm: TCheckBox;
     cbHighlight: TCheckBox;
+    cbBuffers: TCheckBox;
+    lblPerf: TLabel;
     lblHint: TLabel;
     procedure FormCreate(Sender: TObject);
     procedure ControlChanged(Sender: TObject);
@@ -97,8 +107,12 @@ type
 
     FRotation: Double;                        // Where the rotating parts stand
 
+    FRenderTotal: Double;                     // Time spent painting, for the reading
+    FRenderCount: Integer;
+
     procedure LoadDrawing;
     procedure CreateBindings;
+    procedure ApplyRenderOptions;
 
     function Running: Boolean;
 
@@ -117,6 +131,7 @@ implementation
 
 uses
   System.IOUtils,
+  System.Diagnostics,
   System.Math;
 
 {$R *.dfm}
@@ -261,6 +276,20 @@ begin
   FInstruments.MatchSelectorValue := False;
 end;
 
+procedure TForm1.ApplyRenderOptions;
+begin
+  // Changing the render options invalidates what is cached, so this is a clean
+  // switch to make while the drawing is running.
+
+  if cbBuffers.Checked then
+    SVG2Image1.RenderOptions := SVG2Image1.RenderOptions + [sroPersistentBuffers]
+  else
+    SVG2Image1.RenderOptions := SVG2Image1.RenderOptions - [sroPersistentBuffers];
+
+  FRenderTotal := 0;
+  FRenderCount := 0;
+end;
+
 function TForm1.Running: Boolean;
 begin
   Result := cbPump.Checked and cbValve.Checked;
@@ -397,6 +426,8 @@ begin
 
   FTextStatus.Value := Status;
 
+  ApplyRenderOptions;
+
   Timer1.Enabled := cbPump.Checked;
 end;
 
@@ -406,6 +437,8 @@ begin
 end;
 
 procedure TForm1.Timer1Timer(Sender: TObject);
+var
+  Watch: TStopwatch;
 begin
   // Only the two rotating parts are written here. Assigning a binding's Value
   // repaints the control, so there is nothing else to do.
@@ -417,6 +450,27 @@ begin
 
   FPump.Value := Format('rotate(%.1f 230 350)', [FRotation], SvgFmt);
   FAgitator.Value := Format('rotate(%.1f 550 250)', [FRotation * 0.6], SvgFmt);
+
+  // Assigning a value already asked the control to repaint. Repaint does it
+  // here and now instead of when the message queue gets round to it, which is
+  // what makes the time below the time of one frame.
+
+  Watch := TStopwatch.StartNew;
+  SVG2Image1.Repaint;
+  Watch.Stop;
+
+  FRenderTotal := FRenderTotal + Watch.Elapsed.TotalMilliseconds;
+  Inc(FRenderCount);
+
+  if FRenderCount >= 25 then
+  begin
+    lblPerf.Caption := Format('Painting %.2f ms per frame   (%.0f fps)',
+      [FRenderTotal / FRenderCount,
+       1000 / Max(FRenderTotal / FRenderCount, 0.001)]);
+
+    FRenderTotal := 0;
+    FRenderCount := 0;
+  end;
 end;
 
 initialization
