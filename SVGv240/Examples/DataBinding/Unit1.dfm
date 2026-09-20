@@ -220,7 +220,7 @@ object Form1: TForm1
     Width = 988
     Height = 741
     Align = alClient
-    AutoViewbox = False
+    AutoViewbox = True
     Padding.Left = 8
     Padding.Top = 8
     Padding.Right = 8
