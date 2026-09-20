@@ -78,15 +78,16 @@ object Form1: TForm1
       Left = 16
       Top = 546
       Width = 268
-      Height = 150
+      Height = 186
       AutoSize = False
       Caption =
         'Every control on this panel writes to the drawing through the SVG' +
         'Bindings collection of the image. Levels, needles and colours are' +
         ' attributes; the numbers under the gauges and the plant status ar' +
-        'e the text content of an element. The pipes and the alarm lamps a' +
-        're driven by class, and the instrument bubbles by their data-tag a' +
-        'ttribute.'
+        'e the text content of an element.'#13#10#13#10'The pipes are driven by cl' +
+        'ass and the instrument bubbles by their data-tag attribute. The a' +
+        'larm lamps are selected both ways: each vessel lights its own lam' +
+        'p above 90%, and the lamp test lights all of them at once.'
       WordWrap = True
     end
     object tbTemp: TTrackBar
@@ -199,7 +200,7 @@ object Form1: TForm1
       Top = 474
       Width = 268
       Height = 21
-      Caption = 'Alarm'
+      Caption = 'Lamp test - light every alarm'
       TabOrder = 9
       OnClick = ControlChanged
     end

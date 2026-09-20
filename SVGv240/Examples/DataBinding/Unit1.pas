@@ -15,6 +15,10 @@
 //   by attribute  the instrument bubbles, selected on the data-tag the plant
 //                 knows them by rather than on an id
 //
+// The alarm lamps are selected both ways. Each one has an id, so a vessel can
+// raise its own high level alarm, and all of them share a class, so the lamp
+// test lights the lot with one assignment.
+//
 //   attributes    positions, sizes, colours and transforms
 //   text          the numbers under the gauges and the plant status
 //
@@ -87,6 +91,10 @@ type
     FAlarms: TSVGBinding;                     // Every alarm lamp, by class
     FInstruments: TSVGBinding;                // Every bubble, by data-tag
 
+    FLampReactor: TSVGBinding;                // The same lamps again, one by one
+    FLampProduct: TSVGBinding;
+    FLampPanel: TSVGBinding;
+
     FRotation: Double;                        // Where the rotating parts stand
 
     procedure LoadDrawing;
@@ -96,6 +104,8 @@ type
 
     procedure SetLevel(const aY, aHeight: TSVGBinding;
       const aTop, aBottom, aPercent: Double);
+
+    function LampColor(const aInAlarm: Boolean): string;
   public
     procedure UpdatePlant;
   end;
@@ -131,6 +141,9 @@ const
   ColorHeaterOff   = '#dfe5ec';
   ColorInstrument  = '#5b6b7c';
   ColorHighlight   = '#e08a2e';
+
+  // Above this, a vessel raises its own high level alarm.
+  HighLevelAlarm = 90.0;                      // percent
 
 var
   // Anything that is SVG syntax rather than words - a transform, a coordinate,
@@ -229,6 +242,15 @@ begin
   FPipes       := Bindings.Bind('pipe', 'stroke', skClass);
   FAlarms      := Bindings.Bind('alarm', 'fill', skClass);
 
+  // The lamps again, this time one binding each, so a vessel can light its own
+  // without touching the others. Two bindings writing the same attribute of the
+  // same element is allowed; which one the element ends up with is decided by
+  // the order they are applied in, in UpdatePlant below.
+
+  FLampReactor := Bindings.Bind('alarm-reactor', 'fill');
+  FLampProduct := Bindings.Bind('alarm-product', 'fill');
+  FLampPanel   := Bindings.Bind('alarm-panel', 'fill');
+
   // --- by attribute ---------------------------------------------------------
   //
   // The instrument bubbles are selected on the tag the plant knows them by.
@@ -255,11 +277,20 @@ begin
   aY.Value := aBottom - h;
 end;
 
+function TForm1.LampColor(const aInAlarm: Boolean): string;
+begin
+  if aInAlarm then
+    Result := ColorLampAlarm
+  else
+    Result := ColorLampOff;
+end;
+
 procedure TForm1.UpdatePlant;
 var
   Temp, Press, Flow: Double;
   Feed, Reactor, Product: Double;
   Heat: Double;
+  HighReactor, HighProduct: Boolean;
   Status: string;
 begin
   Temp    := tbTemp.Position;
@@ -275,6 +306,9 @@ begin
   lblFeed.Caption    := Format('Feed tank T-101   %.0f %%', [Feed]);
   lblReactor.Caption := Format('Reactor R-101   %.0f %%', [Reactor]);
   lblProduct.Caption := Format('Product tank T-102   %.0f %%', [Product]);
+
+  HighReactor := Reactor > HighLevelAlarm;
+  HighProduct := Product > HighLevelAlarm;
 
   // Levels
 
@@ -323,10 +357,28 @@ begin
   else
     FPipes.Value := ColorPipeIdle;
 
+  // The lamp test is one assignment for every lamp carrying the class. With it
+  // off, each lamp is set on its own, after the class binding rather than
+  // before it, because the last write to an element is the one that stays.
+  //
+  // Apply is called explicitly for those three. Assigning a value a binding
+  // already holds does nothing, and after a lamp test the individual values
+  // usually have not changed - but the element underneath was overwritten by
+  // the class binding, so it does need writing again.
+
   if cbAlarm.Checked then
     FAlarms.Value := ColorLampAlarm
-  else
+  else begin
     FAlarms.Value := ColorLampOff;
+
+    FLampReactor.Value := LampColor(HighReactor);
+    FLampProduct.Value := LampColor(HighProduct);
+    FLampPanel.Value := LampColor(HighReactor or HighProduct);
+
+    FLampReactor.Apply;
+    FLampProduct.Apply;
+    FLampPanel.Apply;
+  end;
 
   if cbHighlight.Checked then
     FInstruments.Value := ColorHighlight
@@ -335,7 +387,7 @@ begin
 
   // Status
 
-  if cbAlarm.Checked then
+  if cbAlarm.Checked or HighReactor or HighProduct then
     Status := 'ALARM'
   else
     if Running then

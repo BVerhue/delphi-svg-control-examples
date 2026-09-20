@@ -10,6 +10,8 @@
          id          on everything that is driven on its own, such as a
                      tank level, a needle or a readout
          class       on groups that are driven together: "pipe", "alarm"
+                     - the alarm lamps also carry an id each, so they can be
+                       lit one at a time as well as all at once
          data-tag    the instrument tag, the way the plant itself names
                      its instruments, so a binding can select by it
 
@@ -106,8 +108,12 @@
           stroke="#41576d" stroke-width="5" stroke-linecap="round" fill="none"/>
   </g>
 
-  <circle id="alarm-reactor" class="alarm" cx="600" cy="160" r="9"
-          fill="#c8d0d8" stroke="#5b6b7c" stroke-width="1.5"/>
+  <g data-tag="LSH-102" stroke="#5b6b7c">
+    <circle id="alarm-reactor" class="alarm" cx="604" cy="126" r="9"
+            fill="#c8d0d8" stroke-width="1.5"/>
+    <text x="604" y="107" font-family="Arial" font-size="9" fill="#7a8794"
+          text-anchor="middle" stroke="none">LSH-102</text>
+  </g>
 
   <text x="550" y="340" font-family="Arial" font-size="12" font-weight="bold"
         fill="#1f2d3d" text-anchor="middle">R-101 Reactor</text>
@@ -140,8 +146,12 @@
   <rect x="790" y="140" width="90" height="180" rx="6"
         fill="none" stroke="#5b6b7c" stroke-width="2.5"/>
 
-  <circle id="alarm-product" class="alarm" cx="900" cy="160" r="9"
-          fill="#c8d0d8" stroke="#5b6b7c" stroke-width="1.5"/>
+  <g data-tag="LSH-103" stroke="#5b6b7c">
+    <circle id="alarm-product" class="alarm" cx="864" cy="126" r="9"
+            fill="#c8d0d8" stroke-width="1.5"/>
+    <text x="864" y="107" font-family="Arial" font-size="9" fill="#7a8794"
+          text-anchor="middle" stroke="none">LSH-103</text>
+  </g>
 
   <text x="835" y="334" font-family="Arial" font-size="12" font-weight="bold"
         fill="#1f2d3d" text-anchor="middle">T-102 Product</text>
@@ -234,13 +244,14 @@
         text-anchor="middle">FI-101 Flow</text>
 
   <!-- plant status -->
-  <rect x="740" y="432" width="190" height="76" rx="6"
+  <rect x="740" y="432" width="190" height="86" rx="6"
         fill="#ffffff" stroke="#5b6b7c" stroke-width="2"/>
-  <text x="835" y="454" font-family="Arial" font-size="11" fill="#7a8794"
+  <text x="835" y="452" font-family="Arial" font-size="11" fill="#7a8794"
         text-anchor="middle">PLANT STATUS</text>
-  <text id="readout-status" x="835" y="482" font-family="Arial" font-size="16"
+  <text id="readout-status" x="835" y="481" font-family="Arial" font-size="16"
         font-weight="bold" fill="#1f2d3d" text-anchor="middle">STOPPED</text>
-  <circle id="alarm-panel" class="alarm" cx="835" cy="496" r="7"
+  <circle id="alarm-panel" class="alarm" cx="812" cy="500" r="7"
           fill="#c8d0d8" stroke="#5b6b7c" stroke-width="1.5"/>
+  <text x="826" y="504" font-family="Arial" font-size="10" fill="#7a8794">ALARM</text>
 
 </svg>
