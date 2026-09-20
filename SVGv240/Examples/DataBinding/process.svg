@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 560" width="960" height="560">
+
+  <!-- ===================================================================
+       A schematic of a small chemical process, drawn so that an
+       application can drive it through BVE.SVG2Bindings.
+
+       Three things in here exist for the bindings to find:
+
+         id          on everything that is driven on its own, such as a
+                     tank level, a needle or a readout
+         class       on groups that are driven together: "pipe", "alarm"
+         data-tag    the instrument tag, the way the plant itself names
+                     its instruments, so a binding can select by it
+
+       Nothing here is animated by the drawing. Every moving part is
+       moved by the application.
+       =================================================================== -->
+
+  <defs>
+    <linearGradient id="liquid" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#5aa9e6"/>
+      <stop offset="1" stop-color="#2b6ca3"/>
+    </linearGradient>
+    <linearGradient id="vessel" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0"    stop-color="#e8edf2"/>
+      <stop offset="0.45" stop-color="#ffffff"/>
+      <stop offset="1"    stop-color="#d4dbe3"/>
+    </linearGradient>
+  </defs>
+
+  <rect x="0" y="0" width="960" height="560" fill="#f7f9fb"/>
+
+  <text x="30" y="40" font-family="Arial" font-size="20" font-weight="bold" fill="#1f2d3d">
+    Unit 100 &#8212; Reactor feed and product
+  </text>
+  <text x="30" y="58" font-family="Arial" font-size="12" fill="#7a8794">
+    Every value shown is written by the application through SVGBindings
+  </text>
+
+  <!-- =================================================== process lines -->
+  <!-- One class, so a single binding colours the whole run. -->
+
+  <g fill="none" stroke="#9aa5b1" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">
+    <path class="pipe" d="M150 280 L180 280 L180 350 L204 350"/>
+    <path class="pipe" d="M256 350 L318 350"/>
+    <path class="pipe" d="M402 350 L450 350 L450 280 L480 280"/>
+    <path class="pipe" d="M620 210 L686 210"/>
+    <path class="pipe" d="M714 210 L790 210"/>
+  </g>
+
+  <!-- ====================================================== feed tank -->
+
+  <rect x="60" y="120" width="90" height="180" rx="6"
+        fill="url(#vessel)" stroke="#5b6b7c" stroke-width="2.5"/>
+  <rect id="tank1-level" x="64" y="193" width="82" height="103"
+        fill="url(#liquid)" opacity="0.9"/>
+  <rect x="60" y="120" width="90" height="180" rx="6"
+        fill="none" stroke="#5b6b7c" stroke-width="2.5"/>
+
+  <text x="105" y="314" font-family="Arial" font-size="12" font-weight="bold"
+        fill="#1f2d3d" text-anchor="middle">T-101 Feed</text>
+  <text id="readout-level1" x="105" y="332" font-family="Arial" font-size="13"
+        fill="#2b6ca3" text-anchor="middle">60 %</text>
+
+  <!-- ============================================================ pump -->
+
+  <circle cx="230" cy="350" r="26" fill="url(#vessel)" stroke="#5b6b7c" stroke-width="2.5"/>
+
+  <!-- The application rotates this group to show the pump running. -->
+  <g id="pump-impeller" transform="rotate(0 230 350)">
+    <path d="M230 350 L230 329 M230 350 L248 361 M230 350 L212 361"
+          stroke="#41576d" stroke-width="5" stroke-linecap="round" fill="none"/>
+  </g>
+  <circle cx="230" cy="350" r="4" fill="#41576d"/>
+
+  <text x="230" y="394" font-family="Arial" font-size="12" font-weight="bold"
+        fill="#1f2d3d" text-anchor="middle">P-101</text>
+
+  <!-- ========================================================== heater -->
+
+  <rect x="318" y="325" width="84" height="50" rx="4"
+        fill="url(#vessel)" stroke="#5b6b7c" stroke-width="2.5"/>
+  <rect id="heater-glow" x="324" y="331" width="72" height="38" rx="3" fill="#dfe5ec"/>
+  <path d="M332 350 L344 338 L356 362 L368 338 L380 362 L388 350"
+        fill="none" stroke="#b03a2e" stroke-width="3" stroke-linecap="round"/>
+
+  <text x="360" y="394" font-family="Arial" font-size="12" font-weight="bold"
+        fill="#1f2d3d" text-anchor="middle">H-101</text>
+
+  <!-- ========================================================= reactor -->
+
+  <rect x="480" y="140" width="140" height="180" rx="8"
+        fill="url(#vessel)" stroke="#5b6b7c" stroke-width="2.5"/>
+  <rect id="reactor-level" x="484" y="200" width="132" height="116"
+        fill="url(#liquid)" opacity="0.9"/>
+  <rect x="480" y="140" width="140" height="180" rx="8"
+        fill="none" stroke="#5b6b7c" stroke-width="2.5"/>
+
+  <!-- agitator -->
+  <rect x="532" y="96" width="36" height="24" rx="3"
+        fill="#dfe5ec" stroke="#5b6b7c" stroke-width="2"/>
+  <line x1="550" y1="120" x2="550" y2="250" stroke="#5b6b7c" stroke-width="4"/>
+  <g id="agitator" transform="rotate(0 550 250)">
+    <path d="M522 250 L578 250 M530 238 L570 262"
+          stroke="#41576d" stroke-width="5" stroke-linecap="round" fill="none"/>
+  </g>
+
+  <circle id="alarm-reactor" class="alarm" cx="600" cy="160" r="9"
+          fill="#c8d0d8" stroke="#5b6b7c" stroke-width="1.5"/>
+
+  <text x="550" y="340" font-family="Arial" font-size="12" font-weight="bold"
+        fill="#1f2d3d" text-anchor="middle">R-101 Reactor</text>
+
+  <!-- =========================================================== valve -->
+
+  <g class="valve">
+    <path id="valve-body-l" d="M686 196 L686 224 L700 210 Z"
+          fill="#8fa3b8" stroke="#41576d" stroke-width="2"/>
+    <path id="valve-body-r" d="M714 196 L714 224 L700 210 Z"
+          fill="#8fa3b8" stroke="#41576d" stroke-width="2"/>
+  </g>
+  <line x1="700" y1="210" x2="700" y2="186" stroke="#41576d" stroke-width="3"/>
+
+  <!-- Rotated by the application about the top of the stem: the bar lies
+       across the line when the valve is shut and is turned when it is open. -->
+  <g id="valve-handle" transform="rotate(0 700 184)">
+    <rect x="686" y="180" width="28" height="7" rx="3" fill="#41576d"/>
+  </g>
+
+  <text x="700" y="250" font-family="Arial" font-size="12" font-weight="bold"
+        fill="#1f2d3d" text-anchor="middle">V-101</text>
+
+  <!-- =================================================== product tank -->
+
+  <rect x="790" y="140" width="90" height="180" rx="6"
+        fill="url(#vessel)" stroke="#5b6b7c" stroke-width="2.5"/>
+  <rect id="tank2-level" x="794" y="240" width="82" height="76"
+        fill="url(#liquid)" opacity="0.9"/>
+  <rect x="790" y="140" width="90" height="180" rx="6"
+        fill="none" stroke="#5b6b7c" stroke-width="2.5"/>
+
+  <circle id="alarm-product" class="alarm" cx="900" cy="160" r="9"
+          fill="#c8d0d8" stroke="#5b6b7c" stroke-width="1.5"/>
+
+  <text x="835" y="334" font-family="Arial" font-size="12" font-weight="bold"
+        fill="#1f2d3d" text-anchor="middle">T-102 Product</text>
+  <text id="readout-level2" x="835" y="352" font-family="Arial" font-size="13"
+        fill="#2b6ca3" text-anchor="middle">44 %</text>
+
+  <!-- ==================================================== instruments -->
+  <!-- Each bubble carries the tag the plant knows it by, so a binding can
+       select on the attribute rather than on an id. -->
+
+  <g font-family="Arial" font-size="10" text-anchor="middle" fill="#1f2d3d">
+    <g data-tag="LI-101" stroke="#5b6b7c">
+      <circle cx="105" cy="88" r="20" fill="#ffffff" stroke-width="2"/>
+      <text x="105" y="92" stroke="none">LI-101</text>
+    </g>
+    <line x1="105" y1="108" x2="105" y2="120" stroke="#5b6b7c" stroke-width="1.5"/>
+
+    <g data-tag="FI-101" stroke="#5b6b7c">
+      <circle cx="230" cy="288" r="20" fill="#ffffff" stroke-width="2"/>
+      <text x="230" y="292" stroke="none">FI-101</text>
+    </g>
+    <line x1="230" y1="308" x2="230" y2="324" stroke="#5b6b7c" stroke-width="1.5"/>
+
+    <g data-tag="TI-101" stroke="#5b6b7c">
+      <circle cx="360" cy="288" r="20" fill="#ffffff" stroke-width="2"/>
+      <text x="360" y="292" stroke="none">TI-101</text>
+    </g>
+    <line x1="360" y1="308" x2="360" y2="325" stroke="#5b6b7c" stroke-width="1.5"/>
+
+    <g data-tag="PI-101" stroke="#5b6b7c">
+      <circle cx="668" cy="110" r="20" fill="#ffffff" stroke-width="2"/>
+      <text x="668" y="114" stroke="none">PI-101</text>
+    </g>
+    <line x1="650" y1="122" x2="620" y2="150" stroke="#5b6b7c" stroke-width="1.5"/>
+  </g>
+
+  <!-- ==================================================== gauge panel -->
+
+  <line x1="30" y1="410" x2="930" y2="410" stroke="#d3dae1" stroke-width="2"/>
+
+  <!-- temperature -->
+  <circle cx="150" cy="470" r="44" fill="#ffffff" stroke="#5b6b7c" stroke-width="2.5"/>
+  <path d="M112 448 A44 44 0 0 1 188 448" fill="none" stroke="#b03a2e" stroke-width="3"/>
+  <g stroke="#7a8794" stroke-width="2">
+    <line x1="150" y1="430" x2="150" y2="438"/>
+    <line x1="116" y1="450" x2="123" y2="454"/>
+    <line x1="184" y1="450" x2="177" y2="454"/>
+  </g>
+  <g id="gauge-temp-needle" transform="rotate(0 150 470)">
+    <path d="M150 470 L150 436" stroke="#1f2d3d" stroke-width="3" stroke-linecap="round"/>
+  </g>
+  <circle cx="150" cy="470" r="5" fill="#1f2d3d"/>
+  <text id="readout-temp" x="150" y="497" font-family="Arial" font-size="14"
+        font-weight="bold" fill="#1f2d3d" text-anchor="middle">20 &#176;C</text>
+  <text x="150" y="530" font-family="Arial" font-size="11" fill="#7a8794"
+        text-anchor="middle">TI-101 Temperature</text>
+
+  <!-- pressure -->
+  <circle cx="400" cy="470" r="44" fill="#ffffff" stroke="#5b6b7c" stroke-width="2.5"/>
+  <path d="M362 448 A44 44 0 0 1 438 448" fill="none" stroke="#b03a2e" stroke-width="3"/>
+  <g stroke="#7a8794" stroke-width="2">
+    <line x1="400" y1="430" x2="400" y2="438"/>
+    <line x1="366" y1="450" x2="373" y2="454"/>
+    <line x1="434" y1="450" x2="427" y2="454"/>
+  </g>
+  <g id="gauge-press-needle" transform="rotate(0 400 470)">
+    <path d="M400 470 L400 436" stroke="#1f2d3d" stroke-width="3" stroke-linecap="round"/>
+  </g>
+  <circle cx="400" cy="470" r="5" fill="#1f2d3d"/>
+  <text id="readout-press" x="400" y="497" font-family="Arial" font-size="14"
+        font-weight="bold" fill="#1f2d3d" text-anchor="middle">0.0 bar</text>
+  <text x="400" y="530" font-family="Arial" font-size="11" fill="#7a8794"
+        text-anchor="middle">PI-101 Pressure</text>
+
+  <!-- flow -->
+  <circle cx="650" cy="470" r="44" fill="#ffffff" stroke="#5b6b7c" stroke-width="2.5"/>
+  <path d="M612 448 A44 44 0 0 1 688 448" fill="none" stroke="#b03a2e" stroke-width="3"/>
+  <g stroke="#7a8794" stroke-width="2">
+    <line x1="650" y1="430" x2="650" y2="438"/>
+    <line x1="616" y1="450" x2="623" y2="454"/>
+    <line x1="684" y1="450" x2="677" y2="454"/>
+  </g>
+  <g id="gauge-flow-needle" transform="rotate(0 650 470)">
+    <path d="M650 470 L650 436" stroke="#1f2d3d" stroke-width="3" stroke-linecap="round"/>
+  </g>
+  <circle cx="650" cy="470" r="5" fill="#1f2d3d"/>
+  <text id="readout-flow" x="650" y="497" font-family="Arial" font-size="14"
+        font-weight="bold" fill="#1f2d3d" text-anchor="middle">0.0 m&#179;/h</text>
+  <text x="650" y="530" font-family="Arial" font-size="11" fill="#7a8794"
+        text-anchor="middle">FI-101 Flow</text>
+
+  <!-- plant status -->
+  <rect x="740" y="432" width="190" height="76" rx="6"
+        fill="#ffffff" stroke="#5b6b7c" stroke-width="2"/>
+  <text x="835" y="454" font-family="Arial" font-size="11" fill="#7a8794"
+        text-anchor="middle">PLANT STATUS</text>
+  <text id="readout-status" x="835" y="482" font-family="Arial" font-size="16"
+        font-weight="bold" fill="#1f2d3d" text-anchor="middle">STOPPED</text>
+  <circle id="alarm-panel" class="alarm" cx="835" cy="496" r="7"
+          fill="#c8d0d8" stroke="#5b6b7c" stroke-width="1.5"/>
+
+</svg>
