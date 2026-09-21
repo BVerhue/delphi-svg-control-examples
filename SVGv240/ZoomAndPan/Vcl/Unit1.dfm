@@ -11,6 +11,9 @@ object Form1: TForm1
   Font.Height = -12
   Font.Name = 'Segoe UI'
   Font.Style = []
+  KeyPreview = True
+  OnCreate = FormCreate
+  OnKeyDown = FormKeyDown
   OnMouseWheel = FormMouseWheel
   TextHeight = 15
   object SVG2Image1: TSVG2Image
@@ -20,10 +23,9 @@ object Form1: TForm1
     Height = 388
     Align = alClient
     OnDblClick = SVG2Image1DblClick
-    OnMouseDown = SVG2Image1MouseDown
     OnMouseMove = SVG2Image1MouseMove
     OnMouseUp = SVG2Image1MouseUp
-    OnAfterParse = SVG2Image1AfterParse
+    OnViewChanged = SVG2Image1ViewChanged
     ExplicitLeft = 8
     ExplicitTop = 112
     ExplicitWidth = 473

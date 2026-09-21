@@ -9,14 +9,29 @@ unit Unit1;
 //------------------------------------------------------------------------------
 
 {
-  Set the following propeties:
+  Zooming and panning are on the control. The view is a transform over the
+  drawing - a scale and a translation - so nothing here touches the document,
+  and the SVG that was loaded is still exactly the SVG that was loaded.
+
+    ZoomByWheel   one turn of the wheel, about a point on the control
+    MousePan      dragging with the left button moves the view
+    PanBy         moves the view by so many pixels of the control
+    ZoomToFit     fits everything the drawing paints
+    ResetView     back to how it was loaded
+    ClientToSVG   a point on the control as a point in the drawing
+
+  The wheel is handled on the form rather than by the control, because a
+  TSVG2Image has no window of its own and so is never sent the wheel message.
+  One line passes it on.
+
+  Set the following properties:
 
     On Form:
       DoubleBuffered = True
 
-    On SVG2Image2
-      AsspectRatioAlign = arXMidYMid
-      AspectRatioMeetOrSlice = arSlice or arMeet
+    On SVG2Image1
+      AspectRatioAlign = arXMidYMid
+      AspectRatioMeetOrSlice = arMeet
       AutoViewbox = True
 }
 
@@ -43,27 +58,21 @@ type
   TForm1 = class(TForm)
     SVG2Image1: TSVG2Image;
     OpenDialog1: TOpenDialog;
-    procedure SVG2Image1MouseDown(Sender: TObject; Button: TMouseButton;
-      Shift: TShiftState; X, Y: Integer);
+    procedure FormCreate(Sender: TObject);
+    procedure FormMouseWheel(Sender: TObject; Shift: TShiftState;
+      WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
+    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure SVG2Image1MouseMove(Sender: TObject; Shift: TShiftState; X,
       Y: Integer);
     procedure SVG2Image1MouseUp(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
-    procedure SVG2Image1AfterParse(Sender: TObject);
-    procedure FormMouseWheel(Sender: TObject; Shift: TShiftState;
-      WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
     procedure SVG2Image1DblClick(Sender: TObject);
+    procedure SVG2Image1ViewChanged(Sender: TObject);
   private
-    FViewBox: TSVGRect;
-    FMousePt: TPoint;
-    FMouseDown: Boolean;
-    FZoomCenter: Boolean;
+    FPointer: TSVGPoint;                        // Where the pointer last was,
+                                                // in the drawing
 
-    function CalcZoomFactor: TSVGFloat;
-    function CalcViewBoxPt(const aMousePt: TPoint): TSVGPoint;
-
-    procedure CenterOnMousePt(const aMousePt: TPoint);
-    procedure SVGRepaint;
+    procedure ShowState;
   public
     { Public declarations }
   end;
@@ -75,172 +84,64 @@ implementation
 
 {$R *.dfm}
 
-function TForm1.CalcViewBoxPt(const aMousePt: TPoint): TSVGPoint;
-var
-  ViewPort: TRect;
-  Zoom: TSVGFloat;
+procedure TForm1.FormCreate(Sender: TObject);
 begin
-  ViewPort := SVG2Image1.ClientRect;
+  // Dragging with the left button moves the view. Off by default, because a
+  // control that starts moving when an application meant to click on it would
+  // be a surprise.
 
-  Zoom := CalcZoomFactor;
+  SVG2Image1.MousePan := True;
 
-  // Convert mousepoint to viewboxpoint
+  // A notch of the wheel is a tenth in or out, and the view can go from a
+  // fiftieth to five hundred times. The drawings this renders survive far more
+  // than that; these are limits for a person turning a wheel.
 
-  Result.X := FViewBox.Left + FViewBox.Width/2 + (aMousePt.X - ViewPort.Width/2 ) * Zoom;
-  Result.Y := FViewBox.Top + FViewBox.Height/2 + (aMousePt.Y - ViewPort.Height/2) * Zoom;
+  SVG2Image1.WheelZoomStep := 1.1;
+  SVG2Image1.ZoomMin := 0.02;
+  SVG2Image1.ZoomMax := 500;
+
+  ShowState;
 end;
 
-function TForm1.CalcZoomFactor: TSVGFloat;
-var
-  ViewPort: TRect;
-  ViewPortRatioXY,
-  ViewBoxRatioXY: TSVGFloat;
+procedure TForm1.FormKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
 begin
-  // This calculates the zoom factor between between the viewPort and the viewBox
+  case Key of
+    // Fit everything the drawing paints, which is not the same as the
+    // viewBox: a drawing can paint outside it.
+    Ord('F'):
+      SVG2Image1.ZoomToFit;
 
-  ViewPort := SVG2Image1.ClientRect;
+    // Back to how the drawing was loaded.
+    Ord('R'), VK_ESCAPE:
+      SVG2Image1.ResetView;
 
-  // We have to take into consideration the aspect ratio settings
-
-  ViewPortRatioXY := ViewPort.Width / ViewPort.Height;
-  ViewBoxRatioXY := FViewBox.Width / FViewBox.Height;
-
-  if SVG2Image1.AspectRatioMeetOrSlice = arSlice then
-  begin
-
-    if ViewPortRatioXY > ViewBoxRatioXY then
-      Result := FViewBox.Width / ViewPort.Width
-    else
-      Result := FViewBox.Height / ViewPort.Height;
-
-  end else begin
-
-    if ViewPortRatioXY > ViewBoxRatioXY then
-      Result := FViewBox.Height / ViewPort.Height
-    else
-      Result := FViewBox.Width / ViewPort.Width;
-
+    Ord('0'):
+      SVG2Image1.ZoomFactor := 1;
   end;
-end;
-
-procedure TForm1.CenterOnMousePt(const aMousePt: TPoint);
-var
-  Zoom: TSVGFLoat;
-  ViewPort: TRect;
-  Delta: TSVGPoint;
-begin
-  // Move the right-clicked viewBox point to the center
-
-  ViewPort := SVG2Image1.ClientRect;
-
-  Zoom := CalcZoomFactor;
-
-  Delta.X := aMousePt.X * Zoom - (ViewPort.Width / 2) * Zoom;
-  Delta.Y := aMousePt.Y * Zoom - (ViewPort.Height / 2) * Zoom;
-
-  FViewBox.Left := FViewBox.Left + Delta.X;
-  FViewBox.Right := FViewBox.Right + Delta.X;
-  FViewBox.Top := FViewBox.Top + Delta.Y;
-  FViewBox.Bottom := FViewBox.Bottom + Delta.Y;
-
-  SVGRepaint;
 end;
 
 procedure TForm1.FormMouseWheel(Sender: TObject; Shift: TShiftState;
   WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
 var
   P: TPoint;
-  F: TSVGFloat;
-  Sign: TSVGFloat;
-  ViewPort: TRect;
-  ViewBoxOriginal: TSVGRect;
-  Zoom: TSVGFloat;
 begin
-  // Zoom the SVG in or out on every change of the mousewheel
+  // Zoom about the pointer, so whatever is under it stays under it. MousePos
+  // is in screen coordinates and the control wants its own.
 
-  if WheelDelta = 0 then
+  P := SVG2Image1.ScreenToClient(MousePos);
+
+  if not PtInRect(SVG2Image1.ClientRect, P) then
     Exit;
 
-  // Zoom with arbitrary factor
+  SVG2Image1.ZoomByWheel(WheelDelta, SVGPoint(P.X, P.Y));
 
-  Sign := WheelDelta / abs(WheelDelta);
-  F := -Sign * 0.05;
-
-  ViewBoxOriginal := FViewBox;
-
-  if FZoomCenter then
-  begin
-    // Optional:
-
-    // Focus zoom onto the center of the viewport
-
-    FViewBox.Left := ViewBoxOriginal.Left - ViewBoxOriginal.Width * F;
-    FViewBox.Top := ViewBoxOriginal.Top - ViewBoxOriginal.Height * F;
-    FViewBox.Right := ViewBoxOriginal.Right + ViewBoxOriginal.Width * F;
-    FViewBox.Bottom := ViewBoxOriginal.Bottom + ViewBoxOriginal.Height * F;
-
-
-  end else begin
-
-    // Focus zoom onto the current mouse position
-
-    ViewPort := SVG2Image1.ClientRect;
-
-    Zoom := CalcZoomFactor;
-
-    P := SVG2Image1.ScreenToClient(MousePos);
-
-    FViewBox.Left := ViewBoxOriginal.Left - ViewBoxOriginal.Width/2 * F - (P.X - ViewPort.Width/2) * Zoom * F;
-    FViewBox.Top := ViewBoxOriginal.Top - ViewBoxOriginal.Height/2 * F - (P.Y - ViewPort.Height/2) * Zoom * F;
-
-    FViewBox.Right := FViewBox.Left + ViewBoxOriginal.Width * (1 + F);
-    FViewBox.Bottom := FViewBox.Top + ViewBoxOriginal.Height * (1 + F);
-
-  end;
-
-  SVGRepaint;
-end;
-
-procedure TForm1.SVG2Image1AfterParse(Sender: TObject);
-var
-  SVG: ISVG;
-  CR: TRect;
-begin
-  // Get the viewBox from the parsed SVG or create one if it is not defined
-
-  // On the TSVG2Image the following properties need to be set:
-
-  // AutoViewbox = True
-  //  This will set the viewPort of the SVG to 100%, so it is always equal to the TSVG2Image ClientRect
-
-  // AspectRatioAlign = arXMidYMid
-  //  That is uniform scaling aligned to the middle of the viewPort
-
-  // Get the Outer SVG element
-
-  if not assigned(SVG2Image1.SVGRoot) then
-    Exit;
-
-  SVG := SVG2Image1.SVGRoot.SVG;
-
-  if not assigned(SVG) then
-    Exit;
-
-  if SVG.ViewBox.IsUndefined then
-  begin
-    // No viewBox so we will create one with the same size as the viewPort.
-    // The viewPort is defined by the dimensions of the outer SVG element.
-
-    CR := SVG2Image1.ClientRect;
-
-    FViewBox := SVG2Image1.SVGRoot.CalcIntrinsicSize(SVGRect(0, 0, CR.Width, CR.Height));
-  end else
-    FViewBox := SVG.ViewBox;
+  Handled := True;
 end;
 
 procedure TForm1.SVG2Image1DblClick(Sender: TObject);
 begin
-  // Load a new SVG image by dubbel clicking the TSVG2Image
+  // Load a new SVG image by double clicking the TSVG2Image
 
   if OpenDialog1.Execute then
   begin
@@ -248,95 +149,55 @@ begin
     // priority over the SVG filename property
 
     SVG2Image1.SVG.Clear;
-
-    FViewBox := TSVGRect.CreateUndefined;
-
     SVG2Image1.Filename := OpenDialog1.FileName;
-  end;
-end;
 
-procedure TForm1.SVG2Image1MouseDown(Sender: TObject; Button: TMouseButton;
-  Shift: TShiftState; X, Y: Integer);
-begin
-  if (mbLeft = Button) and not(ssDouble in Shift) then
-  begin
-    // Save the mousedown point on mousedown
+    // The view belongs to the drawing that was being looked at, not to this
+    // one.
 
-    FMouseDown := True;
-    FMousePt := Point(X, Y);
+    SVG2Image1.ResetView;
   end;
 end;
 
 procedure TForm1.SVG2Image1MouseMove(Sender: TObject; Shift: TShiftState; X,
   Y: Integer);
-var
-  Delta: TPoint;
-  ViewPort: TRect;
-  Zoom: TSVGFLoat;
-  ViewBoxPt: TSVGPoint;
 begin
-  // Convert the mouse coords to viewBox coords and display in caption
-  // Move the viewBox if the mouse btn is pressed
+  // Where the pointer is, in the coordinates of the drawing. This is the
+  // conversion hit testing uses, so it holds however the view is set - and it
+  // keeps being reported while the view is being dragged around.
 
-  ViewBoxPt := CalcViewBoxPt(Point(X, Y));
-  Caption := Format('ViewBox Pt: %3.1f %3.1f', [ViewBoxPt.X, ViewBoxPt.Y]);
+  FPointer := SVG2Image1.ClientToSVG(SVGPoint(X, Y));
 
-  if FMouseDown then
-  begin
-    // Compensate the mousemovent with the zoom factor so the image moves at
-    // the same rate as the mouse
-
-    ViewPort := SVG2Image1.ClientRect;
-
-    Zoom := CalcZoomFactor;
-
-    Delta := Point(FMousePt.X - X, FMousePt.Y - Y);
-
-    // Calculate the new viewport position.
-
-    FViewBox.Left := FViewBox.Left + Delta.X * Zoom;
-    FViewBox.Right := FViewBox.Right + Delta.X * Zoom;
-    FViewBox.Top := FViewBox.Top + Delta.Y * Zoom;
-    FViewBox.Bottom := FViewBox.Bottom + Delta.Y * Zoom;
-
-    // Save the new mousedown position
-
-    FMousePt := Point(X, Y);
-
-    // Set the new viewBox and repaint the SVG image.
-
-    SVGRepaint;
-  end;
+  ShowState;
 end;
 
 procedure TForm1.SVG2Image1MouseUp(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
 begin
-  FMousePt := Point(0, 0);
-  FMouseDown := False;
+  // Right click brings what was clicked to the middle. The view moves by the
+  // distance from the click to the middle, in pixels of the control, which is
+  // what PanBy takes.
 
-  if (mbRight = Button) then
-    CenterOnMousePt(Point(X, Y));
+  if Button = mbRight then
+    SVG2Image1.PanBy(
+      SVG2Image1.ClientWidth / 2 - X,
+      SVG2Image1.ClientHeight / 2 - Y);
 end;
 
-procedure TForm1.SVGRepaint;
-var
-  SVG: ISVG;
+procedure TForm1.SVG2Image1ViewChanged(Sender: TObject);
 begin
-  // Get the outer SVG element
+  // Occurs however the view changed - the wheel, a drag, or any of the
+  // methods.
 
-  if not assigned(SVG2Image1.SVGRoot) then
-    Exit;
+  ShowState;
+end;
 
-  SVG := SVG2Image1.SVGRoot.SVG;
-
-  if not assigned(SVG) then
-    Exit;
-
-  // Set the viewBox attribute on the outer SVG element
-
-  SVG.ViewBox := FViewBox;
-  SVG2Image1.Repaint;
+procedure TForm1.ShowState;
+begin
+  Caption := Format(
+    'Zoom %.2fx   pointer at %.1f %.1f   ' +
+    '[wheel] zoom  [drag] pan  [right click] centre  ' +
+    '[F] fit  [R] reset  [double click] open',
+    [SVG2Image1.ZoomFactor, FPointer.X, FPointer.Y]);
 end;
 
 end.
