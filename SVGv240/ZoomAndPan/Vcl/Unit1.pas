@@ -22,6 +22,13 @@ unit Unit1;
     ResetView     back to how it was loaded
     ClientToSVG   a point on the control as a point in the drawing
 
+  A drawing with a filter on it needs an off screen buffer per filter
+  primitive, and those grow with the zoom. FilterBufferMaxPixels, on the
+  control, is the number of pixels one of them may take: past that the filter
+  is rendered at a lower resolution and scaled up, which costs sharpness but
+  keeps zooming in bounded instead of failing. Eight megapixels by default,
+  zero for no limit.
+
   The wheel is handled on the form rather than by the control, because a
   TSVG2Image has no window of its own and so is never sent the wheel message.
   One line passes it on.

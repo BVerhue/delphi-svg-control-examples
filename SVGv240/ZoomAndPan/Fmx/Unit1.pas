@@ -28,6 +28,13 @@ unit Unit1;
     ResetView     back to how it was loaded
     ClientToSVG   a point on the control as a point in the drawing
 
+  A drawing with a filter on it needs an off screen buffer per filter
+  primitive, and those grow with the zoom. FilterBufferMaxPixels, on the
+  control, is the number of pixels one of them may take: past that the filter
+  is rendered at a lower resolution and scaled up, which costs sharpness but
+  keeps zooming in bounded instead of failing. Eight megapixels by default,
+  zero for no limit.
+
   Set the following properties:
 
     On SVG2Control1
