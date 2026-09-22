@@ -30,6 +30,8 @@
 //   attributes    positions, sizes, colours and transforms
 //   text          the numbers under the gauges and the plant status
 //
+// Requires Delphi SVG Package 2.4 update 25 or later.
+//
 // B.J.H. Verhue
 //
 // -----------------------------------------------------------------------------

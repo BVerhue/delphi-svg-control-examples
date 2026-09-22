@@ -13,6 +13,8 @@ unit Unit1;
   drawing - a scale and a translation - so nothing here touches the document,
   and the SVG that was loaded is still exactly the SVG that was loaded.
 
+  Requires Delphi SVG Package 2.4 update 25 or later.
+
     ZoomByWheel   one turn of the wheel, about a point on the control
     MousePan      dragging with the left button moves the view
     PanBy         moves the view by so many pixels of the control
