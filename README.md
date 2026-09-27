@@ -9,7 +9,7 @@ This repository contains some example projects for the SVG control package, thes
 
 ## Versions
 
-The examples in SVGv240 need Delphi SVG Package 2.4 update 25 or later, full or demo. ZoomAndPan, DataBinding and RenderToEMF use functionality that does not exist in earlier updates: zoom and pan on the controls, the SVGBindings collection, and EMF export through BVE.SVG2ExportEMF.Vcl. ZoomAndPan also mentions FilterBufferMaxPixels, which is new in update 25.
+The examples in SVGv240 need Delphi SVG Package 2.4 update 25 or later, full or demo. ZoomAndPan, DataBinding and RenderToEMF use functionality that does not exist in earlier updates: zoom and pan on the controls, the SVGBindings collection, and EMF export through BVE.SVG2ExportEMF.Vcl. ZoomAndPan also mentions FilterBufferMaxPixels, which is new in update 25. ZoomAndPan\Fpc is the same for Lazarus: the FPC controls have zoom and pan, SVGBindings and FilterBufferMaxPixels from update 25 on as well.
 
 For update 24 or earlier, use the examples as they were at tag v2.4-update24.
 

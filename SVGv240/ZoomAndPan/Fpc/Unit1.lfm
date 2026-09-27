@@ -1,0 +1,30 @@
+object Form1: TForm1
+  Left = 300
+  Height = 440
+  Top = 200
+  Width = 660
+  Caption = 'Form1'
+  ClientHeight = 440
+  ClientWidth = 660
+  KeyPreview = True
+  OnCreate = FormCreate
+  OnKeyDown = FormKeyDown
+  OnMouseWheel = FormMouseWheel
+  object SVG2Image1: TSVG2Image
+    Left = 0
+    Height = 440
+    Top = 0
+    Width = 660
+    Align = alClient
+    OnDblClick = SVG2Image1DblClick
+    OnMouseMove = SVG2Image1MouseMove
+    OnMouseUp = SVG2Image1MouseUp
+    AutoViewbox = True
+    OnViewChanged = SVG2Image1ViewChanged
+  end
+  object OpenDialog1: TOpenDialog
+    Filter = 'SVG files|*.svg;*.svgz|All files|*.*'
+    Left = 32
+    Top = 32
+  end
+end
