@@ -22,6 +22,7 @@ unit Unit1;
     ZoomToFit     fits everything the drawing paints
     ResetView     back to how it was loaded
     ClientToSVG   a point on the control as a point in the drawing
+    ZoomToElement zooms so that an element fills the control (Ctrl+click)
 
   The drawing has a blurred shadow. A filter needs an off screen buffer per
   filter primitive, and those grow with the zoom. FilterBufferMaxPixels, on
@@ -61,6 +62,7 @@ uses
   Dialogs,
   LCLType,
   BVE.SVG2Types,
+  BVE.SVG2Intf,
   BVE.SVG2Control.FPC,
   BVE.SVG2Image.FPC;
 
@@ -86,6 +88,7 @@ type
                                                 // in the drawing
 
     procedure ShowState;
+    function IdAt(const aX, aY: Single): string;
   end;
 
 var
@@ -106,8 +109,8 @@ const
     '<feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>' +
     '</filter></defs>' +
     '<rect width="600" height="400" fill="#e8f0e0"/>' +
-    '<path d="M0 330 C150 300 300 360 600 320 L600 400 L0 400 Z" fill="#9cc3e6"/>' +
-    '<g filter="url(#shadow)">' +
+    '<path id="river" d="M0 330 C150 300 300 360 600 320 L600 400 L0 400 Z" fill="#9cc3e6"/>' +
+    '<g id="building" filter="url(#shadow)">' +
     '<rect x="160" y="80" width="280" height="180" fill="#f4f4f4" stroke="#555" stroke-width="3"/>' +
     '<line x1="300" y1="80" x2="300" y2="260" stroke="#555" stroke-width="2"/>' +
     '<line x1="160" y1="170" x2="300" y2="170" stroke="#555" stroke-width="2"/>' +
@@ -116,7 +119,7 @@ const
     '<text x="230" y="220" font-family="Arial" font-size="14" text-anchor="middle">Store</text>' +
     '<text x="370" y="175" font-family="Arial" font-size="14" text-anchor="middle">Workshop</text>' +
     '<text x="300" y="370" font-family="Arial" font-size="12" text-anchor="middle" fill="#2a5d8a">River</text>' +
-    '<circle cx="80" cy="120" r="30" fill="#6aa84f"/><circle cx="520" cy="110" r="24" fill="#6aa84f"/>' +
+    '<circle id="tree1" cx="80" cy="120" r="30" fill="#6aa84f"/><circle id="tree2" cx="520" cy="110" r="24" fill="#6aa84f"/>' +
     '</svg>';
 
 procedure TForm1.FormCreate(Sender: TObject);
@@ -209,7 +212,21 @@ end;
 
 procedure TForm1.SVG2Image1MouseUp(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
+var
+  Id: string;
 begin
+  // Ctrl+click zooms to what was clicked, with a tenth of its size free
+  // around it. ZoomToElement takes an id, so the nearest element with one is
+  // used: a shape often has no id of its own, the group it belongs to does.
+
+  if (Button = mbLeft) and (ssCtrl in Shift) then
+  begin
+    Id := IdAt(X, Y);
+    if Id <> '' then
+      SVG2Image1.ZoomToElement(Id, 0.1);
+    Exit;
+  end;
+
   // Right click brings what was clicked to the middle. The view moves by the
   // distance from the click to the middle, in pixels of the control, which is
   // what PanBy takes.
@@ -228,11 +245,28 @@ begin
   ShowState;
 end;
 
+// The id of the element under a point on the control, or of the nearest
+// element around it that has one; empty when there is none
+function TForm1.IdAt(const aX, aY: Single): string;
+var
+  Node: IXMLNode;
+  Obj: ISVGObject;
+begin
+  Result := '';
+  Node := SVG2Image1.ObjectAtPt(SVGPoint(aX, aY), False);
+  while Assigned(Node) do
+  begin
+    if Supports(Node, ISVGObject, Obj) and (Obj.ID <> '') then
+      Exit(Obj.ID);
+    Node := Node.ParentNode;
+  end;
+end;
+
 procedure TForm1.ShowState;
 begin
   Caption := Format(
     'Zoom %.2fx   pointer at %.1f %.1f   ' +
-    '[wheel] zoom  [drag] pan  [right click] centre  ' +
+    '[wheel] zoom  [drag] pan  [right click] centre  [ctrl+click] zoom to it  ' +
     '[F] fit  [R] reset  [double click] open',
     [SVG2Image1.ZoomFactor, FPointer.X, FPointer.Y]);
 end;

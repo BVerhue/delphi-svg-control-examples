@@ -21,6 +21,7 @@ unit Unit1;
     ZoomToFit     fits everything the drawing paints
     ResetView     back to how it was loaded
     ClientToSVG   a point on the control as a point in the drawing
+    ZoomToElement zooms so that an element fills the control (Ctrl+click)
 
   A drawing with a filter on it needs an off screen buffer per filter
   primitive, and those grow with the zoom. FilterBufferMaxPixels, on the
@@ -53,6 +54,7 @@ uses
   System.Variants,
   System.Classes,
   System.Types,
+  Xml.XMLIntf,
   Vcl.Graphics,
   Vcl.Controls,
   Vcl.Forms,
@@ -82,6 +84,7 @@ type
                                                 // in the drawing
 
     procedure ShowState;
+    function IdAt(const aX, aY: Single): string;
   public
     { Public declarations }
   end;
@@ -181,7 +184,21 @@ end;
 
 procedure TForm1.SVG2Image1MouseUp(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
+var
+  Id: string;
 begin
+  // Ctrl+click zooms to what was clicked, with a tenth of its size free
+  // around it. ZoomToElement takes an id, so the nearest element with one is
+  // used: a shape often has no id of its own, the group it belongs to does.
+
+  if (Button = mbLeft) and (ssCtrl in Shift) then
+  begin
+    Id := IdAt(X, Y);
+    if Id <> '' then
+      SVG2Image1.ZoomToElement(Id, 0.1);
+    Exit;
+  end;
+
   // Right click brings what was clicked to the middle. The view moves by the
   // distance from the click to the middle, in pixels of the control, which is
   // what PanBy takes.
@@ -200,11 +217,28 @@ begin
   ShowState;
 end;
 
+// The id of the element under a point on the control, or of the nearest
+// element around it that has one; empty when there is none
+function TForm1.IdAt(const aX, aY: Single): string;
+var
+  Node: IXMLNode;
+  Obj: ISVGObject;
+begin
+  Result := '';
+  Node := SVG2Image1.ObjectAtPt(SVGPoint(aX, aY), False);
+  while Assigned(Node) do
+  begin
+    if Supports(Node, ISVGObject, Obj) and (Obj.ID <> '') then
+      Exit(Obj.ID);
+    Node := Node.ParentNode;
+  end;
+end;
+
 procedure TForm1.ShowState;
 begin
   Caption := Format(
     'Zoom %.2fx   pointer at %.1f %.1f   ' +
-    '[wheel] zoom  [drag] pan  [right click] centre  ' +
+    '[wheel] zoom  [drag] pan  [right click] centre  [ctrl+click] zoom to it  ' +
     '[F] fit  [R] reset  [double click] open',
     [SVG2Image1.ZoomFactor, FPointer.X, FPointer.Y]);
 end;
