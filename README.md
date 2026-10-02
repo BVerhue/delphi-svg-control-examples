@@ -13,6 +13,10 @@ The examples in SVGv240 need Delphi SVG Package 2.4 update 25 or later, full or 
 
 For update 24 or earlier, use the examples as they were at tag v2.4-update24.
 
+## The viewer
+
+SVGv240\Viewer has one source for every Delphi version: Vcl for Delphi XE2 and later, Fmx for Delphi XE8 and later. Open SVGViewer.dpr or SVGViewerFMX.dpr; the IDE creates the project file the first time. FPC holds the Lazarus version.
+
 The demo packages, license info and other info can be found on the website: https://www.bverhue.nl/delphisvg/
 
 The online help can be found here: https://www.bverhue.nl/SVGDoc23/Delphi%20SVG%20control%20version%202_3.html

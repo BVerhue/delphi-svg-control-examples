@@ -101,3 +101,10 @@ lib/
 
 # Packaged example archives (e.g. ZoomAndPan.zip) - built for distribution, not source
 *.zip
+
+# Viewer: one source for every Delphi version. Each IDE makes its own project
+# file when the .dpr is opened, so none is kept here.
+SVGv240/Viewer/Vcl/*.dproj
+SVGv240/Viewer/Vcl/*.deployproj
+SVGv240/Viewer/Fmx/*.dproj
+SVGv240/Viewer/Fmx/*.deployproj
