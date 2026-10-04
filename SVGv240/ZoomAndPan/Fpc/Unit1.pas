@@ -24,12 +24,17 @@ unit Unit1;
     ClientToSVG   a point on the control as a point in the drawing
     ZoomToElement zooms so that an element fills the control (Ctrl+click)
 
-  The drawing has a blurred shadow. A filter needs an off screen buffer per
-  filter primitive, and those grow with the zoom. FilterBufferMaxPixels, on
-  the control, is the number of pixels one of them may take: past that the
-  filter is rendered at a lower resolution and scaled up, which costs
-  sharpness but keeps zooming in bounded instead of failing. Eight megapixels
-  by default, zero for no limit.
+  The drawing, a blueprint, is in the SVG property of the control in the
+  form. Ctrl+click the reactor core, the nozzle coils or the turbine to zoom
+  to it. The dimension and callout lines use vector-effect
+  non-scaling-stroke, so they stay hairlines at any zoom.
+
+  The reactor core and the exhaust plume glow. A filter needs an off screen
+  buffer per filter primitive, and those grow with the zoom.
+  FilterBufferMaxPixels, on the control, is the number of pixels one of them
+  may take: past that the filter is rendered at a lower resolution and scaled
+  up, which costs sharpness but keeps zooming in bounded instead of failing.
+  Eight megapixels by default, zero for no limit.
 
   The wheel is handled on the form rather than by the control, because a
   TSVG2Image has no window of its own and so is never sent the wheel. The LCL
@@ -98,34 +103,8 @@ implementation
 
 {$R *.lfm}
 
-const
-  // A site plan with a shadow under the building, so the filter is there to
-  // zoom into
-  Drawing =
-    '<svg xmlns="http://www.w3.org/2000/svg" width="600" height="400" viewBox="0 0 600 400">' +
-    '<defs><filter id="shadow" x="-10%" y="-10%" width="130%" height="130%">' +
-    '<feGaussianBlur in="SourceAlpha" stdDeviation="6"/>' +
-    '<feOffset dx="8" dy="8" result="blur"/>' +
-    '<feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>' +
-    '</filter></defs>' +
-    '<rect width="600" height="400" fill="#e8f0e0"/>' +
-    '<path id="river" d="M0 330 C150 300 300 360 600 320 L600 400 L0 400 Z" fill="#9cc3e6"/>' +
-    '<g id="building" filter="url(#shadow)">' +
-    '<rect x="160" y="80" width="280" height="180" fill="#f4f4f4" stroke="#555" stroke-width="3"/>' +
-    '<line x1="300" y1="80" x2="300" y2="260" stroke="#555" stroke-width="2"/>' +
-    '<line x1="160" y1="170" x2="300" y2="170" stroke="#555" stroke-width="2"/>' +
-    '</g>' +
-    '<text x="230" y="130" font-family="Arial" font-size="14" text-anchor="middle">Office</text>' +
-    '<text x="230" y="220" font-family="Arial" font-size="14" text-anchor="middle">Store</text>' +
-    '<text x="370" y="175" font-family="Arial" font-size="14" text-anchor="middle">Workshop</text>' +
-    '<text x="300" y="370" font-family="Arial" font-size="12" text-anchor="middle" fill="#2a5d8a">River</text>' +
-    '<circle id="tree1" cx="80" cy="120" r="30" fill="#6aa84f"/><circle id="tree2" cx="520" cy="110" r="24" fill="#6aa84f"/>' +
-    '</svg>';
-
 procedure TForm1.FormCreate(Sender: TObject);
 begin
-  SVG2Image1.SVG.Text := Drawing;
-
   // Dragging with the left button moves the view. Off by default, because a
   // control that starts moving when an application meant to click on it would
   // be a surprise.
