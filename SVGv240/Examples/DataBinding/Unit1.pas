@@ -8,6 +8,9 @@
 // in it moves by itself. Every level, needle, colour and readout is written by
 // this application through the SVGBindings collection the control publishes.
 //
+// The drawing is shown in a TSVG2WinControl, which renders with Direct2D into
+// its own window, through Direct3D 11 where available.
+//
 // What the example shows:
 //
 //   by id         a single element: a tank level, a gauge needle, a readout
@@ -45,12 +48,12 @@ uses
   BVE.SVG2Types,
   BVE.SVG2Intf,
   BVE.SVG2Bindings,
-  BVE.SVG2Image.VCL;
+  BVE.SVG2Control.VCL;
 
 type
   TForm1 = class(TForm)
     pnlControls: TPanel;
-    SVG2Image1: TSVG2Image;
+    SVG2WinControl1: TSVG2WinControl;
     Timer1: TTimer;
     lblTemp: TLabel;
     tbTemp: TTrackBar;
@@ -198,7 +201,7 @@ begin
 
     if FileExists(FileName) then
     begin
-      SVG2Image1.SVG.LoadFromFile(FileName);
+      SVG2WinControl1.SVG.LoadFromFile(FileName);
       Exit;
     end;
 
@@ -212,7 +215,7 @@ procedure TForm1.CreateBindings;
 var
   Bindings: TSVGBindingCollection;
 begin
-  Bindings := SVG2Image1.SVGBindings;
+  Bindings := SVG2WinControl1.SVGBindings;
 
   // --- by id, writing an attribute -----------------------------------------
   //
@@ -284,9 +287,9 @@ begin
   // switch to make while the drawing is running.
 
   if cbBuffers.Checked then
-    SVG2Image1.RenderOptions := SVG2Image1.RenderOptions + [sroPersistentBuffers]
+    SVG2WinControl1.RenderOptions := SVG2WinControl1.RenderOptions + [sroPersistentBuffers]
   else
-    SVG2Image1.RenderOptions := SVG2Image1.RenderOptions - [sroPersistentBuffers];
+    SVG2WinControl1.RenderOptions := SVG2WinControl1.RenderOptions - [sroPersistentBuffers];
 
   FRenderTotal := 0;
   FRenderCount := 0;
@@ -458,7 +461,7 @@ begin
   // what makes the time below the time of one frame.
 
   Watch := TStopwatch.StartNew;
-  SVG2Image1.Repaint;
+  SVG2WinControl1.Repaint;
   Watch.Stop;
 
   FRenderTotal := FRenderTotal + Watch.Elapsed.TotalMilliseconds;

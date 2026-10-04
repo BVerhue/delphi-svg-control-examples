@@ -90,7 +90,7 @@ object Form1: TForm1
       AutoSize = False
       Caption =
         'Every control on this panel writes to the drawing through the SVG' +
-        'Bindings collection of the image. Levels, needles and colours are' +
+        'Bindings collection of the control. Levels, needles and colours are' +
         ' attributes; the numbers under the gauges and the plant status ar' +
         'e the text content of an element.'#13#10#13#10'The pipes are driven by cl' +
         'ass and the instrument bubbles by their data-tag attribute. The a' +
@@ -237,7 +237,7 @@ object Form1: TForm1
       OnClick = ControlChanged
     end
   end
-  object SVG2Image1: TSVG2Image
+  object SVG2WinControl1: TSVG2WinControl
     Left = 0
     Top = 0
     Width = 988
@@ -245,10 +245,6 @@ object Form1: TForm1
     Align = alClient
     AutoViewbox = True
     RenderOptions = [sroClippath, sroFilters, sroPersistentBuffers]
-    Padding.Left = 8
-    Padding.Top = 8
-    Padding.Right = 8
-    Padding.Bottom = 8
   end
   object Timer1: TTimer
     Enabled = False
