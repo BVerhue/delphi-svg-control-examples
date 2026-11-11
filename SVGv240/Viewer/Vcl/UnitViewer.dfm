@@ -12,7 +12,6 @@ object Form1: TForm1
   Font.Style = []
   KeyPreview = True
   OnCreate = FormCreate
-  PixelsPerInch = 96
   TextHeight = 13
   object ScrollBox1: TScrollBox
     Left = 0
@@ -31,7 +30,6 @@ object Form1: TForm1
     ParentDoubleBuffered = False
     ParentFont = False
     TabOrder = 0
-    ExplicitWidth = 839
   end
   object ActionToolBar1: TActionToolBar
     Left = 0
@@ -41,7 +39,7 @@ object Form1: TForm1
     ActionManager = ActionManager1
     Caption = 'ActionToolBar1'
     Color = clMenuBar
-    ColorMap.DisabledFontColor = 7171437
+    ColorMap.DisabledFontColor = 10461087
     ColorMap.HighlightColor = clWhite
     ColorMap.BtnSelectedFont = clBlack
     ColorMap.UnusedColor = clWhite
@@ -52,7 +50,6 @@ object Form1: TForm1
     Font.Style = []
     ParentFont = False
     Spacing = 0
-    ExplicitWidth = 839
   end
   object StatusBar1: TStatusBar
     Left = 0
@@ -61,7 +58,6 @@ object Form1: TForm1
     Height = 19
     Panels = <>
     SimplePanel = True
-    ExplicitWidth = 839
   end
   object Panel1: TPanel
     Left = 0
@@ -71,7 +67,6 @@ object Form1: TForm1
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 3
-    ExplicitWidth = 839
     object lblTime: TLabel
       AlignWithMargins = True
       Left = 757
@@ -95,7 +90,6 @@ object Form1: TForm1
       Max = 10000
       Frequency = 1000
       TabOrder = 0
-      ExplicitWidth = 627
     end
     object ToolBar1: TToolBar
       Left = 0
@@ -138,7 +132,6 @@ object Form1: TForm1
     Color = clBtnShadow
     ParentBackground = False
     TabOrder = 4
-    ExplicitWidth = 839
     object Label1: TLabel
       Left = 9
       Top = 8
@@ -257,6 +250,7 @@ object Form1: TForm1
           end
           item
             Action = aPrint
+            Caption = 'Pr&int'
             ImageIndex = 15
           end
           item

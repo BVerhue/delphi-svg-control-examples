@@ -64,12 +64,15 @@ uses
   System.SysUtils,
   System.Variants,
   System.Classes,
-  {$IFDEF Ver240Up} // XE3
+  // CompilerVersion rather than Ver240Up/Ver290Up: the IDE does not see the
+  // defines of DemoAppCompilerSettings.inc, so it took these blocks as off
+  // and added both units again on every save and compile.
+  {$IF CompilerVersion >= 24} // XE3
   System.Actions,
-  {$ENDIF}
-  {$IFDEF Ver290Up} // XE8
+  {$IFEND}
+  {$IF CompilerVersion >= 29} // XE8
   System.ImageList,
-  {$ENDIF}
+  {$IFEND}
   Vcl.Graphics,
   Vcl.Controls,
   Vcl.Forms,
